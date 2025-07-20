@@ -1,0 +1,79 @@
+<!-- Rest of your HTML code remains the same -->
+
+
+<style>
+	body {font-family: Arial, Helvetica, sans-serif;}
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+/* The message box is shown when the user clicks on the password field */
+#message {
+  display:none;
+  background: #f1f1f1;
+  color: #000;
+  position: relative;
+  padding: 25px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+#message p {
+  padding: 10px 30px;
+  font-size: 18px;
+}
+
+/* Add a green text color and a checkmark when the requirements are right */
+.valid {
+  color: green;
+}
+
+.valid:before {
+  position: relative;
+  left: -35px;
+  content: "✔";
+}
+
+/* Add a red text color and an "x" when the requirements are wrong */
+.invalid {
+  color: red;
+}
+
+.invalid:before {
+  position: relative;
+  left: -35px;
+  content: "✖";
+}
+<!-- emp id check-->
+<!-- /*Styling for errors on form*/
+.form_error span {
+  width: 80%;
+  height: 35px;
+  margin: 3px 10%;
+  font-size: 1.1em;
+  color: #D83D5A;
+}
+.form_error input {
+  border: 1px solid #D83D5A;
+}
+
+/*Styling in case no errors on form*/
+.form_success span {
+  width: 80%;
+  height: 35px;
+  margin: 3px 10%;
+  font-size: 1.1em;
+  color: green;
+}
+.form_success input {
+  border: 1px solid green;
+}
+#error_msg {
+  color: red;
+  text-align: center;
+  margin: 10px auto;
+}
+
+</style>
