@@ -22,28 +22,34 @@ if (isset($_POST['submit'])) {
 $conditions = [];
 
 $training_do_or_not = mysqli_real_escape_string($conn, $_POST['training_do_or_not']);
+//$training_title = mysqli_real_escape_string($conn, $_POST['training_title']);
 
-$training_title = mysqli_real_escape_string($conn, $_POST['training_title']);
 
 if ($training_do_or_not === 'do') {
 // Filter by training title
 if (!empty($_POST['training_title'])) {
-    //$training_title = mysqli_real_escape_string($conn, $_POST['training_title']);
+    $training_title = mysqli_real_escape_string($conn, $_POST['training_title']);
     $conditions[] = "o.training_title = '$training_title'";
-}
-}else{
-  // Filter by training title
-if (!empty($_POST['training_title'])) {
-    //$training_title = mysqli_real_escape_string($conn, $_POST['training_title']);
-    $conditions[] = "o.training_title != '$training_title'";
-    }  
-}
-
-// Filter by training type
-if (!empty($_POST['training_type'])) {
+    }
+    if (!empty($_POST['training_type'])) {
     $training_type = mysqli_real_escape_string($conn, $_POST['training_type']);
     $conditions[] = "o.training_type = '$training_type'";
 }
+}
+else{
+  // Filter by training title
+if (!empty($_POST['training_title'])) {
+    $training_title = mysqli_real_escape_string($conn, $_POST['training_title']);
+    $conditions[] = "o.training_title != '$training_title'";
+    }  
+    if (!empty($_POST['training_type'])) {
+    $training_type = mysqli_real_escape_string($conn, $_POST['training_type']);
+    $conditions[] = "o.training_type != '$training_type'";
+}
+}
+
+// Filter by training type
+
 
 // Filter by place of posting
 if (!empty($_POST['place_of_posting'])) {

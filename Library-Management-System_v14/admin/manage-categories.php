@@ -53,83 +53,9 @@ header('location:manage-categories.php');
     </style>
 </head>
 <body>
-    <!------MENU SECTION START-->
-    <?php //include('includes/header.php');?>
+<?php include('includes/navbar.php');?>
+    
     <!-- MENU SECTION END-->
-
-<!-- Navbar Section -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-        <a class="navbar-brand bg-white rounded" href="dashboard.php">
-            <img src="assets/img/logo5556.png" alt="Logo" height="40">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarMenu">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a href="dashboard.php" class="nav-link active">Dashboard</a>
-                </li>
-
-                <!-- Categories Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Categories
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoriesDropdown">
-                        <li><a class="dropdown-item" href="add-category.php">Add Category</a></li>
-                        <li><a class="dropdown-item" href="manage-categories.php">Manage Categories</a></li>
-                    </ul>
-                </li>
-
-                <!-- Authors Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="authorsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Authors
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authorsDropdown">
-                        <li><a class="dropdown-item" href="add-author.php">Add Author</a></li>
-                        <li><a class="dropdown-item" href="manage-authors.php">Manage Authors</a></li>
-                    </ul>
-                </li>
-
-                <!-- Books Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Books
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="booksDropdown">
-                        <li><a class="dropdown-item" href="add-book.php">Add Book</a></li>
-                        <li><a class="dropdown-item" href="manage-books.php">Manage Books</a></li>
-
-                    </ul>
-                </li>
-
-                <!-- Issue Books Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="issueDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Issue Books
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="issueDropdown">
-                        <li><a class="dropdown-item" href="issue-book.php">Issue New Book</a></li>
-                        <li><a class="dropdown-item" href="manage-issued-books.php">Manage Issued Books</a></li>
-                         <li><a class="dropdown-item" href="not-return-books.php">Not Return Books</a></li>
-                    </ul>
-                </li>
-
-                <!-- Other Links -->
-                <li class="nav-item"><a class="nav-link" href="std_signup.php">Registration</a></li>
-                <li class="nav-item"><a class="nav-link" href="reg-students.php">Registered Students</a></li>
-                <!-- <li class="nav-item"><a class="nav-link" href="change-password.php">Change Password</a></li> -->
-                <li class="nav-item"><a class="nav-link" href="inactive_process.php">Inactive/Active Process</a></li>
-
-                <li class="nav-item"><a class="nav-link btn btn-danger text-white ms-2" href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
     
     <div class="content-wrapper">
         <div class="container">

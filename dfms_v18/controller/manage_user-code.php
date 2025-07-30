@@ -1,4 +1,5 @@
 <?php 
+session_name('dfms');
 session_start();
 // $table=$_SESSION['username'];
 // $user_type=$_SESSION['user_type'];

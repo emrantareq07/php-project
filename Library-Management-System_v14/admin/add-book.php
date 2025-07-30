@@ -142,14 +142,14 @@ if (isset($_POST['add'])) {
             </div>
     <div class="col-md-4">
     <div class="form-group">
-        <label class="form-label">ISBN/ISSN<span style="color:red;">*</span></label>
+        <label class="form-label">ISBN/ISSN<span style="color:red;"></span></label>
         <input list="isbns" 
                type="text" 
                class="form-control" 
                id="isbn" 
                name="isbn" 
                placeholder="Enter ISBN" 
-               required>
+               >
         <datalist id="isbns">
             <?php
                 $sql = "SELECT isbn FROM tblbooks";
@@ -176,8 +176,8 @@ if (isset($_POST['add'])) {
               </div></div>
             <div class="col-md-2">
                <div class="form-group">
-              <label for="book_no" class="form-label">Book NO. <span style="color:red;">*</span></label>
-              <input class="form-control" type="text" name="book_no" id="book_no" placeholder="Book No." autocomplete="on" required />
+              <label for="book_no" class="form-label">Book NO. <span style="color:red;"></span></label>
+              <input class="form-control" type="text" name="book_no" id="book_no" placeholder="Book No." autocomplete="on"  />
             </div>
           </div>  
           </div>           

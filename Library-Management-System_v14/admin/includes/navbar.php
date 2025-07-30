@@ -1,141 +1,100 @@
-
 <!-- Navbar Section -->
-<nav class="navbar navbar-expand-lg navbar-primary bg-primary py-3">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
     <div class="container">
-        <a class="navbar-brand" href="dashboard.php">
+        <!-- Brand Logo -->
+        <a class="navbar-brand bg-white rounded" href="dashboard.php">
             <img src="assets/img/logo5556.png" alt="Logo" height="40">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
+        
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Navbar Menu -->
         <div class="collapse navbar-collapse" id="navbarMenu">
             <ul class="navbar-nav ms-auto">
+                <!-- Home Link -->
                 <li class="nav-item">
-                    <a href="dashboard.php" class="nav-link">Dashboard</a>
+                    <a href="dashboard.php" class="nav-link active"><i class="fas fa-home me-1"></i> Home</a>
                 </li>
 
-                <!-- Categories -->
+                <!-- Categories Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown">
-                        Categories
+                    <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-list me-1"></i> Categories
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
-                        <li><a class="dropdown-item" href="add-category.php">Add Category</a></li>
-                        <li><a class="dropdown-item" href="manage-categories.php">Manage Categories</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="categoriesDropdown">
+                        <li><a class="dropdown-item" href="add-category.php"><i class="fas fa-plus me-1"></i>Add Category</a></li>
+                        <li><a class="dropdown-item" href="manage-categories.php"><i class="fas fa-tasks me-1"></i>Manage Categories</a></li>
                     </ul>
                 </li>
 
-                <!-- Authors -->
+                <!-- Authors Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="authorsDropdown" role="button" data-bs-toggle="dropdown">
-                        Authors
+                    <a class="nav-link dropdown-toggle" href="#" id="authorsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-edit me-1"></i> Authors
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="authorsDropdown">
-                        <li><a class="dropdown-item" href="add-author.php">Add Author</a></li>
-                        <li><a class="dropdown-item" href="manage-authors.php">Manage Authors</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="authorsDropdown">
+                        <li><a class="dropdown-item" href="add-author.php"><i class="fas fa-plus me-1"></i>Add Author</a></li>
+                        <li><a class="dropdown-item" href="manage-authors.php"><i class="fas fa-tasks me-1"></i>Manage Authors</a></li>
                     </ul>
                 </li>
 
-                <!-- Books -->
+                <!-- Books Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown">
-                        Books
+                    <a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-book me-1"></i> Books
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="booksDropdown">
-                        <li><a class="dropdown-item" href="add-book.php">Add Book</a></li>
-                        <li><a class="dropdown-item" href="manage-books.php">Manage Books</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="booksDropdown">
+                        <li><a class="dropdown-item" href="add-book.php"><i class="fas fa-plus me-1"></i>Add Book</a></li>
+                        <li><a class="dropdown-item" href="manage-books.php"><i class="fas fa-tasks me-1"></i>Manage Books</a></li>
                     </ul>
                 </li>
 
-                <!-- Issue Books -->
+                <!-- Issue Books Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="issueDropdown" role="button" data-bs-toggle="dropdown">
-                        Issue Books
+                    <a class="nav-link dropdown-toggle" href="#" id="issueDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-exchange-alt me-1"></i> Issue Books
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="issueDropdown">
-                        <li><a class="dropdown-item" href="issue-book.php">Issue New Book</a></li>
-                        <li><a class="dropdown-item" href="manage-issued-books.php">Manage Issued Books</a></li>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="issueDropdown">
+                        <li><a class="dropdown-item" href="issue-book.php"><i class="fas fa-plus me-1"></i> Issue New Book</a></li>
+                        <li><a class="dropdown-item" href="manage-issued-books.php"><i class="fas fa-tasks me-1"></i> Manage Issued Books</a></li>
+                        <li><a class="dropdown-item" href="not-return-books.php"><i class="fas fa-exclamation-circle me-1"></i> Not Returned Books</a></li>
                     </ul>
                 </li>
 
                 <!-- Other Links -->
-                <li class="nav-item"><a class="nav-link" href="std_signup.php">Registration</a></li>
-                <li class="nav-item"><a class="nav-link" href="reg-students.php">Reg Students</a></li>
-                <li class="nav-item"><a class="nav-link" href="change-password.php">Change Password</a></li>
-                <li class="nav-item"><a class="nav-link btn btn-danger text-danger" href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="std_signup.php"><i class="fas fa-user-plus me-1"></i> Registration</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="reg-students.php"><i class="fas fa-users me-1"></i> Registered EMP</a>
+                </li>
+
+                <!-- Settings Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cog me-1"></i> Settings
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
+                        <li>
+                            <form id="downloadForm" action="dawnload_database.php" method="post">
+                                <button class="dropdown-item" type="submit" name="submit">
+                                    <i class="fas fa-download me-1"></i> Download DB
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Logout Button -->
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger ms-lg-2 mt-2 mt-lg-0" href="logout.php">
+                        <i class="fa fa-sign-out me-1"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
 </nav>
-
-<!-- JavaScript Libraries -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/datatables.net@1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<!-- <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#">
-      <img src="assets/img/logo5556.png" height="40" alt="Logo">
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse text-uppercase" id="navbarContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="dashboard.php">Dashboard</a></li>-->
-
-        <!-- Categories Dropdown -->
-        <!-- <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Categories
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
-            <li><a class="dropdown-item" href="add-category.php">Add Category</a></li>
-            <li><a class="dropdown-item" href="manage-categories.php">Manage Categories</a></li>
-          </ul>
-        </li> -->
-
-        <!-- Authors Dropdown -->
-       <!--  <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="authorsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Authors
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="authorsDropdown">
-            <li><a class="dropdown-item" href="add-author.php">Add Author</a></li>
-            <li><a class="dropdown-item" href="manage-authors.php">Manage Authors</a></li>
-          </ul>
-        </li> -->
-
-        <!-- Books Dropdown -->
-       <!--  <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="booksDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Books
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="booksDropdown">
-            <li><a class="dropdown-item" href="add-book.php">Add Book</a></li>
-            <li><a class="dropdown-item" href="manage-books.php">Manage Books</a></li>
-          </ul>
-        </li> -->
-
-        <!-- Issue Books Dropdown -->
-       <!--  <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="issueDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Issue Books
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="issueDropdown">
-            <li><a class="dropdown-item" href="issue-book.php">Issue New Book</a></li>
-            <li><a class="dropdown-item" href="manage-issued-books.php">Manage Issued Books</a></li>
-          </ul>
-        </li>
-
-        <li class="nav-item"><a class="nav-link" href="std_signup.php">Registration</a></li>
-        <li class="nav-item"><a class="nav-link" href="reg-students.php">Reg Students</a></li>
-        <li class="nav-item"><a class="nav-link" href="change-password.php">Change Password</a></li>
-        <li class="nav-item"><a class="nav-link text-danger" href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
-      </ul>
-    </div>
-  </div>
-</nav> --> -->

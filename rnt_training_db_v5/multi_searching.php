@@ -80,7 +80,7 @@ include('includes/header.php');
                     <!-- Training Title -->
                     <div class="form-group mb-3">
                         <label for="training_title">Training Title:</label>
-                        <select class="form-control" id="training_title" name="training_title" required>
+                        <select class="form-control" id="training_title" name="training_title">
                             <option value="" disabled selected>--Select--</option>
                             <?php
                                 $sql = "SELECT t_name FROM training_list";

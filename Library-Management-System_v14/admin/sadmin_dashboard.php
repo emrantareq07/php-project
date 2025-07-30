@@ -49,6 +49,7 @@ if (isset($_SESSION['login']) && $_SESSION['login'] != '') {
         </div>
         <div class="col-sm-3 my-5">
              <a href="manage_user.php" class="btn btn-success btn-sm"><i class="fa fa-edit" style="font-size:16px"></i> Manage User</a>
+             <a href="logout.php" class="btn btn-danger btn-sm"><i class="fa fa-sign-out" style="font-size:16px"></i> Logout</a>
         </div>
    </div>
 </div>
