@@ -33,7 +33,7 @@ include('../db/db.php');
 </div>
 	 <div class="col-sm-3 ">
 	 <span class="text-center float-end my-2">
-	<a href="urea_form.php?username=<?= $_SESSION['username'] ?>&user_type=<?= $_SESSION['user_type'] ?>" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Previous Page</a>
+	<a href="urea_form.php" class="btn btn-primary"><i class="fa fa-arrow-left"></i> Previous Page</a>
 	 <a class="btn btn-danger" href="logout.php"><i class="fa fa-sign-out"></i>Logout</a></span>
 	 </div>
 </div><!--end 2nd row-->	

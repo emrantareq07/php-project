@@ -192,9 +192,6 @@ if(isset($_POST['login'])){
                                   </div>
                                   <div class="card-body">
                                     <h6 class="card-title text-muted text-center text-uppercase"> <b> Welcome DFMS Dashboard </b></h6>
-                                    <div style="text-align: center;">
-                                      <img src="bcic_logo.png" alt="BCIC Logo" width="100" height="100">
-                                    </div>
                                     <hr>
                                     <p class="card-text">
                                 <div class="form-left h-100 py-1 px-1">
@@ -215,11 +212,9 @@ if(isset($_POST['login'])){
                                                 </div>
                                             </div>
 
-                                           <div class="col-12 d-grid gap-2 mt-3">
-                                          <button type="submit" name="login" class="btn btn-primary btn-md">
-                                            <i class="fa fa-sign-in me-2"></i> Login
-                                          </button>
-                                        </div>                                             
+                                            <div class="col-12">
+                                                <button type="submit" name="login" class="btn btn-primary px-3 float-start mt-1"><i class="fa fa-sign-in"></i> Login</button>
+                                            </div>                                             
                                     </form>
 
                                 </div>

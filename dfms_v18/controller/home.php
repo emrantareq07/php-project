@@ -367,7 +367,7 @@ if (isset($_POST['hit'])) {
                 $total_year_target += $year_target;
                 $total_month_target += $month_target;
                 ?>
-                <tr class="p-0" style="font-size:6px; padding: 0px;">
+                <tr>
                     <?php if ($is_first_row): ?>
                     <td class="text-center align-middle" rowspan="<?php echo $rowspan; ?>">
                         <?php echo $i++; ?>
@@ -405,7 +405,7 @@ if ($counttable > 1) {
     // Corrected the echo for product_produce with strong tag
     echo '<td class="text-center text-uppercase" style="font-size:10px;"><strong>' . htmlspecialchars($product_produce ?? '', ENT_QUOTES, 'UTF-8') . '</strong></td>';
     // Corrected the echo for product_produce with strong tag
-    echo '<td class="text-center" style="font-size:10px;"><strong>' . (($row['product_produce'] ?? null) != 'Sheet Glass' ? 'MT' : 'L.Sq.M') . '</strong></td>';
+    echo '<td class="text-center"><strong>' . (($row['product_produce'] ?? null) != 'Sheet Glass' ? 'MT' : 'L.Sq.M') . '</strong></td>';
       echo '<td><strong>' . $total_installed_capacity . '</strong></td>';
     // echo '<td>' . $total_attain_capacity . '</td>';
     // Apply strong tag to the total columns as well
@@ -484,7 +484,7 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
                 $total_year_target += $year_target;
                 $total_month_target += $month_target;
                 ?>
-                <tr class="p-0" style="font-size:6px; padding: 0px;">
+                <tr>
                     <?php if ($is_first_row): ?>
                     <td class="text-center align-middle" rowspan="<?php echo $rowspan; ?>">
                         <?php echo $i++; ?>

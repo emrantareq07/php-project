@@ -159,27 +159,13 @@ elseif(isset($_SESSION['submitted'])) {
 	//}
 	if($user_type=='sadmin'){
 		?>
-		<div class="text-center my-4">
-    <div class="d-flex flex-column gap-3 align-items-center">
-        <!-- Edit Record Button -->
-        <a href="view_urea_report.php?username=<?= htmlspecialchars(urlencode($_SESSION['username'] ?? ''), ENT_QUOTES) ?>&user_type=<?= htmlspecialchars(urlencode($_SESSION['user_type'] ?? ''), ENT_QUOTES) ?>" 
-           class="btn btn-warning btn-lg w-75">
-            <i class="fa fa-edit me-2"></i> Edit Record
-        </a>
-        
-        <!-- Manage User Button -->
-        <a href="manage_user.php?username=<?= htmlspecialchars(urlencode($_SESSION['username'] ?? ''), ENT_QUOTES) ?>&user_type=<?= htmlspecialchars(urlencode($_SESSION['user_type'] ?? ''), ENT_QUOTES) ?>" 
-           class="btn btn-warning btn-lg w-75">
-            <i class="fa fa-users-cog me-2"></i> Manage Users
-        </a>
-        
-        <!-- Set Head Name Button -->
-        <a href="set_name.php" class="btn btn-info btn-lg w-75">
-            <i class="fa fa-user-tie me-2"></i> Set Head Name
-        </a>
-    </div>
-</div>
-
+		<h4 class="text-center">
+		<a href="view_urea_report.php?username=<?= $_SESSION['username'] ?>&user_type=<?= $_SESSION['user_type'] ?>" class="btn btn-warning">
+            <i class="fa fa-edit" style="font-size:15px;color:black"></i> Edit Record</a>
+		<a href="manage_user.php?username=<?=$_SESSION['username']?>" class="btn btn-warning"><i class="fa fa-edit" style="font-size:15px;color:black">            
+        </i> Manage User </a>		
+        <a class="btn btn-info" href="set_name.php" ><i class="fa fa-edit"></i> Set Head Name </a>
+        </h4>
 	<?php
 	}
     elseif ($user_type == 'admin') {
@@ -223,28 +209,7 @@ else {
 
 
 <hr>
-<h4 class="text-center">
-    <a class="btn btn-danger" href="logout.php"><i class="fa fa-sign-out"></i>Logout</a>
-    <!-- In your HTML -->
-    <button onclick="cleanReload()" class="btn btn-secondary">
-      <i class="fas fa-sync-alt me-2"></i> Refresh
-    </button>
-
-    <script>
-    function cleanReload() {
-      // Create new URL object
-      const url = new URL(window.location.href);
-      
-      // Remove sensitive parameters
-      ['username', 'user_type'].forEach(param => {
-        url.searchParams.delete(param);
-      });
-      
-      // Reload without parameters (replace in history)
-      window.location.replace(url.toString());
-    }
-    </script>
-</h4>
+<h4 class="text-center"><a class="btn btn-danger" href="logout.php"><i class="fa fa-sign-out"></i>Logout</a></h4>
 </div>
   
   </div>	   
