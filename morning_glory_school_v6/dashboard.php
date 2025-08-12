@@ -73,13 +73,13 @@ if(isset($_SESSION["uid"]) || isset($_COOKIE['user_login'])) {
         </a>
       </p>
       <p>
-        <a href="includes/std_reg_list.php" class="btn btn-success float-end">
+        <a href="includes/student_details.php" class="btn btn-success float-end">
          Student Registration/Admission</a>
-        <a href="includes/student_exam_fees.php" class="btn btn-success float-end">
-          Admission Fee
+        <a href="includes/add_subject.php" class="btn btn-success float-end">
+          Subject Details
         </a>
-        <a href="includes/student_exam_fees.php" class="btn btn-success float-end">
-          Exam Fee
+        <a href="includes/result.php" class="btn btn-success float-end">
+          Result
         </a>
       <a href="all_fees_details.php" class="btn btn-success float-end">
           Fee Management

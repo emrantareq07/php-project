@@ -581,7 +581,7 @@ if(isset($_SESSION["uid"]) || isset($_COOKIE['user_login'])) {
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-save"></i> Save Fee Record
                     </button>
-                    <a href="std_reg_list.php" class="btn btn-secondary btn-lg">
+                    <a href="student_details.php" class="btn btn-secondary btn-lg">
                         <i class="fas fa-home"></i> Back to Dashboard
                     </a>
                     <a href="fees_details.php?reg_no=<?= $reg_no ?>" class="btn btn-sm btn-info action-btn">
