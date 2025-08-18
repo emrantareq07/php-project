@@ -975,11 +975,52 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
   </div>
 
   <div class="text-muted text-center me-5" style="padding-top: 1rem;">
-    General Manager (Production)<br>
+      General Manager (Production)<br>
     Production Division, BCIC.<br>
     Phone No: 02223388176<br>
     Email: productionbcic@gmail.com<br>
+<?php
+// if (isset($_POST['hit'])) {
+//     $date = $_POST['date']; // YYYY-MM-DD
+
+    // Prepared statement
+//     $stmt = $conn->prepare("
+//    SELECT head_name, designation, start_date, end_date, status
+//             FROM head_name_tbl
+//             WHERE ? BETWEEN start_date
+//                         AND COALESCE(NULLIF(end_date,'0000-00-00'), CURDATE())
+//             ORDER BY start_date DESC
+//             LIMIT 1
+//     ");
+//     $stmt->bind_param("s", $date);
+//     $stmt->execute();
+//     $result = $stmt->get_result();
+
+
+// if ($row = $result->fetch_assoc()) {
+//     echo '
+//     <div class="text-muted text-center me-5" style="padding-top: 1rem; line-height:1.8;">
+//         <span style="font-family:\'Brush Script MT\', cursive; font-size:1.3rem; font-style:italic; color:#555;">
+//            ( Signed )
+//         </span><br>
+//         ' . htmlspecialchars($row['head_name']) . '<br>
+//         ' . htmlspecialchars($row['designation']) . '<br>
+//         Production Division, BCIC.<br>
+//         Phone No: 02223388176<br>
+//         Email: productionbcic@gmail.com<br>
+//     </div>';
+// }
+
+ 
+//     else {
+//         echo '<div class="text-center text-danger">No record found for this date.</div>';
+//     }
+// }
+?>
+
   </div>
+
+
 </div>
 
 </div>
@@ -992,7 +1033,7 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
 </div>
 </div>
 </div>
-<script>
+<!-- <script>
         // Show the reloading message and reload the page every 10 seconds
         setTimeout(() => {
             const reloadMessage = document.getElementById('reload-message');
@@ -1003,7 +1044,7 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
                 location.reload();
             }, 2000); // Wait 2 seconds before reloading
         }, 10000); // 10 seconds = 10000 milliseconds
-    </script>
+    </script> -->
 <!--  <script>
         // Show the reloading message and reload the page every 10 seconds
         setTimeout(() => {

@@ -1,58 +1,79 @@
 <?php
-// include('include/header.php');
 error_reporting(0);
 $date = date('Y-m-d');
 $yesterday = date('Y-m-d', strtotime('-1 day'));
 
-//$date= date('Y-m-d', strtotime('-1 day', $date));
 include('db/db_PDO.php');
 include('include/header_index.php');
 $username=$_SESSION['username'];
 $user_type=$_SESSION['user_type'];
 ?>  
-<div class="container-fluid">
+
 <div class="container-fluid" id="print-content"> 
 <!-- <div id="reload-message">Reloading...</div>  -->
-    <div class="row my-3">           
-        <div class="col-sm-3 col-md-3">
-            <form class="d-flex align-items-center" action="" method="post">
-                <div class="form-group me-3">
-                    <input type="date" class="form-control" placeholder="Enter Date" name="date" id="date" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" id="search-btn" name="hit">
-                        <i class="fa fa-search"></i> Search
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="col-sm-6 col-md-6">
-            <h3 class="text-muted text-center my-0 text-uppercase fw-bold no-wrap itim-regular" style="margin-bottom: 5px;"><b> Bangladesh Chemical Industries Corporation </b></h3>
-            <h4 class="text-success text-center my-1 text-uppercase fw-bold akaya-kanadaka-regular" style="margin-top: 0; margin-bottom: 0px;"> Daily Production & Plant Status Report</h4>            
-            <?php 
-           if (isset($_POST['hit'])) {
-            //$_SESSION['date']=$_POST['date'];
-            ?>
-            <h6 class="text-dark text-center my-0 " style="margin-top: 0; margin-bottom: 0;"><b>Production as on: <?php echo date('d-m-Y', strtotime($_POST['date'])); ?> </b></h6>
-            <h6 class="text-dark text-center my-0 " style="margin-top: 0; margin-bottom: 0;"><b>Dated on: <?php echo date('d-m-Y');?> </b></h6>
-            <?php
-            }else{                
-             ?>
-            <h6 class="text-dark text-center my-0 " style="margin-top: 0; margin-bottom: 0;"><b>Production as on: <?php echo date('d-m-Y', strtotime('-1 day')); ?> </b></h6>
-            <h6 class="text-dark text-center my-0 mb-0" style="margin-top: 0; margin-bottom: 0;"><b>Dated on: <?php echo date('d-m-Y');?> </b></h6>
-            <?php }?>
-        </div>  
-        <div class="col-sm-3  col-md-3 text-end my-0">     
-            <span class="text-center">               
-            <a class="btn btn-primary mb-0" id="reload-btn" href="index.php"><i class="fa fa-refresh"></i> Reload</a>
-            <a class="btn btn-primary mb-0" id="login-btn" href="controller/dashboard.php"><i class="fa fa-sign-in"></i> Login</a>
-            <button onclick="window.print();return false;" class="btn btn-danger mb-0" id="print-btn"><i class="fa fa-print"></i> Print</button>               
-            <!-- <form class="form-inline" action="download_report_pdf.php" method="post" style="display: inline-block; width: auto;">
-                <button type="submit" name="submit" class="btn btn-danger" id="download_pdf"><i class="fa fa-file-pdf-o"></i> Download</button> 
-            </form> -->   
-            </span>
-        </div>
-    </div> 
+<div class="row my-3 align-items-center">
+    <!-- Date Search Form -->
+    <div class="col-12 col-md-3 mb-2 mb-md-0">
+        <form class="row g-2 align-items-center" action="" method="post">
+            <div class="col-8 col-sm-8">
+                <!-- <div class="input-group date" id="datePicker">
+                    <input type="text" class="form-control" name="date" id="date" placeholder="dd-mm-yyyy" required>
+                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                </div> -->
+                <input type="date" class="form-control" name="date" id="date" required>
+               
+            </div>
+            <div class="col-4 col-sm-4">
+                <button type="submit" class="btn btn-primary w-100" id="search-btn" name="hit">
+                    <i class="fa fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Title Section -->
+    <div class="col-12 col-md-6 text-center">
+        <h3 class="text-muted text-uppercase fw-bold itim-regular mb-1">
+            Bangladesh Chemical Industries Corporation
+        </h3>
+        <h4 class="text-success text-uppercase fw-bold akaya-kanadaka-regular mb-1">
+            Daily Production & Plant Status Report
+        </h4>
+        <?php 
+        if (isset($_POST['hit'])) {
+        ?>
+            <h6 class="text-dark mb-0">
+                <b>Production as on: <?php echo date('d-m-Y', strtotime($_POST['date'])); ?> </b>
+            </h6>
+            <h6 class="text-dark mb-0">
+                <b>Dated on: <?php echo date('d-m-Y');?> </b>
+            </h6>
+        <?php
+        } else {                
+        ?>
+            <h6 class="text-dark mb-0">
+                <b>Production as on: <?php echo date('d-m-Y', strtotime('-1 day')); ?> </b>
+            </h6>
+            <h6 class="text-dark mb-0">
+                <b>Dated on: <?php echo date('d-m-Y');?> </b>
+            </h6>
+        <?php } ?>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="col-12 col-md-3 text-md-end text-center mt-2 mt-md-0">
+        <a class="btn btn-primary mb-1" id="reload-btn" href="index.php">
+            <i class="fa fa-refresh"></i> Reload
+        </a>
+        <a class="btn btn-primary mb-1" id="login-btn" href="controller/dashboard.php">
+            <i class="fa fa-sign-in"></i> Login
+        </a>
+        <button onclick="window.print();return false;" class="btn btn-danger mb-1" id="print-btn">
+            <i class="fa fa-print"></i> Print
+        </button>
+    </div>
+</div>
+
 <script type="text/javascript">
 document.getElementById('print_ind_tenants_aa').addEventListener('click', function () {
     // Get the content to be printed
@@ -550,9 +571,7 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
         }
     }
 
-}
-else{
-    //$date = htmlspecialchars($_POST['date'], ENT_QUOTES, 'UTF-8');
+}else{   
     $date=$yesterday;
     $_SESSION['date'] = $date;
     // $date_on_prdate('d-m-Y', strtotime('-1 day'));
@@ -644,7 +663,6 @@ else{
                 while ($row_y = mysqli_fetch_assoc($result_fetch_y)) {
                     $month_y += (float)$row_y['daily'];
                 }
-
                 // Update total variables
                 $total_installed_capacity += (int)$row['installed_capacity'];
                 $total_attain_capacity += (int)$row['attain_capacity'];
@@ -916,17 +934,6 @@ if (!$dataFound) {
 </div>
 </div>
 </div>
-</div>
-<!-- <script>
-// Show the reloading message and reload the page every 10 seconds
-setTimeout(() => {
-    const reloadMessage = document.getElementById('reload-message');
-    reloadMessage.style.display = 'block'; // Show the message
-    setTimeout(() => {
-        location.reload();
-    }, 2000); // Wait 2 seconds before reloading
-}, 10000); // 10 seconds = 10000 milliseconds
-    </script> --> 
 <script>
 // Automatically reload the page every 10 seconds
 setTimeout(() => {

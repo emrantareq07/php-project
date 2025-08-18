@@ -1,10 +1,6 @@
 
 <footer>
- <?php 
-// if ($user_type != 'sadmin') {
-// include('../include/header.php');
-// include('../include/footbar_user.php');
-// } 
+
  ?>
 </div>
 </footer>
@@ -27,9 +23,6 @@
     });
   }, false);
 })();
-</script>  
-  
-
-
+</script>    
 </body>
 </html>

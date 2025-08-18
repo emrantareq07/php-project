@@ -76,7 +76,7 @@ if(isset($_SESSION["uid"]) || isset($_COOKIE['user_login'])) {
         <a href="includes/student_details.php" class="btn btn-success float-end">
          Student Registration/Admission</a>
         <a href="includes/add_subject.php" class="btn btn-success float-end">
-          Subject Details
+          Add Subject 
         </a>
         <a href="includes/result.php" class="btn btn-success float-end">
           Result
