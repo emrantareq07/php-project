@@ -43,7 +43,7 @@
 <!-- </head>
   style="background-color: #751aff;
 <body> -->
-  <nav class="navbar navbar-expand-sm   navbar-dark" style="background-color: #751aff;">
+  <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="#"><img src="../images/bcic_logo.png" alt="Profile" width="100%" height="40" class="profile-picture"></a><h3 class="text-white poetsen-one-regular">BCIC-(DFMS)</h3>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -98,7 +98,7 @@
             $title = 'Karnaphuli Paper Mills Limited (KPML)';
         }
        ?>
-        <div class="username-center text-uppercase "><b><h3 class="text-white poetsen-one-regular"> <?php echo $title; ?></h3></b></div>
+        <div class="username-center text-uppercase "><b><h3 class="text-light poetsen-one-regular"> <?php echo $title; ?></h3></b></div>
         <ul class="navbar-nav ms-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">

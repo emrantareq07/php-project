@@ -12,9 +12,9 @@
   <!-- Main content goes here -->
 
   <!-- Footer -->
-  <footer class="navbar navbar-expand-sm navbar-dark fixed-bottom" style="background-color: #751aff;">
+  <footer class="navbar navbar-expand-sm navbar-dark fixed-bottom" >
     <div class="container-fluid">
-      <div class="ms-auto text-light akaya-telivigala-regular">
+      <div class="ms-auto text-muted akaya-telivigala-regular">
         Design & Developed by ICT Division, BCIC.
       </div>
     </div>

@@ -1,7 +1,6 @@
 
 <footer>
 
- ?>
 </div>
 </footer>
 <script>
