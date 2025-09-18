@@ -24,12 +24,13 @@ $result = $conn->query("SELECT * FROM users_tbl ORDER BY id DESC");
   <title>Manage Users</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-light">
 
-<div class="container mt-4">
-  <h3 class="mb-3">Manage Users</h3>
-  <a href="dashboard.php" class="btn btn-secondary">Back</a>
+<div class="container-fluid mt-4 p-3 shadow rounded">
+  <h3 class="mb-3 text-uppercase fw-bold">Manage Users <a href="dashboard.php" class="btn btn-secondary float-end"><i class="fas fa-arrow-left me-1"></i> Back</a></h3>
+  
   <?php if (isset($_GET['msg']) && $_GET['msg'] == "deleted"): ?>
     <div class="alert alert-success">User deleted successfully.</div>
   <?php endif; ?>
@@ -79,9 +80,9 @@ $result = $conn->query("SELECT * FROM users_tbl ORDER BY id DESC");
     </td>
 
         <td>
-             <a href="download_user.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-info">download</a>
-          <a href="edit_user.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-info">Edit</a>
-          <a href="manage_users.php?delete=<?= $row['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?');">Delete</a>
+             <a href="download_user.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-info"><i class="fas fa-eye me-1"></i>View</a>
+          <a href="edit_user.php?id=<?= $row['id']; ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit me-1"></i> Edit</a>
+          <a href="manage_users.php?delete=<?= $row['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?');"><i class="fas fa-trash me-1"></i> Delete</a>
         </td>
       </tr>
       <?php endwhile; ?>

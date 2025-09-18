@@ -56,8 +56,8 @@ try {
 
 // Insert record
 function insertRecord($pdo) {
-    $sql = "INSERT INTO authority_tbl (batch, training_title,organized_by, start_date, end_date, name1, designation1, office1, ministry1, signature1, name2, designation2, office2, ministry2, signature2, active_status, created_at) 
-            VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    $sql = "INSERT INTO authority_tbl (batch, training_title,organized_by, start_date, end_date, name1, designation1, office1, ministry1, signature1, name2, designation2, office2, ministry2, signature2, active_status,tr_link_status, created_at) 
+            VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, NOW())";
 
     $stmt = $pdo->prepare($sql);
 
@@ -85,7 +85,8 @@ function insertRecord($pdo) {
         $_POST['office2'],
         $_POST['ministry2'],
         $signature2,
-        $_POST['active_status'] ?? 'active'
+        $_POST['active_status'] ?? 'active',
+        $_POST['tr_link_status'] ?? 'active'
     ]);
 
     header("Location: settings.php?success=added");
@@ -94,7 +95,7 @@ function insertRecord($pdo) {
 
 // Update record
 function updateRecord($pdo) {
-    $sql = "UPDATE authority_tbl SET batch=?, training_title=?,organized_by=?, start_date=?, end_date=?, name1=?, designation1=?, office1=?, ministry1=?, name2=?, designation2=?, office2=?, ministry2=?, active_status=?, updated_at=NOW()";
+    $sql = "UPDATE authority_tbl SET batch=?, training_title=?,organized_by=?, start_date=?, end_date=?, name1=?, designation1=?, office1=?, ministry1=?, name2=?, designation2=?, office2=?, ministry2=?, active_status=?,tr_link_status=?, updated_at=NOW()";
     $params = [
         $_POST['batch'],
         $_POST['training_title'],
@@ -109,7 +110,8 @@ function updateRecord($pdo) {
         $_POST['designation2'],
         $_POST['office2'],
         $_POST['ministry2'],
-        $_POST['active_status'] ?? 'active'
+        $_POST['active_status'] ?? 'active',
+        $_POST['tr_link_status'] ?? 'active'
     ];
 
     if (!empty($_FILES['signature1']['name'])) {
@@ -257,6 +259,15 @@ if (isset($_GET['success'])) {
                                 </select>
                             </div>
 
+                            <div class="col-md-6 mt-3">
+                                <label class="form-label required-field">Training Link Status</label>
+                                <select name="tr_link_status" class="form-select" required>
+                                        <option value="Inactive" <?= (isset($edit_data['tr_link_status']) && $edit_data['tr_link_status'] == 'Inactive') ? 'selected' : ''; ?>>Inactive</option>
+                                    <option value="active" <?= (isset($edit_data['tr_link_status']) && $edit_data['tr_link_status'] == 'active') ? 'selected' : ''; ?>>Active</option>
+                                
+                                </select>
+                            </div>
+
                                 <div class="col-md-6 mt-3">
                                 <label for="organized_by" class="form-label required-field">Organised BY</label>
                                 <input type="text" class="form-control" id="organized_by" name="organized_by" required
@@ -363,7 +374,8 @@ if (isset($_GET['success'])) {
                                     <th>Training Title</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
-                                    <th>Status</th>
+                                    <th>Certificate Status</th>
+                                    <th>Tr. Link Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -377,6 +389,7 @@ if (isset($_GET['success'])) {
                                             <td><?= htmlspecialchars($record['start_date']); ?></td>
                                             <td><?= htmlspecialchars($record['end_date']); ?></td>
                                             <td><?= $record['active_status']; ?></td>
+                                            <td><?= $record['tr_link_status']; ?></td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
                                                     <a href="settings.php?edit=<?= $record['id']; ?>" class="btn btn-primary"><i class="fas fa-edit"></i></a>

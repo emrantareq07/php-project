@@ -17,6 +17,7 @@ $email_id = $_SESSION['user_email'];
   <meta charset="UTF-8">
   <title>Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     body { background-color: #f8f9fa; }
     .card { border-radius: 12px; }
@@ -49,7 +50,14 @@ $email_id = $_SESSION['user_email'];
                 <li><a href="reports.php" style="text-decoration: none;">📊 View Reports</a></li>
                 <li><a href="settings.php" style="text-decoration: none;">⚙️ System Settings</a></li>
                 <li><a href="certificate_by_batch.php" style="text-decoration: none;">⚙️ Certificates</a></li>
-                <li><a href="download_db.php" style="text-decoration: none;">⚙️ Download Database</a></li>
+                <li>
+                    <!-- <a href="download_db.php" style="text-decoration: none;">⚙️ Download Database</a> -->
+
+                    <form  id="downloadForm" action="download_db.php" method="post">
+                   <button class="btn btn-warning" type="submit" name="submit" ><i class="fa fa-download" style="font-size:15px;color:black"></i> Download Database</button>
+                 </form>
+
+                </li>
             </ul>
         <?php elseif ($user_role === 'user'): ?>
             <!-- User Panel -->
@@ -64,7 +72,7 @@ $email_id = $_SESSION['user_email'];
         <?php endif; ?>
 
         <hr>
-        <a href="logout.php" class="btn btn-outline-danger">Logout</a>
+        <a href="logout.php" class="btn btn-outline-danger fw-bold">Logout</a>
     </div>
 </div>
 </body>

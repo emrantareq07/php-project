@@ -6,6 +6,7 @@ $today = date('Y-m-d');
 $sql = "SELECT batch, training_title, start_date, end_date, organized_by 
         FROM authority_tbl 
         WHERE end_date >= ?
+        AND tr_link_status='active'
         ORDER BY start_date ASC";
 
 $stmt = $conn->prepare($sql);
@@ -53,5 +54,5 @@ if ($result && $result->num_rows > 0): ?>
   </table>
 </div>
 <?php else: ?>
-<div class="alert alert-info mb-0">No available trainings right now.</div>
+<div class="alert alert-info mb-0">No Available Training Right Now!!!</div>
 <?php endif; ?>

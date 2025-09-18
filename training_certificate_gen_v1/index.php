@@ -77,17 +77,18 @@ if (isset($_POST['login'])) {
 <title>User Authentication</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
 body { background: #f8f9fa; }
-.auth-container { max-width: 500px; margin: 50px auto; padding: 25px; border-radius: 10px; background: #fff; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-.auth-header { text-align: center; margin-bottom: 25px; }
-.auth-icon { font-size: 3rem; color: #0d6efd; margin-bottom: 10px; }
+.auth-container { max-width: 600px; margin: 30px auto; padding: 25px; border-radius: 10px; background: #fff; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+.auth-header { text-align: center; margin-bottom: 10px; }
+.auth-icon { font-size: 3rem; color: #0d6efd; margin-bottom: 5px; }
 .password-toggle { cursor: pointer; }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container ">
 
 <!-- Alerts -->
 <?php if (!empty($alert)): ?>
@@ -98,7 +99,7 @@ body { background: #f8f9fa; }
 <?php endif; ?>
 
 <!-- Login Form -->
-<div class="auth-container" id="login-form">
+<div class="auth-container border border-primary" id="login-form">
     <div class="auth-header">
         <i class="bi bi-person-check auth-icon"></i>
         <h3>User Login</h3>
@@ -120,14 +121,14 @@ body { background: #f8f9fa; }
         </div>
         <button type="submit" class="btn btn-primary w-100" name="login">Login</button>
         <div class="text-center mt-3">
-            <p>Available training
-            <a href="#" onclick="event.preventDefault(); loadTrainingList(event)">training here</a></p>
+            <p>Available Training
+            <a href="#" onclick="event.preventDefault(); loadTrainingList(event)">Click Here</a></p>
         </div>
     </form>
 </div>
 
 <!-- Registration Form -->
-<div class="auth-container" id="registration-form" style="display:none;">
+<div class="auth-container border border-primary" id="registration-form" style="display:none;">
     <div class="auth-header">
         <i class="bi bi-person-plus auth-icon"></i>
         <h3>User Registration</h3>
@@ -135,37 +136,50 @@ body { background: #f8f9fa; }
     </div>
 
     <form method="POST">
-        <div class="row mb-3">
-            <div class="col-md-6">
+        <div class="row mb-3">        
+        <!-- Batch Field -->
+        <div class="col-md-6">
+            <label class="form-label">Batch</label>
+            <input type="text" class="form-control" name="batch" id="reg_batch" readonly>
+        </div> 
+        <div class="col-md-6">
                 <label class="form-label">Employee ID <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="emp_id" required>
-            </div>
-            <div class="col-md-6">
+            </div>           
+        </div>
+
+        <div class="mb-3">
                 <label class="form-label">Full Name <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" name="name" required>
             </div>
+            <div class="row mb-3">
+            <div class="col-md-6">
+            <label class="form-label">Designation <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="designation" required>
         </div>
 
-        <!-- Batch Field -->
-        <div class="mb-3">
-            <label class="form-label">Batch</label>
-            <input type="text" class="form-control" name="batch" id="reg_batch" readonly>
+        <div class="col-md-6">
+            <label class="form-label">Office/Organization <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" name="place_of_posting" required>
         </div>
+    </div>
 
-        <div class="mb-3">
+        <div class="row mb-3">
+            <div class="col-md-6">
             <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
             <input type="tel" class="form-control" name="mobile_no" required>
         </div>
-        <div class="mb-3">
+        <div class="col-md-6">
             <label class="form-label">Email Address <span class="text-danger">*</span></label>
             <input type="email" class="form-control" name="email_id" required>
         </div>
+    </div>
         <div class="mb-3">
             <label class="form-label">Password</label>
             <input type="text" class="form-control" value="1234" readonly>
             <div class="form-text">Default password is set to 1234</div>
         </div>
-        <button type="submit" class="btn btn-primary w-100" name="register">Register</button>
+        <button type="submit" class="btn btn-primary w-100" name="register"><i class='fa fa-user-plus'></i> Register</button>
         <div class="text-center mt-3">
             <p>Already have an account? <a href="#" onclick="event.preventDefault(); showLoginForm()">Login here</a></p>
         </div>
@@ -177,7 +191,7 @@ body { background: #f8f9fa; }
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="trainingModalLabel">Available Trainings</h5>
+        <h5 class="modal-title text-uppercase text-muted" id="trainingModalLabel">Available Trainings</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" id="trainingList"></div>
@@ -221,7 +235,7 @@ function loadTrainingList(e) {
             <div class="spinner-border" role="status"></div>
             <div class="mt-2">Loading trainings…</div>
         </div>`;
-    fetch("training_list.php", { cache: "no-store" })
+    fetch("controller/training_list.php", { cache: "no-store" })
         .then(r => r.text())
         .then(html => {
             target.innerHTML = html;
