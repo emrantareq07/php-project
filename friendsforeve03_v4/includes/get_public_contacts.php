@@ -58,7 +58,7 @@ while ($r = $result->fetch_assoc()):
     $alt       = htmlspecialchars($r['alt_mobile']);
     $smsNumber = $primary ?: $alt;
 ?>
-    <div class="card mb-3 shadow-sm contact-card">
+    <div class="card mb-3 shadow-sm contact-card" onclick="window.location.href='tel:<?= $primary ?>'">
         <div class="card-body d-flex justify-content-between align-items-center">
             <div>
                 <h6 class="fw-bold mb-1 text-primary">

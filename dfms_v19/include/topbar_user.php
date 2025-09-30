@@ -1,12 +1,12 @@
 <?php
 // session_start();
 ?>
-<!-- <!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css"> -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css"> 
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap" rel="stylesheet">
@@ -39,6 +39,7 @@
   font-style: normal;
 }
 
+
   </style>
 <!-- </head>
   style="background-color: #751aff;
@@ -69,7 +70,7 @@
             </ul>
           </li>
         </ul> -->
-       <!--  <div class="username-center text-uppercase "><b><h2 class="text-white">BCIC - Welcome DFMS (<?php echo $_SESSION['username']; ?>)</h2></b></div> -->
+       <!--  <div class="username-center text-uppercase "><b><h2 class="text-white">BCIC - Welcome DFMS (<?php //echo $_SESSION['username']; ?>)</h2></b></div> -->
 
        <?php 
        $title= $_SESSION['username'];
@@ -89,7 +90,7 @@
         } elseif ($title == 'dapfcl') {
             $title = 'DAP Fertilizer Company Limited (DAPFCL)';
         } elseif ($title == 'bisf') {
-            $title = 'Bangladesh Industrial Salt Factory (BISF)';
+            $title = 'Bangladesh Insulator & Sanitaryware Factory Ltd.(BISFL)';
         } elseif ($title == 'cccl') {
             $title = 'Chatak Cement Company Limited (CCCL)';
         } elseif ($title == 'ugsf') {
@@ -98,7 +99,7 @@
             $title = 'Karnaphuli Paper Mills Limited (KPML)';
         }
        ?>
-        <div class="username-center text-uppercase "><b><h3 class="text-light poetsen-one-regular"> <?php echo $title; ?></h3></b></div>
+        <div class="username-center text-uppercase "><b><h4 class="text-light poetsen-one-regular"> <?php echo $title; ?></h4></b></div>
         <ul class="navbar-nav ms-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">

@@ -103,10 +103,10 @@ $user_type=$_SESSION['user_type'];
                     </button>
                 </form>
             <?php } ?> 
-        <?php if ($user_type == 'sadmin') { ?>
+            <?php if ($user_type == 'sadmin') { ?>
             <a class="btn btn-info" href="set_name.php" ><i class="fa fa-edit"></i> Set Name
             </a>
- <?php } ?> 
+            <?php } ?> 
             <button type="button" class="btn btn-success" id="print_ind_tenants_aa">
                 <i class="fa fa-print" style="font-size:16px"></i> Print
             </button>          
@@ -367,7 +367,7 @@ if (isset($_POST['hit'])) {
                 $total_year_target += $year_target;
                 $total_month_target += $month_target;
                 ?>
-                <tr class="p-0" style="font-size:6px; padding: 0px;">
+                <tr >
                     <?php if ($is_first_row): ?>
                     <td class="text-center align-middle" rowspan="<?php echo $rowspan; ?>">
                         <?php echo $i++; ?>
@@ -484,7 +484,7 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
                 $total_year_target += $year_target;
                 $total_month_target += $month_target;
                 ?>
-                <tr class="p-0" style="font-size:6px; padding: 0px;">
+                <tr>
                     <?php if ($is_first_row): ?>
                     <td class="text-center align-middle" rowspan="<?php echo $rowspan; ?>">
                         <?php echo $i++; ?>
@@ -577,7 +577,6 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
             $month_y = 0;
             while ($row_y = mysqli_fetch_assoc($result_fetch_y)) {
                 $month_y += round((float)$row_y['daily'], 2);
-
             }
             ?>
             <tr>
@@ -603,7 +602,6 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
                 <td><?php echo htmlspecialchars($row['plant_load'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <!-- <td><?php echo $month_m - $daily; ?></td> -->
                 <td style="font-size:10px; text-align: left;"><?php echo htmlspecialchars($row['remarks'], ENT_QUOTES, 'UTF-8'); ?></td>
-
             </tr>
             <?php
             $is_first_row = false; // After the first row, do not display the factory_name again
@@ -719,7 +717,6 @@ else{
                         <td class="text-center align-middle" rowspan="<?php echo $rowspan; ?>">
                             <?php echo $i++; ?>
                         </td>
-
                         <td class="text-uppercase text-center align-middle" rowspan="<?php echo $rowspan; ?>">
                             <?php echo htmlspecialchars($factory_name, ENT_QUOTES, 'UTF-8'); ?>
                         </td>
@@ -1017,12 +1014,8 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
 //     }
 // }
 ?>
-
   </div>
-
-
 </div>
-
 </div>
   <div class="card-footer text-end text-muted me-0 m-0 mb-0" id="footer_id" style="font-size: 0.8rem; margin-bottom: 0px;"><i>Design & Developed By ICT Division, BCIC.</i></div>
 </div>  

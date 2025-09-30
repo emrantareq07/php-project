@@ -52,27 +52,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
 }
 
 
-// if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
-//     // Retrieve the ID from the URL query parameter
-//     $id = mysqli_real_escape_string($conn, $_GET['id']);
-
-//     // Prepare the DELETE query
-//     $query = "DELETE FROM users WHERE id='$id'";
-//     $query_run = mysqli_query($conn, $query);
-
-//     // Check if the query was successful
-//     if ($query_run) {
-//         $_SESSION['message'] = "<span class='text-success'><b>User Deleted Successfully</b></span>";
-//         header("Location: manage_user.php");
-//         exit(0);
-//     } else {
-//         $_SESSION['message'] = "<span class='text-danger'><b>User Information Not Deleted</b></span>";
-//         header("Location: manage_user.php");
-//         exit(0);
-//     }
-// }
-
-
 if(isset($_POST['update'])){     
     $id = mysqli_real_escape_string($conn, $_POST['id']);    
     $username = mysqli_real_escape_string($conn, $_POST['username']);

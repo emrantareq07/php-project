@@ -1,0 +1,38 @@
+/*@page
+{
+  size:A4;
+  margin: 10;
+  orientation:;
+
+}*/
+/* Portrait */
+@page {
+  size: A4 portrait;
+  margin: 10mm; /* Adjust margins as needed */
+}
+
+/* Landscape */
+@page {
+  size: A4 landscape;
+  margin: 10mm; /* Adjust margins as needed */
+}
+
+#print-btn
+{
+  display: none;
+  visibility: none;
+}
+
+@media print {
+    .pagebreak {
+        clear: both;
+        page-break-after: always;
+        /*page-break-after: avoid;*/
+    }
+}
+/* Temporary styles, you can adjust or remove them */
+img {
+   max-width: 100%; /* Adjust or remove as needed */
+   height: auto;    /* Adjust or remove as needed */
+}
+

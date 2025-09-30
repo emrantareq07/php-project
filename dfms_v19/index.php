@@ -551,8 +551,11 @@ $tables1 = ['tspcl','dapfcl','kpml','cccl','ugsf'];
                     <?php echo htmlspecialchars($factory_name, ENT_QUOTES, 'UTF-8'); ?>
                 </td>
                 <?php endif; ?>
+                
                 <td class="text-uppercase text-center" style="font-size:10px;"><?php echo htmlspecialchars($row['product_produce'], ENT_QUOTES, 'UTF-8'); ?></td>
+
                 <td class="text-uppercase text-center" style="font-size:10px;"><?php echo ($row['product_produce'] != 'Sheet Glass') ? 'MT' : 'L.Sq.M'; ?></td>
+
                 <td><?php echo (int)$row['installed_capacity']; ?></td>
                 <!-- <td><?php echo (int)$row['attain_capacity']; ?></td> -->
                 <td><?php echo $daily; ?></td>

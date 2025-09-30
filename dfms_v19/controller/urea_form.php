@@ -71,11 +71,18 @@ if ($user_type == 'sadmin') {
       ?>
     </div>
 
+    <?php   
+
+    //if($table==sadmin){
+
+   // }
+
+    ?>
     <!-- Center Column Form -->
     <div class="col-lg-6 col-md-8 col-12">
-      <div class="border shadow rounded p-3 border-success">
+      <div class="shadow rounded p-3 border border-3 border border-muted">
         <form action="insert_urea.php" method="POST">       
-          <div class="form-group mb-3">
+          <div class="form-group mb-3">            
             <label for="date">Choose a Date</label>
             <input type="date" class="form-control" name="date" id="date" 
               onChange="checkAvailability()" required 
@@ -141,10 +148,10 @@ if ($user_type == 'sadmin') {
             <i class="fa fa-edit me-2"></i> Edit Record
           </a>
           <a href="manage_user.php?username=<?=urlencode($_SESSION['username'])?>&user_type=<?=urlencode($_SESSION['user_type'])?>" class="btn btn-warning w-100">
-            <i class="fa fa-users-cog me-2"></i> Manage Users
+            <i class="fa fa-group me-2"></i> Manage Users
           </a>
           <a href="set_name.php" class="btn btn-info w-100">
-            <i class="fa fa-user-tie me-2"></i> Set Head Name
+            <i class="fa fa-check"></i> Set Head Name
           </a>
         <?php } elseif ($user_type=='admin') { ?>
           <a href="home.php?username=<?=$_SESSION['username']?>&user_type=<?=$_SESSION['user_type']?>" class="btn btn-primary w-100">

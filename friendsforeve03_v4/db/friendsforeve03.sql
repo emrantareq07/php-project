@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 18, 2025 at 08:46 AM
+-- Generation Time: Sep 29, 2025 at 08:21 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,19 +40,6 @@ CREATE TABLE `friends` (
   `status` enum('pending','approved') NOT NULL DEFAULT 'pending'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `friends`
---
-
-INSERT INTO `friends` (`id`, `name`, `mobile`, `alt_mobile`, `email`, `occupation`, `jobplace`, `address`, `created_at`, `status`) VALUES
-(2, 'MD. ABUL HOSSAIN', '01913428714', '01718834655', 'hasan@yahoo.com', 'Govt. Service', 'Dhaka', '', '2025-09-14 08:41:52', 'approved'),
-(5, 'test33', '01913428714', '01718834655', 'hasan@yahoo.com', 'Govt. Service', 'Dhaka', '', '2025-09-16 10:41:02', 'approved'),
-(6, 'test', '01913428714', '01718834655', 'emran445@yahoo.com', 'Govt. Service', 'Dhaka', '', '2025-09-17 03:50:39', 'approved'),
-(9, 'emran', '01913428714', '01718834655', 'jamal@yahoo.com', 'Govt. Service', 'Dhaka', '', '2025-09-17 04:09:02', 'approved'),
-(15, 'hhh', '01913428714', '01718834655', 'kamal@yahoo.com', 'Govt. Service', 'Dhaka', '', '2025-09-18 06:27:23', 'pending'),
-(16, 'ttt', '01913428714', '01718834655', 'emran445@yahoo.com', 'Govt. Service', 'Dhaka', 'dd', '2025-09-18 06:29:45', 'pending'),
-(17, 'rrrr', '01913428714', '01718834655', 'hasan@yahoo.com', 'Govt. Service', 'Dhaka', 'f', '2025-09-18 06:32:03', 'pending');
-
 -- --------------------------------------------------------
 
 --
@@ -71,13 +58,6 @@ CREATE TABLE `friend_requests` (
   `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `friend_requests`
---
-
-INSERT INTO `friend_requests` (`id`, `name`, `mobile`, `alt_mobile`, `email`, `occupation`, `jobplace`, `address`, `status`, `created_at`) VALUES
-(1, 'MD. ABUL HOSSAIN', '01913428714', '01718834655', 'hasan@yahoo.com', 'Govt. Service', 'Dhaka', '', 'Approved', '2025-09-14 08:06:30');
 
 -- --------------------------------------------------------
 
@@ -130,13 +110,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `friends`
 --
 ALTER TABLE `friends`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `friend_requests`
 --
 ALTER TABLE `friend_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
