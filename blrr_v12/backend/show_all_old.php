@@ -3,10 +3,10 @@ session_name('blrr');
 session_start();
 
 if (!isset($_SESSION['username'])) {
-    header("Location: index.php");
+    header("Location: ../index.php");
     exit();
 }
-
+include_once '../db/db.php';
 include_once '../db/database_old.php';
 include_once 'header.php';
 
@@ -15,7 +15,7 @@ $user_type = htmlspecialchars($_SESSION['user_type'], ENT_QUOTES, 'UTF-8');
 $office = htmlspecialchars($_SESSION['office'], ENT_QUOTES, 'UTF-8');
 $office_title = htmlspecialchars($_SESSION['office_title'], ENT_QUOTES, 'UTF-8');
 $today_date = date("Y-m-d");
-
+$user_type = $_SESSION['user_type'];//admin
 // Validate table name
 $allowed_tables = ['rri'];
 $table_name = 'rri'; // Hardcoded for this example
@@ -43,17 +43,17 @@ if (!in_array($table_name, $allowed_tables)) {
 <body>
 <div class="container-fluid">
     <div class="table-wrapper border border-muted rounded shadow p-2 my-1">
-        <div class="row mb-0">
-            <div class="col">
+        
+           <!--  <div class="col">
                 <h2 class="text-muted"><b>বিসিআইসি পত্র প্রাপ্তি রেজিস্টার</b></h2>
             <p>
             <span class="text-primary fw-bold mb-0 m-0">Username: [<?php echo $username; ?>]</span><br>
             <span class="text-success fw-bold">Office: [<?php echo $office; ?>]</span><br>
             <span class="text-warning fw-bold">Logged in as: [<?php echo $user_type; ?>]</span>
             </p>
-            </div>
-            <div class="col-sm-4 text-end">
-                <a href="../dashboard.php" class="btn btn-outline-success mb-2">
+            </div> -->
+            <span class="float-end">
+                <a href="dashboard.php" class="btn btn-outline-success mb-2">
                     <i class="fa fa-home"></i> Home
                 </a>
                 <a href="show_all_old_search.php?table_name=<?= $table_name ?>&val=987" class="btn btn-outline-primary mb-2">
@@ -62,11 +62,11 @@ if (!in_array($table_name, $allowed_tables)) {
                 <button type="button" class="btn btn-danger mb-2" id="print_current_date">
                     <i class="fa fa-print"></i> Print
                 </button>
-                <a href="logout.php" class="btn btn-danger mb-2">
+                <!-- <a href="logout.php" class="btn btn-danger mb-2">
                     <i class="fa fa-sign-out"></i> Logout
-                </a>
-            </div>
-        </div>
+                </a> -->
+            </span>
+       
 
         <!-- DataTable -->
         <table class="table table-hover table-striped table-bordered text-center" id="form-tbl">
@@ -119,8 +119,23 @@ if (!in_array($table_name, $allowed_tables)) {
                 { data: "dis_date" },
                 { data: "by" }
             ],
-            dom: 'Bfrtip',
-            buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            // dom: 'Bfrtip',
+            dom: '<"row"<"col-sm-4"l><"col-sm-4"B><"col-sm-4"f>>rtip',
+            // buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            buttons: {
+                dom: {
+                    button: {
+                        tag: 'button',
+                        className: 'btn btn-sm'
+                    }
+                },
+                buttons: [
+                    { extend:'pdfHtml5', text:'PDF', className:'btn-danger', exportOptions:{columns:':not(:last-child)'} },
+                    { extend:'excelHtml5', text:'Excel', className:'btn-success', exportOptions:{columns:':not(:last-child)'} },
+                    { extend:'csvHtml5', text:'CSV', className:'btn-primary', exportOptions:{columns:':not(:last-child)'} },
+                    { extend:'print', text:'Print', className:'btn-secondary', exportOptions:{columns:':not(:last-child)'} }
+                ]
+            },
             language: {
                 search: "অনুসন্ধান:",
                 lengthMenu: "প্রতি পৃষ্ঠায় _MENU_ টি রেকর্ড দেখান",

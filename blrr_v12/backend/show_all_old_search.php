@@ -10,6 +10,8 @@ if (!isset($_SESSION['username'])) {
   header("Location: ../index.php");
   exit();
 }
+date_default_timezone_set("Asia/Dhaka");   //India time (GMT+6)
+include('header.php');
 ?>  
 
 <!DOCTYPE html>
@@ -53,7 +55,7 @@ if (!isset($_SESSION['username'])) {
         </div> 
         <div class="col-sm-3"></div>
         <div class="col-sm-6">
-            <form action="show_all_old.php?table_name=<?=$_GET['table_name']?>" method="post" class="needs-validation">    
+            <form action="show_all_old_search.php?table_name=<?=$_GET['table_name']?>" method="post" class="needs-validation">    
                 <input type="hidden" class="form-control" value="<?php echo $_GET['table_name']; ?>" name="table_name">
                 
                 <!-- Date Input Fields -->
@@ -129,12 +131,7 @@ if (!isset($_SESSION['username'])) {
             <!-- Fetch and Display Records here -->
             <?php
             include_once '../db/database_old.php';
-            function englishToBanglaNumber($number) {
-                $englishNumbers = range(0, 9);
-                $banglaNumbers = array('০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯');
-                return str_replace($englishNumbers, $banglaNumbers, $number);
-            } 
-
+            
             if (isset($_POST['submit'])) {
                 $from_date = $_POST['date1'];
                 $to_date = $_POST['date2'];

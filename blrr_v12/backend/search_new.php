@@ -1,8 +1,15 @@
 <?php
 session_name('blrr');
+session_start();
+$username = $_SESSION['username']; //chairman
+$user_type = $_SESSION['user_type'];//admin
+$office = $_SESSION['office'];
+//$table_name = $_SESSION['table_name'];
+//$office_title = $_SESSION['office_title'];
+date_default_timezone_set("Asia/Dhaka");   //India time (GMT+6)
 include('header.php');
 include_once '../db/database.php';
-session_start();
+
 $office_title = $_SESSION['office_title'];
 // echo $office_title;
 $table_name = isset($_GET['table_name']) ? urlencode($_GET['table_name']) : '';
@@ -40,7 +47,7 @@ if ($table == 'chairman') {
 }
 
 ?>  
-<div class="container mt-1 p-2 border rounded shadow-lg">  
+<div class="container-fluid mt-1 p-2 border rounded shadow-lg">  
  <div class="row"> 
     <div class="col-sm-12">
         <h2 class="text-muted text-center"><b>বিসিআইসি পত্র প্রাপ্তি রেজিস্টার</b> </h2>
@@ -89,7 +96,7 @@ if ($table == 'chairman') {
     ?>
       <a href="incoming_letter.php" class="btn btn-primary text-center"> <i class="fa fa-arrow-left" style="font-size:16px"></i> Back</a>  
       <?php } else if($val=='987'){ ?> 
-      <a href="../dashboard.php" class="btn btn-primary text-center"> <i class="fa fa-arrow-left" style="font-size:16px"></i> Back</a>
+      <a href="dashboard.php" class="btn btn-primary text-center"> <i class="fa fa-arrow-left" style="font-size:16px"></i> Back</a>
       <?php } ?> 
 
         <!-- <a href="../dashboard.php" class="btn btn-primary"><i class="fa fa-arrow-left" style="font-size:16px"></i> <span>Back</span></a>
@@ -128,12 +135,7 @@ if ($table == 'chairman') {
             </tr>
         </thead>
         <tbody>
-        <?php
-        function englishToBanglaNumber($number) {
-            $englishNumbers = range(0, 9);
-            $banglaNumbers = array('০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯');
-            return mb_convert_encoding($number, 'UTF-8', 'ASCII') ? str_replace($englishNumbers, $banglaNumbers, $number) : $number;
-        } 
+<?php
 
 if (isset($_POST['submit'])) {
     $from_date = $_POST['date1'];

@@ -155,25 +155,46 @@ document.addEventListener('DOMContentLoaded', () => {
       } else insertPendingCard();
 
       function insertPendingCard(){
-        const tempId = `pending-${Date.now()}`;
-        const pendingHtml = `
-          <div class="list-group-item card contact-card contact-highlight" data-temp-id="${tempId}">
-            <div class="card-body d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center">
-                ${imgHTML}
-                <div>
-                  <h6 class="card-title mb-1">${name}</h6>
-                  <p class="mb-1 small text-muted">${mobile}</p>
-                  <p class="mb-1">Blood Group: ${blood_group}</p>
-                  <p class="mb-1">${address}</p>
-                  <span class="badge bg-warning text-dark">Pending Approval</span>
-                </div>
-              </div>
+          const tempId = `pending-${Date.now()}`;
+    let imageURL = imageFile && imageFile.name ? URL.createObjectURL(imageFile) : "https://via.placeholder.com/60";
+    const pendingHtml = `
+      <div class="list-group-item card contact-card contact-highlight" data-temp-id="${tempId}">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="${imageURL}" class="rounded-circle me-3" width="60" height="60" style="object-fit:cover;">
+            <div>
+              <h6 class="card-title mb-1">${name}</h6>
+              <p class="mb-1 small text-muted">${mobile}</p>
+              <p class="mb-1">${address}</p>
+              <span class="badge bg-warning text-dark"><i class="fa fa-clock-o"></i> Pending Approval</span>
+              ${blood_group ? `<span class="badge bg-danger ms-1">${blood_group}</span>` : ''}
             </div>
           </div>
-        `;
-        contactsList.insertAdjacentHTML('afterbegin',pendingHtml);
+        </div>
+      </div>
+    `;
+      contactsList.insertAdjacentHTML('afterbegin',pendingHtml);
       }
+
+        // const tempId = `pending-${Date.now()}`;
+        // const pendingHtml = `
+        //   <div class="list-group-item card contact-card contact-highlight" data-temp-id="${tempId}">
+        //     <div class="card-body d-flex justify-content-between align-items-center">
+        //       <div class="d-flex align-items-center">
+        //         ${imgHTML}
+        //         <div>
+        //           <h6 class="card-title mb-1">${name}</h6>
+        //           <p class="mb-1 small text-muted">${mobile}</p>
+        //           <p class="mb-1">Blood Group: ${blood_group}</p>
+        //           <p class="mb-1">${address}</p>
+        //           <span class="badge bg-warning text-dark">Pending Approval</span>
+        //         </div>
+        //       </div>
+        //     </div>
+        //   </div>
+        // `;
+      //   contactsList.insertAdjacentHTML('afterbegin',pendingHtml);
+      // }
 
     }catch(e){
       showMsg('danger','Error submitting request.');

@@ -1,15 +1,4 @@
 <?php
-// Set a unique session name for Project 2 and start the session
-// session_name('PROJECT2SESSION');
-// session_set_cookie_params([
-//     'path' => 'assets/blrr_v6', // Set a unique path for Project 2
-//     'secure' => true, // Use HTTPS if your site supports it
-//     'httponly' => true
-// ]);
-
-// Set session cookie parameters before starting the session
-
-
 // Start the session
 session_name('blrr');
 session_start();
@@ -94,7 +83,7 @@ if(isset($_POST['login'])){
     $query_run = mysqli_query($conn, $query);
     // For success
     if ($query_run) {     
-       echo "<script>window.location.href='dashboard.php?code=" . $_SESSION['code'] . "'</script>";
+       echo "<script>window.location.href='backend/dashboard.php?code=" . $_SESSION['code'] . "'</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
     }
@@ -230,12 +219,12 @@ if(isset($_POST['login'])){
         <input class="form-check-input" type="checkbox" name="remember"> Remember me
       </label>
     </div>
-    <button type="submit" class="btn  gap-2 col-12 mx-auto text-white" name="login" style="background-color: #7e11bd;"><i class="fa fa-sign-in" ></i> Sign In</button>
+    <button type="submit" class="btn  gap-2 col-12 mx-auto text-white" name="login" style="background-color: #7e11bd;"><i class="fa fa-sign-in" ></i> Login</button>
     <!-- <button type="submit" class="btn btn-primary d-grid gap-2 col-12 mx-auto" name="login" style="font-size:24px">Sign In <i class="fa fa-sign-out"></i></button> -->
   </form>
   </div>
-  <div class="card-footer text-center text-muted"><b><i class="fa fa-copyright"></i><?php echo date("Y");
-?> BCIC. [--Design & Developed by ICT Division, BCIC.--]</b></div>
+  <div class="card-footer text-center text-muted"><small><i class="fa fa-copyright"></i> <?php echo date("Y");
+?> BCIC. [--Design & Developed by ICT Division, BCIC.--]</small></div>
 </div>  
 </div>
   <div class="col-sm-4"></div>

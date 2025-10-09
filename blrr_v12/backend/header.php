@@ -1,9 +1,10 @@
 <?php 
+date_default_timezone_set("Asia/Dhaka");   //India time (GMT+6)
 
 function englishToBanglaNumber($number) {
     $englishNumbers = range(0, 9);
     $banglaNumbers = array('০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯');
-    return mb_convert_encoding($number, 'UTF-8', 'ASCII') ? str_replace($englishNumbers, $banglaNumbers, $number) : $number;
+    return str_replace($englishNumbers, $banglaNumbers, $number);
 }
 ?>
 <!DOCTYPE html>
@@ -12,7 +13,7 @@ function englishToBanglaNumber($number) {
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>বিসিআইসি - BLRR সিস্টেম</title>
+  <title>BCIC BLRR</title>
   
   <!-- SEO Meta Tags -->
   <meta name="description" content="বিসিআইসি পত্র প্রাপ্তি রেজিস্টার সিস্টেম - BLRR Management System">
@@ -29,28 +30,36 @@ function englishToBanglaNumber($number) {
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   
-  <!-- DataTables CSS -->
+  <!-- DataTables + Buttons -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
-  
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.1.1/css/buttons.bootstrap5.min.css">
+
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- DataTables JS -->
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <!-- DataTables JS + Buttons -->
+  <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-
-  <!-- Custom Script -->
-  <!-- <script src="ajax/ajax.js"></script> -->
+  <script src="https://cdn.datatables.net/buttons/3.1.1/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/3.1.1/js/buttons.print.min.js"></script> -->
+<!-- Add these CDN links in head section -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
+
+body {
+    font-family: 'Noto Sans Bengali', sans-serif;
+}
     /* Print Styles */
     @media print {
       .no-print, .btn, .modal, .dataTables_length, .dataTables_filter, 
@@ -140,7 +149,8 @@ function englishToBanglaNumber($number) {
     /* Logo Container */
     .imgcontainer {
       text-align: center;
-      margin: 10px 0 15px 0;
+/*      margin: 10px 0 15px 0;*/
+       margin: 3px 0 5px 0;
       position: relative;
     }
     
@@ -156,6 +166,10 @@ function englishToBanglaNumber($number) {
     .navbar-custom {
       background: linear-gradient(135deg, var(--custom-purple) 0%, var(--custom-purple-dark) 100%);
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+      min-height: 50px;
+      padding-top: 0.15rem;
+      padding-bottom: 0.15rem;
     }
 
     /* Card Enhancements */
@@ -257,34 +271,35 @@ function englishToBanglaNumber($number) {
     }
 
     /* Modal Height Fix */
-.modal-dialog-scrollable .modal-content {
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-dialog-scrollable .modal-body {
-    overflow-y: auto;
-    flex: 1;
-}
-
-.modal-dialog-scrollable .modal-footer {
-    flex-shrink: 0;
-}
-.custom-alert {
-    animation: slideInRight 0.3s ease-out;
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
+    .modal-dialog-scrollable .modal-content {
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
     }
-    to {
-        transform: translateX(0);
-        opacity: 1;
+
+    .modal-dialog-scrollable .modal-body {
+        overflow-y: auto;
+        flex: 1;
     }
-}
+
+    .modal-dialog-scrollable .modal-footer {
+        flex-shrink: 0;
+    }
+
+    .custom-alert {
+        animation: slideInRight 0.3s ease-out;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
   </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -300,7 +315,7 @@ function englishToBanglaNumber($number) {
   <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
     <div class="container-fluid">
       <div class="imgcontainer">
-        <img src="images/bcic_logo.jpg" alt="BCIC Logo" class="avatar" width="100" height="50">
+        <img src="images/bcic_logo.jpg" alt="BCIC Logo" class="avatar" >
       </div>
       
       <a class="navbar-brand fw-bold" href="dashboard.php">
@@ -326,10 +341,10 @@ function englishToBanglaNumber($number) {
             </span>
           </li>
             <li class="nav-item">
-            <span class="nav-link text-light"><small>Logged As a : [--<?php echo $user_type; ?>--]</small></span>
+            <span class="nav-link text-light"><small>Logged As a : [--<?php echo $user_type ?? 'user'; ?>--]</small></span>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-light" href="backend/logout.php">
+            <a class="nav-link text-light" href="logout.php">
               <i class="fas fa-sign-out-alt me-1"></i>লগআউট
             </a>
           </li>
@@ -342,13 +357,18 @@ function englishToBanglaNumber($number) {
   <div class="bg-light border-bottom py-2">
     <div class="container-fluid">
       <div class="row align-items-center">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <small class="text-muted">
             <i class="fas fa-calendar-alt me-1"></i>
             <?php echo date('l, d F Y'); ?>
           </small>
         </div>
-        <div class="col-md-6 text-end">
+       <div class="col-md-4 text-end">
+          <small class="text-muted">
+            <small><i class="fa fa-copyright"></i> <?php echo date("Y");?> BCIC. [--Design & Developed by ICT Division, BCIC.--]</small>
+          </small>
+        </div>
+        <div class="col-md-4 text-end">
           <small class="text-muted">
             <i class="fas fa-clock me-1"></i>
             <span id="liveClock"><?php echo date('h:i:s A'); ?></span>
@@ -360,4 +380,3 @@ function englishToBanglaNumber($number) {
 
   <!-- Main Content Container -->
   <main class="container-fluid flex-grow-1 fade-in">
-    <!-- Content will be inserted here by individual pages -->
