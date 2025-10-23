@@ -54,17 +54,20 @@ include_once 'header.php';
 					        <a href="logfile.php?username=<?=$_SESSION['username']?>" class="btn btn-success me-2" target="_blank">
 					            <i class="fa fa-building-o" style="font-size:15px;color:black"></i> Log File
 					        </a>
-					        <form id="downloadForm" action="download_database.php" method="post">
-					            <button class="btn btn-warning" type="submit" name="submit">
-					                <i class="fa fa-download" style="font-size:16px"></i> Download DB New
-					            </button>
-					        </form>
-					        &nbsp;
-					        <form id="downloadForm" action="download_database.php" method="post">
-					            <button class="btn btn-warning" type="submit" name="submit_old">
-					                <i class="fa fa-download" style="font-size:16px"></i> Download Old DB
-					            </button>
-					        </form>
+					        <form id="downloadFormNew" action="download_database.php" method="post">
+									    <button class="btn btn-warning" type="submit" name="submit_new">
+									        <i class="fa fa-download" style="font-size:16px"></i> Download DB New
+									    </button>
+									</form>
+
+									&nbsp;
+
+									<form id="downloadFormOld" action="download_database.php" method="post">
+									    <button class="btn btn-warning" type="submit" name="submit_old">
+									        <i class="fa fa-download" style="font-size:16px"></i> Download Old DB
+									    </button>
+									</form>
+
 					    </div>
 						<?php
 						 }

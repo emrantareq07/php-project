@@ -68,7 +68,7 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content" style="max-height: 95vh; display: flex; flex-direction: column;">
                         <div class="modal-header bg-custom-purple text-white" style="flex-shrink: 0;">
-                            <h5 class="modal-title">পত্র প্রাপ্তি রেজিস্টার এন্ট্রি ফরম</h5>
+                            <h5 class="modal-title">পত্র প্রাপ্তি রেজিস্টার এন্ট্রি/ সংশোধন ফরম</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" style="overflow-y: auto; flex: 1;">
@@ -81,7 +81,7 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
                                     <?php if($table_name=='chairman'): ?>
                                     <div class="col-md-6">
                                         <label class="form-label">পত্র প্রাপ্তি তারিখ</label>
-                                        <input type="date" class="form-control" id="entry_date" name="entry_date" value="<?php echo $today_date ?>" required>
+                                        <input type="date" class="form-control" id="entry_date" name="entry_date" value="<?php echo englishToBanglaNumber($today_date)?>" required>
                                     </div>
                                     <?php endif; ?>  
                                     
@@ -178,6 +178,12 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
                                         <!-- Hidden input to store selected destinations -->
                                         <input type="hidden" id="selected_destinations" name="selected_destinations">
                                     </div>
+                                     <div class="col-md-6">
+                                      <div class="form-group  mt-2"><label> গন্তব্য (লিখুন): </label>
+                                       <input type="text" class="form-control" id="destination" placeholder="" name="destination" >                                                 
+                                        </div>
+                                      </div>  
+
 
                                     <div class="col-md-6">
                                         <label class="form-label">মাধ্যম</label>
@@ -209,7 +215,7 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
                                         <input type="text" class="form-control" id="chairman_note" name="chairman_note">
                                     </div>
                                     
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <label class="form-label">মন্তব্য</label>
                                         <textarea class="form-control" name="comments" id="comments" rows="1"></textarea>
                                     </div>
@@ -578,7 +584,8 @@ buttons: {
                             <p><strong>প্রেরক:</strong> ${res.sender || ''}</p>
                             <p><strong>ডিভিশন/অফিস:</strong> ${res.div_dept_office || ''}</p>
                             <p><strong>বিষয়বস্তু:</strong> ${res.subject || ''}</p>
-                            <p><strong>গন্তব্য অফিস:</strong> ${res.destination || ''}</p>
+                            
+                            <p><strong>গন্তব্য অফিস:</strong> ${res.destination_drop || ''}, ${res.destination || ''}</p>
                             <p><strong>বিতরণ তারিখ:</strong> ${res.distribution_date ? new Date(res.distribution_date).toLocaleDateString('bn-BD') : ''}</p>
                         </div>
                     </div>
@@ -623,11 +630,11 @@ $('#friendsTable').on('click', '.editBtn', function(){
             $('#distribution_date').val(res.distribution_date || '');
             $('#chairman_note').val(res.chairman_note || '');
             $('#comments').val(res.comments || '');
-
+            $('#destination').val(res.destination || '');
             // ----- DESTINATIONS: reset & repopulate -----
             // use normalized field 'destination' (fetch.php sets it), but fallback if necessary
-            var destString = res.destination || res.destination_drop || '';
-
+            // var destString = res.destination || res.destination_drop || '';
+            var destString =  res.destination_drop || '';
             // reset current selection UI/state
             selectedDestinations = {};
             $('#selected_destinations').val('');
