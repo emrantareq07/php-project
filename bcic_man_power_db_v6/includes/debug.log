@@ -1,0 +1,8 @@
+2025-10-16 11:54:43 - === SAVE_DATA.PHP STARTED ===
+2025-10-16 11:54:43 - User: sfcl, Table: officers_tbl
+2025-10-16 11:54:43 - Database connection OK
+2025-10-16 11:54:43 - Table exists
+2025-10-16 11:54:43 - Factory: , Date: 2025-10-16, ID: null
+2025-10-16 11:54:43 - ERROR: Factory name and date are required
+2025-10-16 11:54:43 - === SAVE_DATA.PHP COMPLETED ===
+

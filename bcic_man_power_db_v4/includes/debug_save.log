@@ -1,0 +1,162 @@
+2025-10-19 06:24:28 - === SAVE_DATA STARTED ===
+2025-10-19 06:24:28 - User: sfcl, Table: officers_tbl
+2025-10-19 06:24:28 - Database connection OK
+2025-10-19 06:24:28 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:24:28 - Processing data array with 14 sections
+2025-10-19 06:24:28 - Data prepared for 9 grades
+2025-10-19 06:24:28 - Attempting INSERT for new record
+2025-10-19 06:24:28 - ERROR: A record for this date already exists (ID: 5). Please use edit instead.
+2025-10-19 06:24:28 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:24:42 - === SAVE_DATA STARTED ===
+2025-10-19 06:24:42 - User: sfcl, Table: officers_tbl
+2025-10-19 06:24:42 - Database connection OK
+2025-10-19 06:24:42 - Factory: sfcl, Date: 2025-10-18, ID: 5
+2025-10-19 06:24:42 - Processing data array with 14 sections
+2025-10-19 06:24:42 - Data prepared for 9 grades
+2025-10-19 06:24:42 - Attempting UPDATE for ID: 5
+2025-10-19 06:24:42 - UPDATE SQL prepared
+2025-10-19 06:24:42 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:24:42 - Record UPDATED successfully - ID: 5
+2025-10-19 06:24:42 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:24:49 - === SAVE_DATA STARTED ===
+2025-10-19 06:24:49 - User: sfcl, Table: officers_tbl
+2025-10-19 06:24:49 - Database connection OK
+2025-10-19 06:24:49 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:24:49 - Processing data array with 14 sections
+2025-10-19 06:24:49 - Data prepared for 9 grades
+2025-10-19 06:24:49 - Attempting INSERT for new record
+2025-10-19 06:24:49 - INSERT SQL prepared
+2025-10-19 06:24:49 - Binding parameters: sssssssssssssssssssssssssssssssss, 33 parameters
+2025-10-19 06:24:49 - Record INSERTED successfully - New ID: 6
+2025-10-19 06:24:49 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:25:03 - === SAVE_DATA STARTED ===
+2025-10-19 06:25:03 - User: sfcl, Table: officers_tbl
+2025-10-19 06:25:03 - Database connection OK
+2025-10-19 06:25:03 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:25:03 - Processing data array with 14 sections
+2025-10-19 06:25:03 - Data prepared for 9 grades
+2025-10-19 06:25:03 - Attempting UPDATE for ID: 6
+2025-10-19 06:25:03 - UPDATE SQL prepared
+2025-10-19 06:25:03 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:25:03 - Record UPDATED successfully - ID: 6
+2025-10-19 06:25:03 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:25:13 - === SAVE_DATA STARTED ===
+2025-10-19 06:25:13 - User: sfcl, Table: officers_tbl
+2025-10-19 06:25:13 - Database connection OK
+2025-10-19 06:25:13 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:25:13 - Processing data array with 14 sections
+2025-10-19 06:25:13 - Data prepared for 9 grades
+2025-10-19 06:25:13 - Attempting INSERT for new record
+2025-10-19 06:25:13 - ERROR: A record for this date already exists (ID: 6). Please use edit instead.
+2025-10-19 06:25:13 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:30:33 - === SAVE_DATA STARTED ===
+2025-10-19 06:30:33 - User: sfcl, Table: officers_tbl
+2025-10-19 06:30:33 - Database connection OK
+2025-10-19 06:30:33 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:30:33 - Processing data array with 14 sections
+2025-10-19 06:30:33 - Data prepared for 9 grades
+2025-10-19 06:30:33 - Attempting UPDATE for ID: 6
+2025-10-19 06:30:33 - UPDATE SQL prepared
+2025-10-19 06:30:33 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:30:33 - Record UPDATED successfully - ID: 6
+2025-10-19 06:30:33 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:33:53 - === SAVE_DATA STARTED ===
+2025-10-19 06:33:53 - User: sfcl, Table: officers_tbl
+2025-10-19 06:33:53 - Database connection OK
+2025-10-19 06:33:53 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:33:53 - Processing data array with 14 sections
+2025-10-19 06:33:53 - Data prepared for 9 grades
+2025-10-19 06:33:53 - Attempting UPDATE for ID: 6
+2025-10-19 06:33:53 - UPDATE SQL prepared
+2025-10-19 06:33:53 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:33:53 - Record UPDATED successfully - ID: 6
+2025-10-19 06:33:53 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:34:06 - === SAVE_DATA STARTED ===
+2025-10-19 06:34:06 - User: sfcl, Table: officers_tbl
+2025-10-19 06:34:06 - Database connection OK
+2025-10-19 06:34:06 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:34:06 - Processing data array with 14 sections
+2025-10-19 06:34:06 - Data prepared for 9 grades
+2025-10-19 06:34:06 - Attempting UPDATE for ID: 6
+2025-10-19 06:34:06 - UPDATE SQL prepared
+2025-10-19 06:34:06 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:34:06 - Record UPDATED successfully - ID: 6
+2025-10-19 06:34:06 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:39:51 - === SAVE_DATA STARTED ===
+2025-10-19 06:39:51 - User: sfcl, Table: officers_tbl
+2025-10-19 06:39:51 - Database connection OK
+2025-10-19 06:39:51 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:39:51 - Processing data array with 14 sections
+2025-10-19 06:39:51 - Data prepared for 9 grades
+2025-10-19 06:39:51 - Attempting UPDATE for ID: 6
+2025-10-19 06:39:51 - UPDATE SQL prepared
+2025-10-19 06:39:51 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:39:51 - Record UPDATED successfully - ID: 6
+2025-10-19 06:39:51 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:59:59 - === SAVE_DATA STARTED ===
+2025-10-19 06:59:59 - User: sfcl, Table: officers_tbl
+2025-10-19 06:59:59 - Database connection OK
+2025-10-19 06:59:59 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:59:59 - Processing data array with 14 sections
+2025-10-19 06:59:59 - Data prepared for 9 grades
+2025-10-19 06:59:59 - Attempting INSERT for new record
+2025-10-19 06:59:59 - ERROR: A record for this date already exists (ID: 6). Please use edit instead.
+2025-10-19 06:59:59 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:13:24 - === SAVE_DATA STARTED ===
+2025-10-19 07:13:24 - User: sfcl, Table: officers_tbl
+2025-10-19 07:13:24 - Database connection OK
+2025-10-19 07:13:24 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 07:13:24 - Processing data array with 14 sections
+2025-10-19 07:13:24 - Data prepared for 9 grades
+2025-10-19 07:13:24 - Attempting UPDATE for ID: 6
+2025-10-19 07:13:24 - UPDATE SQL prepared
+2025-10-19 07:13:24 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:13:24 - Record UPDATED successfully - ID: 6
+2025-10-19 07:13:24 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:13:47 - === SAVE_DATA STARTED ===
+2025-10-19 07:13:47 - User: sfcl, Table: officers_tbl
+2025-10-19 07:13:47 - Database connection OK
+2025-10-19 07:13:47 - Factory: sfcl, Date: 2025-10-09, ID: 5
+2025-10-19 07:13:47 - Processing data array with 14 sections
+2025-10-19 07:13:47 - Data prepared for 9 grades
+2025-10-19 07:13:47 - Attempting UPDATE for ID: 5
+2025-10-19 07:13:47 - UPDATE SQL prepared
+2025-10-19 07:13:47 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:13:47 - Record UPDATED successfully - ID: 5
+2025-10-19 07:13:47 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:13:58 - === SAVE_DATA STARTED ===
+2025-10-19 07:13:58 - User: sfcl, Table: officers_tbl
+2025-10-19 07:13:58 - Database connection OK
+2025-10-19 07:13:58 - Factory: sfcl, Date: 2025-10-17, ID: 6
+2025-10-19 07:13:58 - Processing data array with 14 sections
+2025-10-19 07:13:58 - Data prepared for 9 grades
+2025-10-19 07:13:58 - Attempting UPDATE for ID: 6
+2025-10-19 07:13:58 - UPDATE SQL prepared
+2025-10-19 07:13:58 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:13:58 - Record UPDATED successfully - ID: 6
+2025-10-19 07:13:58 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:14:20 - === SAVE_DATA STARTED ===
+2025-10-19 07:14:20 - User: sfcl, Table: officers_tbl
+2025-10-19 07:14:20 - Database connection OK
+2025-10-19 07:14:20 - Factory: sfcl, Date: 2025-10-17, ID: 6
+2025-10-19 07:14:20 - Processing data array with 14 sections
+2025-10-19 07:14:20 - Data prepared for 9 grades
+2025-10-19 07:14:20 - Attempting UPDATE for ID: 6
+2025-10-19 07:14:20 - UPDATE SQL prepared
+2025-10-19 07:14:20 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:14:20 - Record UPDATED successfully - ID: 6
+2025-10-19 07:14:20 - === SAVE_DATA COMPLETED ===
+
