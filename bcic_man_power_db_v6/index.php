@@ -32,17 +32,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login_time = date('Y-m-d H:i:s');
 
     // Fetch hashed password from DB
-    $stmt = $conn->prepare("SELECT username, password FROM users WHERE username = ?");
+    $stmt = $conn->prepare("SELECT username, password,role FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
+       // $role=$user['role'];
 
         // Verify password
         if (password_verify($password, $user['password'])) {
             $_SESSION['username'] = $username;
+            $_SESSION['role'] = $user['role'];
             $status = 'success';
 
             // Insert login attempt into log_table
@@ -52,8 +54,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $log->execute();
             $log->close();
 
-            echo "<script>window.location.href='includes/officers_info.php';</script>";
-            exit;
+            if ($_SESSION['role'] !== 'admin' && $_SESSION['username'] !== 'admin') {
+                echo "<script>window.location.href='includes/dashboard.php';</script>";
+                exit;
+            } else {
+                echo "<script>window.location.href='includes/admin_dashboard.php';</script>";
+                exit;
+            }
+
+            // if((!$username==='admin') && ($_SESSION['role'] == 'admin')) {
+            //    echo "<script>window.location.href='includes/dashboard.php';</script>";
+            // exit; 
+            // }else{
+            //      echo "<script>window.location.href='includes/admin_dashboard.php';</script>";
+            //     exit;
+            // }
+           
         }
     }
 
@@ -123,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="login-card">
     <div class="text-center mb-4">
-        <img src="assets/logo.png" alt="Logo" width="80">
+        <img src="assets/bcic_logo.png" alt="Logo" width="80">
         <h4 class="mt-2">Man Power Management</h4>
         <p class="text-muted">Please sign in to continue</p>
     </div>

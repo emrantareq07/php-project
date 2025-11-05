@@ -340,3 +340,113 @@
 2025-10-23 16:23:37 - Processing 15 section entries
 2025-10-23 16:23:37 - Preparing UPDATE for ID 4
 2025-10-23 16:23:37 - Updated ID 4 successfully
+2025-10-23 16:30:41 - === SAVE_DATA STARTED ===
+2025-10-23 16:30:41 - ID: null, Load ID: null
+2025-10-23 16:30:41 - Processing 15 section entries
+2025-10-23 16:30:41 - Preparing INSERT for new record
+2025-10-23 16:30:41 - Inserted new record ID 5
+2025-10-26 10:36:02 - === SAVE_DATA STARTED ===
+2025-10-26 10:36:02 - ID: null, Load ID: null
+2025-10-26 10:36:02 - Processing 15 section entries
+2025-10-26 10:36:02 - Preparing INSERT for new record
+2025-10-26 10:36:02 - Inserted new record ID 6
+2025-10-26 10:36:27 - === SAVE_DATA STARTED ===
+2025-10-26 10:36:27 - ID: 6, Load ID: null
+2025-10-26 10:36:27 - Processing 15 section entries
+2025-10-26 10:36:27 - Preparing UPDATE for ID 6
+2025-10-26 10:36:27 - Updated ID 6 successfully
+2025-10-29 10:45:30 - === SAVE_DATA STARTED ===
+2025-10-29 10:45:30 - ID: 5, Load ID: null
+2025-10-29 10:45:30 - Processing 15 section entries
+2025-10-29 10:45:30 - Preparing UPDATE for ID 5
+2025-10-29 10:45:30 - ERROR: Record not found or access denied
+2025-10-29 10:47:46 - === SAVE_DATA STARTED ===
+2025-10-29 10:47:46 - ID: 5, Load ID: null
+2025-10-29 10:47:46 - Processing 15 section entries
+2025-10-29 10:47:46 - Preparing UPDATE for ID 5
+2025-10-29 10:47:46 - Updated ID 5 successfully
+2025-10-29 10:48:50 - === SAVE_DATA STARTED ===
+2025-10-29 10:48:50 - ID: 5, Load ID: null
+2025-10-29 10:48:50 - Processing 15 section entries
+2025-10-29 10:48:50 - Preparing UPDATE for ID 5
+2025-10-29 10:48:50 - Updated ID 5 successfully
+2025-10-29 10:57:32 - === SAVE_DATA STARTED ===
+2025-10-29 10:57:32 - ID: 6, Load ID: null
+2025-10-29 10:57:32 - Processing 15 section entries
+2025-10-29 10:57:32 - Preparing UPDATE for ID 6
+2025-10-29 10:57:32 - Updated ID 6 successfully
+2025-10-29 10:58:37 - === SAVE_DATA STARTED ===
+2025-10-29 10:58:37 - ID: 5, Load ID: null
+2025-10-29 10:58:37 - Processing 15 section entries
+2025-10-29 10:58:37 - Preparing UPDATE for ID 5
+2025-10-29 10:58:37 - ERROR: Record not found or access denied
+2025-10-29 10:58:53 - === SAVE_DATA STARTED ===
+2025-10-29 10:58:53 - ID: 5, Load ID: null
+2025-10-29 10:58:53 - Processing 15 section entries
+2025-10-29 10:58:53 - Preparing UPDATE for ID 5
+2025-10-29 10:58:53 - ERROR: Record not found or access denied
+2025-10-29 10:59:41 - === SAVE_DATA STARTED ===
+2025-10-29 10:59:41 - ID: 5, Load ID: null
+2025-10-29 10:59:41 - Processing 15 section entries
+2025-10-29 10:59:41 - Preparing UPDATE for ID 5
+2025-10-29 10:59:41 - Updated ID 5 successfully
+2025-10-29 11:05:20 - === SAVE_DATA STARTED ===
+2025-10-29 11:05:20 - ID: 3, Load ID: null
+2025-10-29 11:05:20 - Processing 15 section entries
+2025-10-29 11:05:20 - Preparing UPDATE for ID 3
+2025-10-29 11:05:20 - Updated ID 3 successfully
+2025-10-29 11:08:02 - === SAVE_DATA STARTED ===
+2025-10-29 11:08:02 - ID: 6, Load ID: null
+2025-10-29 11:08:02 - Processing 15 section entries
+2025-10-29 11:08:02 - Preparing UPDATE for ID 6
+2025-10-29 11:08:02 - Updated ID 6 successfully
+2025-10-29 11:45:05 - === SAVE_DATA STARTED ===
+2025-10-29 11:45:05 - ID: 6, Load ID: null
+2025-10-29 11:45:05 - Processing 15 section entries
+2025-10-29 11:45:05 - Preparing UPDATE for ID 6
+2025-10-29 11:45:05 - Updated ID 6 successfully
+2025-10-29 12:04:22 - === SAVE_DATA STARTED ===
+2025-10-29 12:04:22 - ID: 6, Load ID: null
+2025-10-29 12:04:22 - Processing 15 section entries
+2025-10-29 12:04:22 - Preparing UPDATE for ID 6
+2025-10-29 12:04:22 - ERROR: Record not found or access denied
+2025-10-29 12:04:27 - === SAVE_DATA STARTED ===
+2025-10-29 12:04:27 - ID: 6, Load ID: null
+2025-10-29 12:04:27 - Processing 15 section entries
+2025-10-29 12:04:27 - Preparing UPDATE for ID 6
+2025-10-29 12:04:27 - ERROR: Record not found or access denied
+2025-10-29 12:39:09 - === SAVE_DATA STARTED ===
+2025-10-29 12:39:09 - ID: 6, Load ID: null
+2025-10-29 12:39:09 - Processing 15 section entries
+2025-10-29 12:39:09 - Preparing UPDATE for ID 6
+2025-10-29 12:39:09 - Updated ID 6 successfully
+2025-10-29 12:40:03 - === SAVE_DATA STARTED ===
+2025-10-29 12:40:03 - ID: 5, Load ID: null
+2025-10-29 12:40:03 - Processing 15 section entries
+2025-10-29 12:40:03 - Preparing UPDATE for ID 5
+2025-10-29 12:40:03 - Updated ID 5 successfully
+2025-10-29 12:42:31 - === SAVE_DATA STARTED ===
+2025-10-29 12:42:31 - ID: 6, Load ID: null
+2025-10-29 12:42:31 - Processing 15 section entries
+2025-10-29 12:42:31 - Preparing UPDATE for ID 6
+2025-10-29 12:42:31 - Updated ID 6 successfully
+2025-10-29 12:43:11 - === SAVE_DATA STARTED ===
+2025-10-29 12:43:11 - ID: 6, Load ID: null
+2025-10-29 12:43:11 - Processing 15 section entries
+2025-10-29 12:43:11 - Preparing UPDATE for ID 6
+2025-10-29 12:43:11 - Updated ID 6 successfully
+2025-11-04 14:15:12 - === SAVE_DATA STARTED ===
+2025-11-04 14:15:12 - ID: null, Load ID: null
+2025-11-04 14:15:12 - Processing 15 section entries
+2025-11-04 14:15:12 - Preparing INSERT for new record
+2025-11-04 14:15:12 - Inserted new record ID 7
+2025-11-04 15:21:05 - === SAVE_DATA STARTED ===
+2025-11-04 15:21:05 - ID: null, Load ID: null
+2025-11-04 15:21:05 - Processing 15 section entries
+2025-11-04 15:21:05 - Preparing INSERT for new record
+2025-11-04 15:21:05 - Inserted new record ID 8
+2025-11-04 15:21:23 - === SAVE_DATA STARTED ===
+2025-11-04 15:21:23 - ID: 8, Load ID: null
+2025-11-04 15:21:23 - Processing 15 section entries
+2025-11-04 15:21:23 - Preparing UPDATE for ID 8
+2025-11-04 15:21:23 - Updated ID 8 successfully

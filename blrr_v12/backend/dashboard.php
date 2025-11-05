@@ -32,13 +32,9 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
             <span class="float-end d-flex flex-wrap gap-2 align-items-center">
     <!-- Button to open modal -->
     <button class="btn btn-outline-primary mb-2" data-bs-toggle="modal" data-bs-target="#entryModal">
-        <i class="fa fa-plus"></i> Add New Docs
+        <i class="fa fa-plus"></i> নতুন পত্র/চিঠি এন্ট্রি
     </button>
-
-   <!--  <a href="#addEmployeeModalfile" class="btn btn-outline-success border-custom-purple d-inline-block" data-toggle="modal">
-    <i class="fa fa-plus" style="font-size:16px;color:red"></i> <span>Add File</span>
-    </a> -->
-
+  
     <a href="addfiledashboard.php" 
        class="btn btn-outline-success border-custom-purple d-inline-block mb-2">
         <i class="fa fa-file" style="font-size:16px;color:red"></i> 
@@ -47,12 +43,12 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
 
     <!-- Your other buttons remain the same -->
     <a href="show_all.php?table_name=<?= $_SESSION['table_name'] ?>" class="btn btn-outline-success mb-2">
-        <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>Show All</span>
+        <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>সব পত্র দেখুন</span>
     </a>
 
     <?php if ($user_type == 'user' && ($office_title == 'division' || $office_title == 'director' || $office_title == 'chairman')) { ?>
         <a href="incoming_letter.php" class="btn btn-outline-success position-relative mb-2">
-            <i class="fa fa-clock-o" style="font-size:20px;color:red"></i> Incoming Letter
+            <i class="fa fa-clock-o" style="font-size:20px;color:red"></i> আগত চিঠি
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 <?= $upcoming_meeting_count; ?>
             </span>
@@ -60,10 +56,10 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
     <?php } ?>
 
     <a href="show_all_old.php?table_name=<?= $_SESSION['table_name'] ?>" class="btn btn-outline-success mb-2">
-        <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>Show Old Docs</span>
+        <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>পুরাতন পত্র দেখুন</span>
     </a>
     <a href="search_new.php?table_name=<?= $_SESSION['table_name'] ?>&val=987" class="btn btn-outline-primary mb-2">
-        <i class="fa fa-search" style="font-size:16px"></i> <span>Search</span>
+        <i class="fa fa-search" style="font-size:16px"></i> <span>খুজুন</span>
     </a>
 
     <?php //if ($user_type == 'sadmin') { ?>
@@ -76,170 +72,20 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
     <?php //} ?> 
     
     <?php if ($table_name == 'chairman') { ?>
-        <form id="downloadForm" action="download_database.php" method="post" class="mb-2">
+        <form id="downloadForm" action="download_db.php" method="post" class="mb-2">
             <button class="btn btn-warning" type="submit" name="submit">
-                <i class="fa fa-download" style="font-size:16px"></i> Download DB
+                <i class="fa fa-download" style="font-size:16px"></i> ডাউনলোড ডিবি
             </button>
         </form>
     <?php } ?>           
 </span>
 
-<!-- addfile modal -->
-<div id="addEmployeeModalfile" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="user_formfile" role="form">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h4 class="modal-title text-uppercase mx-auto fw-bold text-muted">File প্রাপ্তি রেজিস্টার এন্ট্রি ফরম</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>                
-                <div class="modal-body">
-
-                    <div class="row g-2">
-                        <div class="col-md">
-                            <div class="form-floating mb-2">
-                                <input type="date" class="form-control" id="entry_date" 
-                                       name="entry_date" value="<?php echo $today_date ?>" required>
-                                <label for="entry_date">ফাইল প্রাপ্তি তারিখ :</label>
-                            </div>
-                        </div>                  
-
-                        <div class="col-md">
-                            <div class="form-floating mb-2">
-                               <select class="form-select" id="recipient" name="recipient" required>
-                                <option selected disabled value="">--Select--</option>
-                                 <?php
-                                    $sql = "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
-                                    $result = mysqli_query($conn, $sql);
-                                    while($row = mysqli_fetch_array($result)) {
-                                        echo "<option value='".$row['division_bn']."'>".$row['division_bn']."</option>";
-                                    }
-                                 ?>   
-                                </select>
-                                <label for="recipient">উপস্থাপনকারীর বিভাগ :</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-2">
-                        <div class="col-md">
-                            <div class="form-group">
-                                <label>ডকেট নং :</label>
-                                <?php
-                                $year_auto = date("Y");
-                                $sql_d_number1 = "SELECT MAX(d_number) AS max_d_number 
-                                                  FROM chairmanfile 
-                                                  WHERE entry_date LIKE '$year_auto%'";
-                                $result_d_number1 = mysqli_query($conn, $sql_d_number1);
-                                $row_d_number1 = mysqli_fetch_array($result_d_number1);
-                                $row_d_number_max = empty($row_d_number1['max_d_number']) ? 1 : $row_d_number1['max_d_number'] + 1;
-                                ?> 
-                                <input type="text" 
-                                       class="form-control bg-light" 
-                                       id="d_number" 
-                                       name="d_number" 
-                                       value="<?php echo englishToBanglaNumber($row_d_number_max); ?>" 
-                                       readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-2">
-                        <div class="col-md">
-                            <div class="form-group mb-2">
-                                <label>স্বাক্ষরের তারিখ :</label>
-                                <input type="date" class="form-control" id="send_date" 
-                                       value="<?php echo $today_date ?>" name="send_date" required>
-                            </div>
-                        </div>
-                    </div> 
-
-                    <div class="form-group mb-2">
-                        <label>বিবরণ/বিষয়/সারসংক্ষেপ/বিষয়বস্তু:</label>
-                        <textarea class="form-control" rows="2" id="subject" name="subject" required></textarea> 
-                    </div> 
-
-                    <!-- Multiple Destination Selection -->
-                    <div class="form-group">
-                        <label>গন্তব্য (এক/একাধিক নির্বাচন করুন):</label>
-                        <input type="text" class="form-control" id="destination_inputfile" list="destination_dropfile" autocomplete="off" placeholder="Select destinations">
-                        <datalist id="destination_dropfile">
-                            <?php
-                            $sql0 = ($office_title == "chairman") 
-                                ? "SELECT division_bn FROM division"
-                                : "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
-                            $result0 = mysqli_query($conn, $sql0);
-                            while ($row0 = mysqli_fetch_array($result0)) {
-                                echo "<option value='" . $row0['division_bn'] . "'>" . $row0['division_bn'] . "</option>";
-                            }
-                            ?>
-                        </datalist>
-                        <div id="selected_destinations_displayfile" class="mt-2"></div>
-                        <input type="hidden" id="selected_destinationsfile" name="selected_destinationsfile">
-                    </div>
-
-                    <div class="row g-2">
-                        <div class="col-md">
-                            <div class="form-group mb-2">
-                                <label>মন্তব্য:</label>
-                                <input type="text" class="form-control" id="comments" name="comments">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" value="Cancel">
-                    <button type="submit" class="btn btn-success" id="btn-add">
-                        <i class="fa fa-save" style="font-size:16px"></i> Save
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-            <script>
-            $(document).off('submit', '#user_formfile').on('submit', '#user_formfile', function(e){
-                e.preventDefault();
-
-                if(window.isSubmitting) return;
-                window.isSubmitting = true;
-
-                let formData = $(this).serialize() + "&type=1";
-
-                $.ajax({
-                    url: "savefile.php",
-                    type: "POST",
-                    data: formData,
-                    success: function(response){
-                        window.isSubmitting = false;
-                        try {
-                            let result = JSON.parse(response);
-                            if(result.statusCode == 200){
-                                alert("Data saved successfully!");
-                                $("#addEmployeeModalfile").modal('hide');
-                                location.reload();
-                            } else {
-                                alert("Error: " + result.error);
-                            }
-                        } catch(e) {
-                            alert("Invalid response from server.");
-                        }
-                    },
-                    error: function(){
-                        window.isSubmitting = false;
-                        alert("An error occurred while saving data.");
-                    }
-                });
-            });
-            </script>
             <!-- Add/Edit Modal - FIXED STRUCTURE -->
             <div class="modal fade" id="entryModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content" style="max-height: 95vh; display: flex; flex-direction: column;">
                         <div class="modal-header bg-custom-purple text-white" style="flex-shrink: 0;">
-                            <h5 class="modal-title">পত্র প্রাপ্তি রেজিস্টার এন্ট্রি ফরম</h5>
+                            <h5 class="modal-title fw-bold">পত্র প্রাপ্তি রেজিস্টার এন্ট্রি ফরম</h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body" style="overflow-y: auto; flex: 1;">
@@ -247,12 +93,33 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
                                 <input type="hidden" id="edit_id" name="id">
                                 <input type="hidden" id="unique_id" name="unique_id">
                                 <input type="hidden" id="table_name" name="table_name" value="<?php echo $table_name; ?>">
-
+                                <input type="hidden" id="year_auto1" name="year_auto1">
                                 <div class="row g-3">
                                     <?php if($table_name=='chairman'): ?>
                                     <div class="col-md-6">
-                                        <label class="form-label">পত্র প্রাপ্তি তারিখ</label>
-                                        <input type="date" class="form-control" id="entry_date" name="entry_date" value="<?php echo $today_date ?>" required>
+                                      <label class="form-label">পত্র প্রাপ্তি তারিখ</label>
+                                      <input type="date" class="form-control" id="entry_date" name="entry_date" value="<?php echo $today_date ?>" required>
+
+                                      <span id="dateDisplay"></span> <!-- Empty span to be filled by JS -->
+                                        <script>
+                                          document.addEventListener('DOMContentLoaded', function () {
+                                            const dateInput = document.getElementById('entry_date');
+                                            const docketInput = document.getElementById('d_number');
+
+                                            dateInput.addEventListener('change', function () {
+                                              const selectedDate = this.value;
+                                              if (!selectedDate) return;
+
+                                              const year = new Date(selectedDate).getFullYear();
+
+                                              // Send year to PHP via AJAX
+                                              $.post('get_d_number.php', { year_auto1: year }, function(response) {
+                                                docketInput.value = response; // response should be Bengali number
+                                              });
+                                            });
+                                          });
+                                        </script>
+                                      
                                     </div>
                                     <?php endif; ?>  
                                     
@@ -272,17 +139,18 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
 
                                     <?php 
                                     if($user_type=='user' && $table_name=='chairman'){
-                                        $sql_d_number1 = "SELECT id FROM $table_name WHERE entry_date LIKE '$year_auto%'";
-                                        $result_d_number1 = mysqli_query($conn, $sql_d_number1);
+                                        
+                                    // $sql_d_number1 = "SELECT id FROM $table_name WHERE entry_date LIKE '$year_auto%'";
+                                    // $result_d_number1 = mysqli_query($conn, $sql_d_number1);
 
-                                        if (mysqli_num_rows($result_d_number1) == 0) {
-                                            $row_d_number_max = 1;
-                                        } else {
-                                            $sql_d_number = "SELECT MAX(d_number) AS max_d_number FROM $table_name";
-                                            $result_d_number = mysqli_query($conn, $sql_d_number);
-                                            $row_d_number = mysqli_fetch_array($result_d_number); 
-                                            $row_d_number_max= $row_d_number['max_d_number']+1;
-                                        } 
+                                    // if (mysqli_num_rows($result_d_number1) == 0) {
+                                    //     $row_d_number_max = 1;
+                                    // } else {
+                                    //     $sql_d_number = "SELECT MAX(d_number) AS max_d_number FROM $table_name WHERE entry_date LIKE '$year_auto%'";
+                                    //     $result_d_number = mysqli_query($conn, $sql_d_number);
+                                    //     $row_d_number = mysqli_fetch_array($result_d_number);
+                                    //     $row_d_number_max = $row_d_number['max_d_number'] + 1;
+                                    // }
                                     ?> 
                                     <div class="col-md-6">
                                         <label class="form-label">ডকেট নং</label>
@@ -393,8 +261,8 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
                             </form>
                         </div>
                         <div class="modal-footer" style="flex-shrink: 0;">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success" id="saveFormButton">Save</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa fa-cancel"></i> Close</button>
+                            <button type="button" class="btn btn-success" id="saveFormButton"><i class="fa fa-save"></i> Save</button>
                         </div>
                     </div>
                 </div>
@@ -859,5 +727,27 @@ $('#friendsTable').on('click', '.editBtn', function(){
         selectedDestinations = {};
         updateSelectedDestinations();
     });
+
+   // Auto-update d_number every time Add New Docs modal opens
+$('#entryModal').on('show.bs.modal', function () {
+    var tableName = "<?php echo $table_name; ?>";
+    var userType = "<?php echo $user_type; ?>";
+    var officeTitle = "<?php echo $office_title; ?>";
+
+    // Only for chairman user
+    if (userType === 'user' && tableName === 'chairman') {
+        $.ajax({
+            url: 'get_next_d_number.php',
+            type: 'GET',
+            data: { table_name: tableName },
+            success: function (res) {
+                $('#d_number').val(res); // Bengali number returned
+            }
+        });
+    }
+});
+
+
+
 });
 </script>

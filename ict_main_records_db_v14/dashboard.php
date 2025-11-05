@@ -86,7 +86,7 @@ include('includes/header.php');
                     <div class="row g-2">
                         <div class="col-md">
                             <label for="requisition_no" class="form-label">Requisition No</label>
-                            <input type="text" class="form-control" id="requisition_no" name="requisition_no" required readonly>
+                            <input type="text" class="form-control" id="requisition_no" name="requisition_no" required >
                         </div>
 
                         <div class="col-md">
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Function to update requisition number and product list
 function updateData() {
-    datelist();
+    //datelist();
     productlist();
 }
 
@@ -545,7 +545,7 @@ $(document).ready(function () {
                     <div class="row g-2">
                         <div class="col-md">
                             <label for="edit_requisition_no" class="form-label">Requisition No</label>
-                            <input type="text" class="form-control" id="edit_requisition_no" name="requisition_no" required readonly>
+                            <input type="text" class="form-control" id="edit_requisition_no" name="requisition_no" required >
                         </div>
                         <div class="col-md">
                             <label for="edit_date" class="form-label">Requisition Date</label>

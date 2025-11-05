@@ -18,7 +18,7 @@ $action = $_GET['action'] ?? '';
 switch($action){
 
 case 'fetch':
-    $columns = ['id','entry_date','recipient','d_number','send_date','subject','destination_dropfile','comments'];
+    $columns = ['id','entry_date','recipient','immediate_sender_office','section_dept','d_number','sign_date','div_sign_date','subject','destination_dropfile','comments'];
     $limit = $_POST['length'];
     $start = $_POST['start'];
     $order_col = $columns[$_POST['order'][0]['column']] ?? 'id';
@@ -81,24 +81,46 @@ case 'save':
     $id = intval($_POST['id'] ?? 0);
     $entry_date = $_POST['entry_date'] ?? '';
     $recipient = $_POST['recipient'] ?? '';
+    $immediate_sender_office = $_POST['immediate_sender_office'] ?? '';
+    $section_dept = $_POST['section_dept'] ?? '';
     $d_number = banglaToEnglishNumber($_POST['d_number'] ?? '0');
-    $send_date = $_POST['send_date'] ?? '';
+    $div_sign_date = $_POST['div_sign_date'] ?? '';
+    $sign_date = $_POST['sign_date'] ?? '';
     $subject = $_POST['subject'] ?? '';
     $destination_dropfile = implode(',', $_POST['destination_dropfile'] ?? []);
     $comments = $_POST['comments'] ?? '';
 
+    // Debug: Check what values are received
+    error_log("Save Data - ID: $id, Recipient: $recipient, Immediate Sender: $immediate_sender_office");
+
     if($id>0){
         // Update
-        $stmt = $conn->prepare("UPDATE chairmanfile SET entry_date=?, recipient=?, d_number=?, send_date=?, subject=?, destination_dropfile=?, comments=? WHERE id=?");
-        $stmt->bind_param("ssissssi", $entry_date, $recipient, $d_number, $send_date, $subject, $destination_dropfile, $comments, $id);
-        $stmt->execute();
-        echo json_encode(['status'=>200,'message'=>'Updated successfully']);
+        $stmt = $conn->prepare("UPDATE chairmanfile SET entry_date=?, recipient=?, immediate_sender_office=?, section_dept=?, d_number=?,div_sign_date=?, sign_date=?, subject=?, destination_dropfile=?, comments=? WHERE id=?");
+        if($stmt){
+            $stmt->bind_param("ssssisssssi", $entry_date, $recipient, $immediate_sender_office, $section_dept, $d_number, $div_sign_date,$sign_date, $subject, $destination_dropfile, $comments, $id);
+            if($stmt->execute()){
+                echo json_encode(['status'=>200,'message'=>'Updated successfully']);
+            } else {
+                echo json_encode(['status'=>500,'message'=>'Update failed: '.$stmt->error]);
+            }
+            $stmt->close();
+        } else {
+            echo json_encode(['status'=>500,'message'=>'Prepare failed: '.$conn->error]);
+        }
     }else{
         // Insert
-        $stmt = $conn->prepare("INSERT INTO chairmanfile(entry_date,recipient,d_number,send_date,subject,destination_dropfile,comments) VALUES(?,?,?,?,?,?,?)");
-        $stmt->bind_param("ssissss", $entry_date, $recipient, $d_number, $send_date, $subject, $destination_dropfile, $comments);
-        $stmt->execute();
-        echo json_encode(['status'=>200,'message'=>'Inserted successfully']);
+        $stmt = $conn->prepare("INSERT INTO chairmanfile(entry_date, recipient, immediate_sender_office, section_dept, d_number,div_sign_date, sign_date, subject, destination_dropfile, comments) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+        if($stmt){
+            $stmt->bind_param("ssssisssss", $entry_date, $recipient, $immediate_sender_office, $section_dept, $d_number, $div_sign_date,$sign_date, $subject, $destination_dropfile, $comments);
+            if($stmt->execute()){
+                echo json_encode(['status'=>200,'message'=>'Inserted successfully']);
+            } else {
+                echo json_encode(['status'=>500,'message'=>'Insert failed: '.$stmt->error]);
+            }
+            $stmt->close();
+        } else {
+            echo json_encode(['status'=>500,'message'=>'Prepare failed: '.$conn->error]);
+        }
     }
     break;
 
@@ -110,8 +132,11 @@ case 'get':
 
 case 'delete':
     $id=intval($_POST['id'] ?? 0);
-    $conn->query("DELETE FROM chairmanfile WHERE id=$id");
-    echo json_encode(['status'=>200,'message'=>'Deleted successfully']);
+    if($conn->query("DELETE FROM chairmanfile WHERE id=$id")){
+        echo json_encode(['status'=>200,'message'=>'Deleted successfully']);
+    } else {
+        echo json_encode(['status'=>500,'message'=>'Delete failed']);
+    }
     break;
 
 default:

@@ -5,6 +5,17 @@ session_start();
 
 include_once 'db/database.php';
 require_once("backend/config.php");
+
+
+// header("Location: backend/dashboard.php");
+// exit();
+
+// if (!isset($_SESSION['username'])) {
+//   header("Location: ../index.php");
+//   exit();
+// }
+
+
 if(isset($_POST['login'])){
     $username = $_POST['username'];
     $password = $_POST['password'];

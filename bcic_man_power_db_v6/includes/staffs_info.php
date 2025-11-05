@@ -8,9 +8,23 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-$username = $_SESSION['username'];
+$back=1;
+
+if ($_SESSION['role'] == 'admin' && $_SESSION['username'] == 'admin') {
+  $role = $_SESSION['role'] ?? ''; // ensure role exists
+  $username = $conn->real_escape_string($_GET['factory_name']);
+  $_SESSION['username']=$username;
+
+}else{
+  $role = $_SESSION['role'] ?? ''; // ensure role exists
+  $username = $_SESSION['username'];
+  
+}
 $table = 'staffs_tbl';
-$today_date = date("Y-m-d");
+
+// $username = $_SESSION['username'];
+// $table = 'staffs_tbl';
+ $today_date = date("Y-m-d");
 
 // Function to check if entry exists for selected month (excluding current record during edit)
 function checkMonthlyEntry($conn, $table, $username, $date, $exclude_id = null) {
@@ -205,10 +219,22 @@ $stmt->close();
                             <strong>Date:</strong> 
                             <?php echo $is_editing && isset($edit_record['date']) ? htmlspecialchars($edit_record['date']) : date('Y-m-d'); ?>
                         </div>
-                        <div class="col-md-4">
+                        <!-- <div class="col-md-4">
                             <a href="dashboard.php" class="btn btn-primary btn-sm">
                                 <i class="fas fa-arrow-left me-1"></i>Back
                             </a>
+                        </div> -->
+                        <div class="col-md-4">
+                        <?php if ($role == 'admin') { ?>
+         
+                          <a href="staff_details.php" class="btn btn-primary btn-sm">
+                              <i class="fa fa-arrow-left me-1"></i>Back
+                          </a>
+                      <?php } else { ?>
+                          <a href="dashboard.php" class="btn btn-primary btn-sm">
+                              <i class="fa fa-arrow-left me-1"></i>Back
+                          </a>
+                      <?php } ?>
                         </div>
                     </div>
                 </div>

@@ -26,7 +26,8 @@ function createDatabaseBackup($dbName, $outputFile) {
         $mail->Password = "jhuimijoiytxcbrw";
         $mail->SetFrom("pmisict@gmail.com");
 
-        $mail->addAddress("emrantareq09@gmail.com");
+        $mail->addAddress("myallphpproject@gmail.com");
+        $mail->addAddress("pmisict@gmail.com");
         $mail->addAddress("shanewornbhadra@gmail.com");
 
         $mail->IsHTML(true);

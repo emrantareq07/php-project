@@ -8,8 +8,22 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-$username = $_SESSION['username'];
+$back=1;
+
+if ($_SESSION['role'] == 'admin' && $_SESSION['username'] == 'admin') {
+  $role = $_SESSION['role'] ?? ''; // ensure role exists
+  $username = $conn->real_escape_string($_GET['factory_name']);
+  $_SESSION['username']=$username;
+
+}else{
+  $role = $_SESSION['role'] ?? ''; // ensure role exists
+  $username = $_SESSION['username'];
+  
+}
 $table = 'officers_tbl';
+
+//$id = $conn->real_escape_string($_GET['id']);
+//$factory_name = $conn->real_escape_string($_GET['factory']);
 
 $today_date = date("Y-m-d");
 $year_auto = date("Y", strtotime($today_date));
@@ -19,7 +33,7 @@ $first_day_next_month = date('Y-m-01', strtotime('+1 month'));
 
 // Fetch existing records for the table
 $records = [];
-$sql = "SELECT * FROM $table ORDER BY date DESC";
+$sql = "SELECT * FROM $table WHERE factory_name = '$username'  ORDER BY date DESC";
 $result = $conn->query($sql);
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
@@ -309,9 +323,19 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
       </div>
       <div class="col-md-6 text-end">
         <div class="btn-group">
-          <a href="dashboard.php" class="btn btn-outline-secondary btn-md">
-            <i class="fa fa-arrow-left me-1"></i>Back
+
+      <?php if ($role == 'admin') { ?>
+         
+          <a href="officer_details.php" class="btn btn-outline-secondary btn-md">
+              <i class="fa fa-arrow-left me-1"></i>Back
           </a>
+      <?php } else { ?>
+          <a href="dashboard.php" class="btn btn-outline-secondary btn-md">
+              <i class="fa fa-arrow-left me-1"></i>Back
+          </a>
+      <?php } ?>
+
+          
           <button class="btn btn-outline-primary btn-md" id="clearAll" title="Clear all inputs">
             <i class="fas fa-eraser me-1"></i>Clear All
           </button>
@@ -570,23 +594,41 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
                 <?php endforeach; ?>
                 <td class="text-center"><strong><?php echo $total_employees; ?></strong></td>
                 <td class="text-center">
-                    <?php if($is_current_or_future): ?>
-                    <!-- Show all buttons for current and future months -->
-                    <button class="btn btn-warning btn-sm edit-btn me-1" data-id="<?php echo $record['id']; ?>" title="Edit">
-                        <i class="fas fa-edit me-1"></i>Edit
-                    </button>
-                    <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $record['id']; ?>" title="Delete">
-                        <i class="fas fa-trash me-1"></i>Delete
-                    </button>
-                    <?php endif; ?>
-                    <!-- Always show Print and Load buttons -->
-                    <button class="btn btn-info btn-sm print-btn me-1" data-id="<?php echo $record['id']; ?>" title="Print">
-                        <i class="fas fa-print me-1"></i>Print
-                    </button>
-                    <button class="btn btn-primary btn-sm load-btn" data-id="<?php echo $record['id']; ?>" title="Load for New Record">
-                        <i class="fas fa-hourglass-half me-1"></i>Load
-                    </button>
-                </td>
+              <?php if ($role != 'admin') { ?>
+                  <?php if ($is_current_or_future) { ?>
+                      <!-- Show all buttons for current and future months -->
+                      <button class="btn btn-warning btn-sm edit-btn me-1" data-id="<?php echo $record['id']; ?>" title="Edit">
+                          <i class="fas fa-edit me-1"></i>Edit
+                      </button>
+                      <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $record['id']; ?>" title="Delete">
+                          <i class="fas fa-trash me-1"></i>Delete
+                      </button>
+                  <?php } ?>
+                  <!-- Always show Print and Load buttons -->
+                  <button class="btn btn-info btn-sm print-btn me-1" data-id="<?php echo $record['id']; ?>" title="Print">
+                      <i class="fas fa-print me-1"></i>Print
+                  </button>
+                  <button class="btn btn-primary btn-sm load-btn" data-id="<?php echo $record['id']; ?>" title="Load for New Record">
+                      <i class="fas fa-hourglass-half me-1"></i>Clone
+                  </button>
+              <?php } else { ?>
+                  <!-- Show all buttons for current and future months -->
+                  <button class="btn btn-warning btn-sm edit-btn me-1" data-id="<?php echo $record['id']; ?>" title="Edit">
+                      <i class="fas fa-edit me-1"></i>Edit
+                  </button>
+                  <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $record['id']; ?>" title="Delete">
+                      <i class="fas fa-trash me-1"></i>Delete
+                  </button>
+
+                  <!-- Always show Print and Load buttons -->
+                  <button class="btn btn-info btn-sm print-btn me-1" data-id="<?php echo $record['id']; ?>" title="Print">
+                      <i class="fas fa-print me-1"></i>Print
+                  </button>
+                  <button class="btn btn-primary btn-sm load-btn" data-id="<?php echo $record['id']; ?>" title="Load for New Record">
+                      <i class="fas fa-hourglass-half me-1"></i>Clone
+                  </button>
+              <?php } ?>
+          </td>
             </tr>
             <?php endforeach; ?>
           </tbody>

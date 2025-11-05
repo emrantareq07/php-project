@@ -14,272 +14,10 @@ function englishToBanglaNumber($number) {
     $bn  = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
     return str_replace($eng, $bn, $number);
 }
+
+include_once 'header_file.php';
 ?>
-<!DOCTYPE html>
-<html lang="bn">
-<head>
-<meta charset="UTF-8">
-<title>ফাইল প্রাপ্তি রেজিস্টার</title>
 
-<!-- Bootstrap & DataTables CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet">
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
-
-body {
-    font-family: 'Noto Sans Bengali', sans-serif;
-}
-    /* Print Styles */
-    @media print {
-      .no-print, .btn, .modal, .dataTables_length, .dataTables_filter, 
-      .dataTables_paginate, #edit_btn, #view_btn, #action_col {
-        display: none !important;
-      }
-      
-      .table-bordered {
-        border: 1px solid #000 !important;
-      }
-      
-      .table th, .table td {
-        border-color: #000 !important;
-        background-color: white !important;
-        color: black !important;
-      }
-    }
-
-    /* Font Definitions */
-    @font-face {
-      font-family: 'Nikosh';
-      src: url('fonts/Nikosh.ttf') format('truetype'),
-           url('fonts/Nikosh.woff') format('woff'),
-           url('fonts/Nikosh.woff2') format('woff2');
-      font-weight: normal;
-      font-style: normal;
-      font-display: swap;
-    }
-
-    /* Base Typography */
-    * {
-      font-family: 'Nikosh', 'SolaimanLipi', 'Open Sans', sans-serif;
-    }
-
-    /* Color Variables */
-    :root {
-      --custom-purple: #7e11bd;
-      --custom-purple-light: #9c3dd4;
-      --custom-purple-dark: #5c0d8a;
-      --text-light: #ffffff;
-      --text-dark: #333333;
-    }
-
-    /* Custom Color Classes */
-    .bg-custom-purple {
-      background-color: var(--custom-purple) !important;
-    }
-    
-    .bg-custom-purple-light {
-      background-color: var(--custom-purple-light) !important;
-    }
-    
-    .bg-custom-purple-dark {
-      background-color: var(--custom-purple-dark) !important;
-    }
-
-    .text-custom-purple {
-      color: var(--custom-purple) !important;
-    }
-
-    .border-custom-purple {
-      border-color: var(--custom-purple) !important;
-    }
-
-    .btn-custom-purple {
-      background-color: var(--custom-purple);
-      border-color: var(--custom-purple);
-      color: white;
-    }
-
-    .btn-custom-purple:hover {
-      background-color: var(--custom-purple-dark);
-      border-color: var(--custom-purple-dark);
-      color: white;
-    }
-
-    /* Table Styles */
-    .table-purple thead {
-      background-color: var(--custom-purple);
-      color: var(--text-light);
-    }
-
-    .table-hover tbody tr:hover {
-      background-color: rgba(126, 17, 189, 0.1);
-    }
-
-    /* Logo Container */
-    .imgcontainer {
-      text-align: center;
-/*      margin: 10px 0 15px 0;*/
-       margin: 3px 0 5px 0;
-      position: relative;
-    }
-    
-    img.avatar {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--custom-purple);
-    }
-
-    /* Navigation Enhancements */
-    .navbar-custom {
-      background: linear-gradient(135deg, var(--custom-purple) 0%, var(--custom-purple-dark) 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
-      min-height: 50px;
-      padding-top: 0.15rem;
-      padding-bottom: 0.15rem;
-    }
-
-    /* Card Enhancements */
-    .card-custom {
-      border: 1px solid var(--custom-purple);
-      border-radius: 10px;
-      transition: transform 0.2s ease-in-out;
-    }
-
-    .card-custom:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(126, 17, 189, 0.2);
-    }
-
-    /* Loading Spinner */
-    .loading-spinner {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-    }
-
-    /* Responsive Improvements */
-    @media (max-width: 768px) {
-      .imgcontainer img.avatar {
-        width: 60px;
-        height: 60px;
-      }
-      
-      .table-responsive {
-        font-size: 0.875rem;
-      }
-      
-      .btn-group-vertical {
-        width: 100%;
-      }
-    }
-
-    /* Animation Classes */
-    .fade-in {
-      animation: fadeIn 0.5s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Badge Customization */
-    .badge-custom {
-      font-size: 0.75em;
-      padding: 0.35em 0.65em;
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--custom-purple);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--custom-purple-dark);
-    }
-
-    /* Modal Enhancements */
-    .modal-header-custom {
-      background: linear-gradient(135deg, var(--custom-purple) 0%, var(--custom-purple-dark) 100%);
-      color: white;
-      border-bottom: none;
-    }
-
-    /* Form Control Enhancements */
-    .form-control:focus {
-      border-color: var(--custom-purple);
-      box-shadow: 0 0 0 0.2rem rgba(126, 17, 189, 0.25);
-    }
-
-    /* Alert Customization */
-    .alert-custom {
-      border-left: 4px solid var(--custom-purple);
-    }
-
-    /* Footer Styles */
-    .footer-custom {
-      background-color: var(--custom-purple);
-      color: white;
-      padding: 1rem 0;
-      margin-top: 2rem;
-    }
-
-    /* Modal Height Fix */
-    .modal-dialog-scrollable .modal-content {
-        max-height: 90vh;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .modal-dialog-scrollable .modal-body {
-        overflow-y: auto;
-        flex: 1;
-    }
-
-    .modal-dialog-scrollable .modal-footer {
-        flex-shrink: 0;
-    }
-
-    .custom-alert {
-        animation: slideInRight 0.3s ease-out;
-    }
-
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-  </style>
-</head>
 <body class="d-flex flex-column min-vh-100">
   
   <!-- Loading Spinner -->
@@ -364,20 +102,27 @@ body {
         <span class="float-end">
          <a href="dashboard.php" class="btn btn-outline-success " ><i class="fa fa-home" style="font-size:16px;color:red"></i>  Home</a>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fa fa-plus"></i> নতুন এন্ট্রি</button>
-        <a href="file_search_new.php?table_name=<?= $_SESSION['table_name'] ?>&val=987" class="btn btn-outline-primary">
+          <!-- Your other buttons remain the same -->
+    <a href="show_all_file.php" class="btn btn-outline-warning">
+        <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>সব ফাইল দেখুন</span>
+    </a>
+        <a href="file_search_new.php" class="btn btn-outline-primary">
     <i class="fa fa-search" style="font-size:16px"></i> 
      Search</a></span>
     </div>    
 
 
-    <table id="fileTable" class="table table-striped table-bordered w-100">
+    <table id="fileTable" class="table table-striped table-bordered ">
         <thead class="table-dark text-center">
             <tr>
                 <th>ক্রমিক নং</th>
                 <th>এন্ট্রি তারিখ</th>
-                <th>উপস্থাপনকারীর বিভাগ</th>
                 <th>ডকেট নং</th>
+                <th>প্রাপক</th>
                 <th>স্বাক্ষরের তারিখ</th>
+                <th>উপস্থাপনকারী/ প্রেরিত বিভাগ</th>
+                <th>শাখা</th>
+                <th>তারিখ</th>  
                 <th>বিষয়</th>
                 <th>গন্তব্য</th>
                 <th>মন্তব্য</th>
@@ -393,14 +138,63 @@ body {
         <form id="fileForm" class="modal-content">
             <div class="modal-header modal-header-custom">
                 <h5 class="modal-title fw-bold">ফাইল তথ্য সংযোজন / সম্পাদনা</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="id" id="id">
+                <input type="hidden" id="year_auto1" name="year_auto1">
                 <div class="row g-2">
-                    <div class="col-md-4"><label>এন্ট্রি তারিখ:</label><input type="date" name="entry_date" id="entry_date" class="form-control" required></div>
+                    <div class="col-md-4"><label>এন্ট্রি তারিখ:</label><input type="date" name="entry_date" id="entry_date" class="form-control" required value="<?php echo date('Y-m-d');?>">
+
+                      <script>
+                          document.addEventListener('DOMContentLoaded', function () {
+                            const dateInput = document.getElementById('entry_date');
+                            const docketInput = document.getElementById('d_number');
+
+                            dateInput.addEventListener('change', function () {
+                              const selectedDate = this.value;
+                              if (!selectedDate) return;
+
+                              const year = new Date(selectedDate).getFullYear();
+
+                              // Send year to PHP via AJAX
+                              $.post('get_d_number_file.php', { year_auto1: year }, function(response) {
+                                docketInput.value = response; // response should be Bengali number
+                              });
+                            });
+                          });
+                        </script>
+
+                    </div>
                     <div class="col-md-4">
-                        <label>উপস্থাপনকারীর বিভাগ:</label>
+                        <label>ডকেট নং:</label>
+                        <!-- <input type="text" class="form-control bg-light" id="d_number" name="d_number" value="" readonly> -->
+                        <input type="text" class="form-control bg-light" id="d_number" name="d_number" value="<?php echo englishToBanglaNumber($row_d_number_max)?>" readonly>
+                    </div>
+                   
+                    <div class="col-md-4">
+                        <label>উপস্থাপনকারী/ প্রেরিত বিভাগ:</label>
+                        <select class="form-select" id="immediate_sender_office" name="immediate_sender_office" required>
+                            <option selected disabled value="">--Select--</option>
+                            <?php
+                            $sql = "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
+                            $result = mysqli_query($conn, $sql);
+                            while($row = mysqli_fetch_array($result)) {
+                                echo "<option value='".$row['division_bn']."'>".$row['division_bn']."</option>";
+                            }
+                            ?>   
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>শাখা (লিখুন):</label>
+                        <input type="text" class="form-control bg-light" id="section_dept" name="section_dept" value="" >
+                    </div>
+                    
+                    <div class="col-md-6"><label> তারিখ:</label><input type="date" name="div_sign_date" id="div_sign_date" class="form-control" value="<?php echo date('Y-m-d');?>"></div>
+                    <div class="col-md-12"><label>বিবরণ/বিষয়/সারসংক্ষেপ/বিষয়বস্তু:</label><input type="text" name="subject" id="subject" class="form-control" required></div>
+
+                       <div class="col-md-6">
+                        <label>প্রাপক:</label>
                         <select class="form-select" id="recipient" name="recipient" required>
                             <option selected disabled value="">--Select--</option>
                             <?php
@@ -412,12 +206,7 @@ body {
                             ?>   
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label>ডকেট নং:</label>
-                        <input type="text" class="form-control bg-light" id="d_number" name="d_number" value="" readonly>
-                    </div>
-                    <div class="col-md-4"><label>স্বাক্ষরের তারিখ:</label><input type="date" name="send_date" id="send_date" class="form-control" required></div>
-                    <div class="col-md-8"><label>বিবরণ/বিষয়/সারসংক্ষেপ/বিষয়বস্তু:</label><input type="text" name="subject" id="subject" class="form-control" required></div>
+                    <div class="col-md-6"><label>স্বাক্ষরের তারিখ:</label><input type="date" name="sign_date" id="sign_date" class="form-control" required value="<?php echo date('Y-m-d');?>"></div>
                     <div class="col-md-6">
                         <label>গন্তব্য (একাধিক নির্বাচন করুন):</label>
                         <select name="destination_dropfile[]" id="destination_dropfile" class="form-select chosen-select" multiple required>
@@ -432,12 +221,13 @@ body {
                             ?>
                         </select>
                     </div>
-                    <div class="col-md-6"><label>মন্তব্য:</label><input type="text" name="comments" id="comments" class="form-control"></div>
+                    <div class="col-md-6"><label>গন্তব্য (লিখুন):</label><input type="text" name="comments" id="comments" class="form-control"></div>
+                    <div class="col-md-12"><label>মন্তব্য:</label><input type="text" name="comments" id="comments" class="form-control"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">বাতিল</button>
-                <button type="submit" class="btn btn-success">সংরক্ষণ</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="fa fa-cancel"></i> বাতিল</button>
+                <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> সংরক্ষণ</button>
             </div>
         </form>
     </div>
@@ -468,16 +258,30 @@ $(function(){
         serverSide: true,
         ajax: { url: 'file_action.php?action=fetch', type: 'POST' },
         columns: [
-            { data: null, render: (data, type, row, meta)=> meta.row + meta.settings._iDisplayStart + 1 },
+            {
+              data: null,
+              render: function (data, type, row, meta) {
+                const rowNum = meta.row + meta.settings._iDisplayStart + 1;
+                // Convert English digits to Bangla digits
+                return rowNum.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+              }
+            },
+
             { data: 'entry_date', "render": function (data) {
                 return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
             }
             },
-            { data: 'recipient' },
             { data: 'd_number',  },
-            { data: 'send_date', "render": function (data) {
+            { data: 'recipient' },
+            { data: 'sign_date', "render": function (data) {
                 return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
             } },
+            { data: 'immediate_sender_office' },
+            { data: 'section_dept' },
+            { data: 'div_sign_date', "render": function (data) {
+                return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
+            } },          
+            
             { data: 'subject' },
             { data: 'destination_dropfile' },
             { data: 'comments' },
@@ -505,15 +309,6 @@ $(function(){
         }
     });
 
-    // Auto-update d_number on modal open
-    // $('#addModal').on('show.bs.modal', function () {
-    //     $.getJSON('file_action.php?action=next_d_number', function(res){
-    //         if(res.status === 200){
-    //             $('#d_number').val(res.next_d_number);
-    //         }
-    //     });
-    // });
-
     // Auto-update d_number only for new entry
     $('#addModal').on('show.bs.modal', function () {
         let id = $('#id').val(); // check if id exists
@@ -525,7 +320,6 @@ $(function(){
             });
         }
     });
-
 
     // Save (Add/Update)
     $('#fileForm').on('submit', function(e){
@@ -539,15 +333,18 @@ $(function(){
             alert(res.message);
             if(res.status==200){
                 $('#addModal').modal('hide');
-                $('#addModal').on('hidden.bs.modal', function () {
+                // Reset form and reload table after modal is hidden
+                setTimeout(function() {
                     $('#fileForm')[0].reset();
                     $('.chosen-select').val([]).trigger("chosen:updated");
                     table.ajax.reload(null, false);
-                    $('body').removeClass('modal-open');
-                    $('.modal-backdrop').remove();
-                });
+                }, 500);
+            } else {
+                alert('Error: ' + res.message);
             }
-        }, 'json');
+        }, 'json').fail(function(xhr, status, error) {
+            alert('Request failed: ' + error);
+        });
     });
 
     // Edit
@@ -555,10 +352,13 @@ $(function(){
         let id = $(this).data('id');
         $.getJSON('file_action.php?action=get&id='+id, function(data){
             $('#id').val(data.id);
-            $('#entry_date').val(data.entry_date);
+            $('#entry_date').val(data.entry_date);            
             $('#recipient').val(data.recipient);
+            $('#immediate_sender_office').val(data.immediate_sender_office);
+            $('#section_dept').val(data.section_dept);
             $('#d_number').val(data.d_number); // use existing d_number
-            $('#send_date').val(data.send_date);
+            $('#div_sign_date').val(data.div_sign_date);
+            $('#sign_date').val(data.sign_date);
             $('#subject').val(data.subject);
             $('#comments').val(data.comments);
 
@@ -568,7 +368,6 @@ $(function(){
             $('#addModal').modal('show');
         });
     });
-
 
     // Delete
     $('#fileTable').on('click','.delBtn', function(){
@@ -580,11 +379,12 @@ $(function(){
         },'json');
     });
 
-    // Reset modal
+    // Reset modal when hidden
     $('#addModal').on('hidden.bs.modal', function () {
         $('#fileForm')[0].reset();
         $('#id').val('');
         $('.chosen-select').val([]).trigger("chosen:updated");
+        // Remove any existing backdrop
         $('.modal-backdrop').remove();
         $('body').removeClass('modal-open').css('padding-right','');
     });
