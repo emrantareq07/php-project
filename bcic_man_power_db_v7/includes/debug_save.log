@@ -1,0 +1,452 @@
+2025-10-19 06:24:28 - === SAVE_DATA STARTED ===
+2025-10-19 06:24:28 - User: sfcl, Table: officers_tbl
+2025-10-19 06:24:28 - Database connection OK
+2025-10-19 06:24:28 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:24:28 - Processing data array with 14 sections
+2025-10-19 06:24:28 - Data prepared for 9 grades
+2025-10-19 06:24:28 - Attempting INSERT for new record
+2025-10-19 06:24:28 - ERROR: A record for this date already exists (ID: 5). Please use edit instead.
+2025-10-19 06:24:28 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:24:42 - === SAVE_DATA STARTED ===
+2025-10-19 06:24:42 - User: sfcl, Table: officers_tbl
+2025-10-19 06:24:42 - Database connection OK
+2025-10-19 06:24:42 - Factory: sfcl, Date: 2025-10-18, ID: 5
+2025-10-19 06:24:42 - Processing data array with 14 sections
+2025-10-19 06:24:42 - Data prepared for 9 grades
+2025-10-19 06:24:42 - Attempting UPDATE for ID: 5
+2025-10-19 06:24:42 - UPDATE SQL prepared
+2025-10-19 06:24:42 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:24:42 - Record UPDATED successfully - ID: 5
+2025-10-19 06:24:42 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:24:49 - === SAVE_DATA STARTED ===
+2025-10-19 06:24:49 - User: sfcl, Table: officers_tbl
+2025-10-19 06:24:49 - Database connection OK
+2025-10-19 06:24:49 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:24:49 - Processing data array with 14 sections
+2025-10-19 06:24:49 - Data prepared for 9 grades
+2025-10-19 06:24:49 - Attempting INSERT for new record
+2025-10-19 06:24:49 - INSERT SQL prepared
+2025-10-19 06:24:49 - Binding parameters: sssssssssssssssssssssssssssssssss, 33 parameters
+2025-10-19 06:24:49 - Record INSERTED successfully - New ID: 6
+2025-10-19 06:24:49 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:25:03 - === SAVE_DATA STARTED ===
+2025-10-19 06:25:03 - User: sfcl, Table: officers_tbl
+2025-10-19 06:25:03 - Database connection OK
+2025-10-19 06:25:03 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:25:03 - Processing data array with 14 sections
+2025-10-19 06:25:03 - Data prepared for 9 grades
+2025-10-19 06:25:03 - Attempting UPDATE for ID: 6
+2025-10-19 06:25:03 - UPDATE SQL prepared
+2025-10-19 06:25:03 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:25:03 - Record UPDATED successfully - ID: 6
+2025-10-19 06:25:03 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:25:13 - === SAVE_DATA STARTED ===
+2025-10-19 06:25:13 - User: sfcl, Table: officers_tbl
+2025-10-19 06:25:13 - Database connection OK
+2025-10-19 06:25:13 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:25:13 - Processing data array with 14 sections
+2025-10-19 06:25:13 - Data prepared for 9 grades
+2025-10-19 06:25:13 - Attempting INSERT for new record
+2025-10-19 06:25:13 - ERROR: A record for this date already exists (ID: 6). Please use edit instead.
+2025-10-19 06:25:13 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:30:33 - === SAVE_DATA STARTED ===
+2025-10-19 06:30:33 - User: sfcl, Table: officers_tbl
+2025-10-19 06:30:33 - Database connection OK
+2025-10-19 06:30:33 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:30:33 - Processing data array with 14 sections
+2025-10-19 06:30:33 - Data prepared for 9 grades
+2025-10-19 06:30:33 - Attempting UPDATE for ID: 6
+2025-10-19 06:30:33 - UPDATE SQL prepared
+2025-10-19 06:30:33 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:30:33 - Record UPDATED successfully - ID: 6
+2025-10-19 06:30:33 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:33:53 - === SAVE_DATA STARTED ===
+2025-10-19 06:33:53 - User: sfcl, Table: officers_tbl
+2025-10-19 06:33:53 - Database connection OK
+2025-10-19 06:33:53 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:33:53 - Processing data array with 14 sections
+2025-10-19 06:33:53 - Data prepared for 9 grades
+2025-10-19 06:33:53 - Attempting UPDATE for ID: 6
+2025-10-19 06:33:53 - UPDATE SQL prepared
+2025-10-19 06:33:53 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:33:53 - Record UPDATED successfully - ID: 6
+2025-10-19 06:33:53 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:34:06 - === SAVE_DATA STARTED ===
+2025-10-19 06:34:06 - User: sfcl, Table: officers_tbl
+2025-10-19 06:34:06 - Database connection OK
+2025-10-19 06:34:06 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:34:06 - Processing data array with 14 sections
+2025-10-19 06:34:06 - Data prepared for 9 grades
+2025-10-19 06:34:06 - Attempting UPDATE for ID: 6
+2025-10-19 06:34:06 - UPDATE SQL prepared
+2025-10-19 06:34:06 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:34:06 - Record UPDATED successfully - ID: 6
+2025-10-19 06:34:06 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:39:51 - === SAVE_DATA STARTED ===
+2025-10-19 06:39:51 - User: sfcl, Table: officers_tbl
+2025-10-19 06:39:51 - Database connection OK
+2025-10-19 06:39:51 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 06:39:51 - Processing data array with 14 sections
+2025-10-19 06:39:51 - Data prepared for 9 grades
+2025-10-19 06:39:51 - Attempting UPDATE for ID: 6
+2025-10-19 06:39:51 - UPDATE SQL prepared
+2025-10-19 06:39:51 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 06:39:51 - Record UPDATED successfully - ID: 6
+2025-10-19 06:39:51 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 06:59:59 - === SAVE_DATA STARTED ===
+2025-10-19 06:59:59 - User: sfcl, Table: officers_tbl
+2025-10-19 06:59:59 - Database connection OK
+2025-10-19 06:59:59 - Factory: sfcl, Date: 2025-10-19, ID: null
+2025-10-19 06:59:59 - Processing data array with 14 sections
+2025-10-19 06:59:59 - Data prepared for 9 grades
+2025-10-19 06:59:59 - Attempting INSERT for new record
+2025-10-19 06:59:59 - ERROR: A record for this date already exists (ID: 6). Please use edit instead.
+2025-10-19 06:59:59 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:13:24 - === SAVE_DATA STARTED ===
+2025-10-19 07:13:24 - User: sfcl, Table: officers_tbl
+2025-10-19 07:13:24 - Database connection OK
+2025-10-19 07:13:24 - Factory: sfcl, Date: 2025-10-19, ID: 6
+2025-10-19 07:13:24 - Processing data array with 14 sections
+2025-10-19 07:13:24 - Data prepared for 9 grades
+2025-10-19 07:13:24 - Attempting UPDATE for ID: 6
+2025-10-19 07:13:24 - UPDATE SQL prepared
+2025-10-19 07:13:24 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:13:24 - Record UPDATED successfully - ID: 6
+2025-10-19 07:13:24 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:13:47 - === SAVE_DATA STARTED ===
+2025-10-19 07:13:47 - User: sfcl, Table: officers_tbl
+2025-10-19 07:13:47 - Database connection OK
+2025-10-19 07:13:47 - Factory: sfcl, Date: 2025-10-09, ID: 5
+2025-10-19 07:13:47 - Processing data array with 14 sections
+2025-10-19 07:13:47 - Data prepared for 9 grades
+2025-10-19 07:13:47 - Attempting UPDATE for ID: 5
+2025-10-19 07:13:47 - UPDATE SQL prepared
+2025-10-19 07:13:47 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:13:47 - Record UPDATED successfully - ID: 5
+2025-10-19 07:13:47 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:13:58 - === SAVE_DATA STARTED ===
+2025-10-19 07:13:58 - User: sfcl, Table: officers_tbl
+2025-10-19 07:13:58 - Database connection OK
+2025-10-19 07:13:58 - Factory: sfcl, Date: 2025-10-17, ID: 6
+2025-10-19 07:13:58 - Processing data array with 14 sections
+2025-10-19 07:13:58 - Data prepared for 9 grades
+2025-10-19 07:13:58 - Attempting UPDATE for ID: 6
+2025-10-19 07:13:58 - UPDATE SQL prepared
+2025-10-19 07:13:58 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:13:58 - Record UPDATED successfully - ID: 6
+2025-10-19 07:13:58 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 07:14:20 - === SAVE_DATA STARTED ===
+2025-10-19 07:14:20 - User: sfcl, Table: officers_tbl
+2025-10-19 07:14:20 - Database connection OK
+2025-10-19 07:14:20 - Factory: sfcl, Date: 2025-10-17, ID: 6
+2025-10-19 07:14:20 - Processing data array with 14 sections
+2025-10-19 07:14:20 - Data prepared for 9 grades
+2025-10-19 07:14:20 - Attempting UPDATE for ID: 6
+2025-10-19 07:14:20 - UPDATE SQL prepared
+2025-10-19 07:14:20 - Binding parameters: ssssssssssssssssssssssssssssssssi, 33 parameters
+2025-10-19 07:14:20 - Record UPDATED successfully - ID: 6
+2025-10-19 07:14:20 - === SAVE_DATA COMPLETED ===
+
+2025-10-19 11:41:31 - === SAVE_DATA STARTED ===
+2025-10-19 11:41:31 - Processing 14 section entries
+2025-10-19 11:41:31 - Preparing UPDATE for ID 6
+2025-10-19 11:41:31 - Updated ID 6 successfully
+2025-10-19 11:41:45 - === SAVE_DATA STARTED ===
+2025-10-19 11:41:45 - Processing 14 section entries
+2025-10-19 11:41:45 - Preparing INSERT for new record
+2025-10-19 11:41:45 - ERROR: A record for this date already exists (ID: 6). Please use edit instead.
+2025-10-19 11:52:03 - === SAVE_DATA STARTED ===
+2025-10-19 11:52:03 - Processing 14 section entries
+2025-10-19 11:52:03 - Preparing UPDATE for ID 6
+2025-10-19 11:52:03 - Updated ID 6 successfully
+2025-10-19 12:05:54 - === SAVE_DATA STARTED ===
+2025-10-19 12:05:54 - Processing 14 section entries
+2025-10-19 12:05:54 - Preparing INSERT for new record
+2025-10-19 12:05:54 - ERROR: A record for this month already exists (ID: 3). Please use edit instead.
+2025-10-19 12:06:11 - === SAVE_DATA STARTED ===
+2025-10-19 12:06:11 - Processing 14 section entries
+2025-10-19 12:06:11 - Preparing UPDATE for ID 6
+2025-10-19 12:06:11 - Updated ID 6 successfully
+2025-10-19 12:06:23 - === SAVE_DATA STARTED ===
+2025-10-19 12:06:23 - Processing 14 section entries
+2025-10-19 12:06:23 - Preparing UPDATE for ID 6
+2025-10-19 12:06:23 - Updated ID 6 successfully
+2025-10-19 12:23:41 - === SAVE_DATA STARTED ===
+2025-10-19 12:23:41 - Processing 14 section entries
+2025-10-19 12:23:41 - Preparing INSERT for new record
+2025-10-19 12:23:41 - ERROR: A record for this month already exists (ID: 3). Please use edit instead.
+2025-10-19 13:03:09 - === SAVE_DATA STARTED ===
+2025-10-19 13:03:09 - Processing 14 section entries
+2025-10-19 13:03:09 - Preparing UPDATE for ID 6
+2025-10-19 13:03:09 - Updated ID 6 successfully
+2025-10-19 13:05:32 - === SAVE_DATA STARTED ===
+2025-10-19 13:05:32 - Processing 14 section entries
+2025-10-19 13:05:32 - Preparing INSERT for new record
+2025-10-19 13:05:32 - Inserted new record ID 1
+2025-10-19 13:06:08 - === SAVE_DATA STARTED ===
+2025-10-19 13:06:08 - Processing 14 section entries
+2025-10-19 13:06:08 - Preparing UPDATE for ID 1
+2025-10-19 13:06:08 - Updated ID 1 successfully
+2025-10-19 14:05:50 - === SAVE_DATA STARTED ===
+2025-10-19 14:05:50 - Processing 14 section entries
+2025-10-19 14:05:50 - Preparing UPDATE for ID 1
+2025-10-19 14:05:50 - Updated ID 1 successfully
+2025-10-19 15:12:38 - === SAVE_DATA STARTED ===
+2025-10-19 15:12:38 - Processing 14 section entries
+2025-10-19 15:12:38 - Preparing UPDATE for ID 1
+2025-10-19 15:12:38 - Updated ID 1 successfully
+2025-10-19 15:35:27 - === SAVE_DATA STARTED ===
+2025-10-19 15:35:27 - Processing 14 section entries
+2025-10-19 15:35:27 - Preparing UPDATE for ID 1
+2025-10-19 15:35:27 - Updated ID 1 successfully
+2025-10-19 15:35:43 - === SAVE_DATA STARTED ===
+2025-10-19 15:35:43 - Processing 14 section entries
+2025-10-19 15:35:43 - Preparing UPDATE for ID 1
+2025-10-19 15:35:43 - Updated ID 1 successfully
+2025-10-19 15:36:01 - === SAVE_DATA STARTED ===
+2025-10-19 15:36:01 - Processing 14 section entries
+2025-10-19 15:36:01 - Preparing INSERT for new record
+2025-10-19 15:36:01 - ERROR: A record for this month already exists (ID: 1). Please use edit instead.
+2025-10-19 15:58:46 - === SAVE_DATA STARTED ===
+2025-10-19 15:58:46 - Processing 14 section entries
+2025-10-19 15:58:46 - Preparing UPDATE for ID 1
+2025-10-19 15:58:46 - Updated ID 1 successfully
+2025-10-19 16:15:30 - === SAVE_DATA STARTED ===
+2025-10-19 16:15:30 - Processing 14 section entries
+2025-10-19 16:15:30 - Preparing INSERT for new record
+2025-10-19 16:15:30 - ERROR: A record for this month already exists (ID: 1). Please use edit instead.
+2025-10-19 16:15:38 - === SAVE_DATA STARTED ===
+2025-10-19 16:15:38 - Processing 14 section entries
+2025-10-19 16:15:38 - Preparing UPDATE for ID 1
+2025-10-19 16:15:38 - Updated ID 1 successfully
+2025-10-20 09:54:51 - === SAVE_DATA STARTED ===
+2025-10-20 09:54:51 - Processing 15 section entries
+2025-10-20 09:54:51 - Preparing UPDATE for ID 1
+2025-10-20 09:54:51 - Updated ID 1 successfully
+2025-10-23 11:01:46 - === SAVE_DATA STARTED ===
+2025-10-23 11:01:46 - Processing 15 section entries
+2025-10-23 11:01:46 - Preparing INSERT for new record
+2025-10-23 11:01:46 - ERROR: A record for this month already exists (ID: 1). Please use edit instead.
+2025-10-23 11:02:10 - === SAVE_DATA STARTED ===
+2025-10-23 11:02:10 - Processing 15 section entries
+2025-10-23 11:02:10 - Preparing INSERT for new record
+2025-10-23 11:02:10 - Inserted new record ID 2
+2025-10-23 11:12:22 - === SAVE_DATA STARTED ===
+2025-10-23 11:12:22 - Processing 15 section entries
+2025-10-23 11:12:22 - Preparing INSERT for new record
+2025-10-23 11:12:22 - ERROR: A record for this month already exists (ID: 2). Please use edit instead.
+2025-10-23 11:12:30 - === SAVE_DATA STARTED ===
+2025-10-23 11:12:30 - Processing 15 section entries
+2025-10-23 11:12:30 - Preparing INSERT for new record
+2025-10-23 11:12:30 - Inserted new record ID 3
+2025-10-23 11:20:38 - === SAVE_DATA STARTED ===
+2025-10-23 11:20:38 - ID: null, Load ID: 2
+2025-10-23 11:20:38 - Processing 15 section entries
+2025-10-23 11:20:38 - Preparing INSERT for new record
+2025-10-23 11:20:38 - Load mode detected - skipping duplicate check for Load ID: 2
+2025-10-23 11:20:38 - Inserted new record ID 4 from Load ID: 2
+2025-10-23 11:28:53 - === SAVE_DATA STARTED ===
+2025-10-23 11:28:53 - ID: 1, Load ID: null
+2025-10-23 11:28:53 - Processing 15 section entries
+2025-10-23 11:28:53 - Preparing UPDATE for ID 1
+2025-10-23 11:28:53 - Updated ID 1 successfully
+2025-10-23 13:05:40 - === SAVE_DATA STARTED ===
+2025-10-23 13:05:40 - ID: null, Load ID: 4
+2025-10-23 13:05:40 - Processing 15 section entries
+2025-10-23 13:05:40 - Preparing INSERT for new record
+2025-10-23 13:05:40 - Load mode detected - skipping duplicate check for Load ID: 4
+2025-10-23 13:05:40 - Inserted new record ID 5 from Load ID: 4
+2025-10-23 13:33:08 - === SAVE_DATA STARTED ===
+2025-10-23 13:33:08 - ID: 4, Load ID: null
+2025-10-23 13:33:08 - Processing 15 section entries
+2025-10-23 13:33:08 - Preparing UPDATE for ID 4
+2025-10-23 13:33:08 - Updated ID 4 successfully
+2025-10-23 13:33:38 - === SAVE_DATA STARTED ===
+2025-10-23 13:33:38 - ID: null, Load ID: 4
+2025-10-23 13:33:38 - Processing 15 section entries
+2025-10-23 13:33:38 - Preparing INSERT for new record
+2025-10-23 13:33:38 - Load mode detected - skipping duplicate check for Load ID: 4
+2025-10-23 13:33:38 - Inserted new record ID 6 from Load ID: 4
+2025-10-23 13:34:08 - === SAVE_DATA STARTED ===
+2025-10-23 13:34:08 - ID: null, Load ID: 6
+2025-10-23 13:34:08 - Processing 15 section entries
+2025-10-23 13:34:08 - Preparing INSERT for new record
+2025-10-23 13:34:08 - Load mode detected - skipping duplicate check for Load ID: 6
+2025-10-23 13:34:08 - Inserted new record ID 7 from Load ID: 6
+2025-10-23 13:34:46 - === SAVE_DATA STARTED ===
+2025-10-23 13:34:46 - ID: null, Load ID: 6
+2025-10-23 13:34:46 - Processing 15 section entries
+2025-10-23 13:34:46 - Preparing INSERT for new record
+2025-10-23 13:34:46 - Load mode detected - skipping duplicate check for Load ID: 6
+2025-10-23 13:34:46 - Inserted new record ID 8 from Load ID: 6
+2025-10-23 13:45:27 - === SAVE_DATA STARTED ===
+2025-10-23 13:45:27 - ID: null, Load ID: null
+2025-10-23 13:45:27 - Processing 15 section entries
+2025-10-23 13:45:27 - Preparing INSERT for new record
+2025-10-23 13:45:27 - Inserted new record ID 1
+2025-10-23 13:45:47 - === SAVE_DATA STARTED ===
+2025-10-23 13:45:47 - ID: 1, Load ID: null
+2025-10-23 13:45:47 - Processing 15 section entries
+2025-10-23 13:45:47 - Preparing UPDATE for ID 1
+2025-10-23 13:45:47 - Updated ID 1 successfully
+2025-10-23 13:46:25 - === SAVE_DATA STARTED ===
+2025-10-23 13:46:25 - ID: null, Load ID: 1
+2025-10-23 13:46:25 - Processing 15 section entries
+2025-10-23 13:46:25 - Preparing INSERT for new record
+2025-10-23 13:46:25 - Load mode detected - skipping duplicate check for Load ID: 1
+2025-10-23 13:46:25 - Inserted new record ID 2 from Load ID: 1
+2025-10-23 15:35:48 - === SAVE_DATA STARTED ===
+2025-10-23 15:35:48 - ID: null, Load ID: 2
+2025-10-23 15:35:48 - Processing 15 section entries
+2025-10-23 15:35:48 - Preparing INSERT for new record
+2025-10-23 15:35:48 - Load mode detected - skipping duplicate check for Load ID: 2
+2025-10-23 15:35:48 - Inserted new record ID 3 from Load ID: 2
+2025-10-23 16:20:57 - === SAVE_DATA STARTED ===
+2025-10-23 16:20:57 - ID: 2, Load ID: null
+2025-10-23 16:20:57 - Processing 15 section entries
+2025-10-23 16:20:57 - Preparing UPDATE for ID 2
+2025-10-23 16:20:57 - Updated ID 2 successfully
+2025-10-23 16:21:12 - === SAVE_DATA STARTED ===
+2025-10-23 16:21:12 - ID: 2, Load ID: null
+2025-10-23 16:21:12 - Processing 15 section entries
+2025-10-23 16:21:12 - Preparing UPDATE for ID 2
+2025-10-23 16:21:12 - Updated ID 2 successfully
+2025-10-23 16:22:26 - === SAVE_DATA STARTED ===
+2025-10-23 16:22:26 - ID: null, Load ID: 3
+2025-10-23 16:22:26 - Processing 15 section entries
+2025-10-23 16:22:26 - Preparing INSERT for new record
+2025-10-23 16:22:26 - Load mode detected - skipping duplicate check for Load ID: 3
+2025-10-23 16:22:26 - Inserted new record ID 4 from Load ID: 3
+2025-10-23 16:22:43 - === SAVE_DATA STARTED ===
+2025-10-23 16:22:43 - ID: 4, Load ID: null
+2025-10-23 16:22:43 - Processing 15 section entries
+2025-10-23 16:22:43 - Preparing UPDATE for ID 4
+2025-10-23 16:22:43 - Updated ID 4 successfully
+2025-10-23 16:23:37 - === SAVE_DATA STARTED ===
+2025-10-23 16:23:37 - ID: 4, Load ID: null
+2025-10-23 16:23:37 - Processing 15 section entries
+2025-10-23 16:23:37 - Preparing UPDATE for ID 4
+2025-10-23 16:23:37 - Updated ID 4 successfully
+2025-10-23 16:30:41 - === SAVE_DATA STARTED ===
+2025-10-23 16:30:41 - ID: null, Load ID: null
+2025-10-23 16:30:41 - Processing 15 section entries
+2025-10-23 16:30:41 - Preparing INSERT for new record
+2025-10-23 16:30:41 - Inserted new record ID 5
+2025-10-26 10:36:02 - === SAVE_DATA STARTED ===
+2025-10-26 10:36:02 - ID: null, Load ID: null
+2025-10-26 10:36:02 - Processing 15 section entries
+2025-10-26 10:36:02 - Preparing INSERT for new record
+2025-10-26 10:36:02 - Inserted new record ID 6
+2025-10-26 10:36:27 - === SAVE_DATA STARTED ===
+2025-10-26 10:36:27 - ID: 6, Load ID: null
+2025-10-26 10:36:27 - Processing 15 section entries
+2025-10-26 10:36:27 - Preparing UPDATE for ID 6
+2025-10-26 10:36:27 - Updated ID 6 successfully
+2025-10-29 10:45:30 - === SAVE_DATA STARTED ===
+2025-10-29 10:45:30 - ID: 5, Load ID: null
+2025-10-29 10:45:30 - Processing 15 section entries
+2025-10-29 10:45:30 - Preparing UPDATE for ID 5
+2025-10-29 10:45:30 - ERROR: Record not found or access denied
+2025-10-29 10:47:46 - === SAVE_DATA STARTED ===
+2025-10-29 10:47:46 - ID: 5, Load ID: null
+2025-10-29 10:47:46 - Processing 15 section entries
+2025-10-29 10:47:46 - Preparing UPDATE for ID 5
+2025-10-29 10:47:46 - Updated ID 5 successfully
+2025-10-29 10:48:50 - === SAVE_DATA STARTED ===
+2025-10-29 10:48:50 - ID: 5, Load ID: null
+2025-10-29 10:48:50 - Processing 15 section entries
+2025-10-29 10:48:50 - Preparing UPDATE for ID 5
+2025-10-29 10:48:50 - Updated ID 5 successfully
+2025-10-29 10:57:32 - === SAVE_DATA STARTED ===
+2025-10-29 10:57:32 - ID: 6, Load ID: null
+2025-10-29 10:57:32 - Processing 15 section entries
+2025-10-29 10:57:32 - Preparing UPDATE for ID 6
+2025-10-29 10:57:32 - Updated ID 6 successfully
+2025-10-29 10:58:37 - === SAVE_DATA STARTED ===
+2025-10-29 10:58:37 - ID: 5, Load ID: null
+2025-10-29 10:58:37 - Processing 15 section entries
+2025-10-29 10:58:37 - Preparing UPDATE for ID 5
+2025-10-29 10:58:37 - ERROR: Record not found or access denied
+2025-10-29 10:58:53 - === SAVE_DATA STARTED ===
+2025-10-29 10:58:53 - ID: 5, Load ID: null
+2025-10-29 10:58:53 - Processing 15 section entries
+2025-10-29 10:58:53 - Preparing UPDATE for ID 5
+2025-10-29 10:58:53 - ERROR: Record not found or access denied
+2025-10-29 10:59:41 - === SAVE_DATA STARTED ===
+2025-10-29 10:59:41 - ID: 5, Load ID: null
+2025-10-29 10:59:41 - Processing 15 section entries
+2025-10-29 10:59:41 - Preparing UPDATE for ID 5
+2025-10-29 10:59:41 - Updated ID 5 successfully
+2025-10-29 11:05:20 - === SAVE_DATA STARTED ===
+2025-10-29 11:05:20 - ID: 3, Load ID: null
+2025-10-29 11:05:20 - Processing 15 section entries
+2025-10-29 11:05:20 - Preparing UPDATE for ID 3
+2025-10-29 11:05:20 - Updated ID 3 successfully
+2025-10-29 11:08:02 - === SAVE_DATA STARTED ===
+2025-10-29 11:08:02 - ID: 6, Load ID: null
+2025-10-29 11:08:02 - Processing 15 section entries
+2025-10-29 11:08:02 - Preparing UPDATE for ID 6
+2025-10-29 11:08:02 - Updated ID 6 successfully
+2025-10-29 11:45:05 - === SAVE_DATA STARTED ===
+2025-10-29 11:45:05 - ID: 6, Load ID: null
+2025-10-29 11:45:05 - Processing 15 section entries
+2025-10-29 11:45:05 - Preparing UPDATE for ID 6
+2025-10-29 11:45:05 - Updated ID 6 successfully
+2025-10-29 12:04:22 - === SAVE_DATA STARTED ===
+2025-10-29 12:04:22 - ID: 6, Load ID: null
+2025-10-29 12:04:22 - Processing 15 section entries
+2025-10-29 12:04:22 - Preparing UPDATE for ID 6
+2025-10-29 12:04:22 - ERROR: Record not found or access denied
+2025-10-29 12:04:27 - === SAVE_DATA STARTED ===
+2025-10-29 12:04:27 - ID: 6, Load ID: null
+2025-10-29 12:04:27 - Processing 15 section entries
+2025-10-29 12:04:27 - Preparing UPDATE for ID 6
+2025-10-29 12:04:27 - ERROR: Record not found or access denied
+2025-10-29 12:39:09 - === SAVE_DATA STARTED ===
+2025-10-29 12:39:09 - ID: 6, Load ID: null
+2025-10-29 12:39:09 - Processing 15 section entries
+2025-10-29 12:39:09 - Preparing UPDATE for ID 6
+2025-10-29 12:39:09 - Updated ID 6 successfully
+2025-10-29 12:40:03 - === SAVE_DATA STARTED ===
+2025-10-29 12:40:03 - ID: 5, Load ID: null
+2025-10-29 12:40:03 - Processing 15 section entries
+2025-10-29 12:40:03 - Preparing UPDATE for ID 5
+2025-10-29 12:40:03 - Updated ID 5 successfully
+2025-10-29 12:42:31 - === SAVE_DATA STARTED ===
+2025-10-29 12:42:31 - ID: 6, Load ID: null
+2025-10-29 12:42:31 - Processing 15 section entries
+2025-10-29 12:42:31 - Preparing UPDATE for ID 6
+2025-10-29 12:42:31 - Updated ID 6 successfully
+2025-10-29 12:43:11 - === SAVE_DATA STARTED ===
+2025-10-29 12:43:11 - ID: 6, Load ID: null
+2025-10-29 12:43:11 - Processing 15 section entries
+2025-10-29 12:43:11 - Preparing UPDATE for ID 6
+2025-10-29 12:43:11 - Updated ID 6 successfully
+2025-11-04 14:15:12 - === SAVE_DATA STARTED ===
+2025-11-04 14:15:12 - ID: null, Load ID: null
+2025-11-04 14:15:12 - Processing 15 section entries
+2025-11-04 14:15:12 - Preparing INSERT for new record
+2025-11-04 14:15:12 - Inserted new record ID 7
+2025-11-04 15:21:05 - === SAVE_DATA STARTED ===
+2025-11-04 15:21:05 - ID: null, Load ID: null
+2025-11-04 15:21:05 - Processing 15 section entries
+2025-11-04 15:21:05 - Preparing INSERT for new record
+2025-11-04 15:21:05 - Inserted new record ID 8
+2025-11-04 15:21:23 - === SAVE_DATA STARTED ===
+2025-11-04 15:21:23 - ID: 8, Load ID: null
+2025-11-04 15:21:23 - Processing 15 section entries
+2025-11-04 15:21:23 - Preparing UPDATE for ID 8
+2025-11-04 15:21:23 - Updated ID 8 successfully
