@@ -313,7 +313,7 @@ $stmt->close();
                             <tr class="worker-row">
                                 <td>
                                     <input type="text" class="form-control designation" name="designation[]" 
-                                           value="<?php echo htmlspecialchars($designations[$i] ?? ''); ?>" required>
+                                           value="<?php echo htmlspecialchars($designations[$i] ?? ''); ?>" >
                                 </td>
                                 <td>
                                 <input type="text" class="form-control grade" name="grade[]" placeholder="Enter Grade" >
@@ -352,14 +352,14 @@ $stmt->close();
                             <tr class="worker-row">
                                 <td>
                                     <input type="text" class="form-control designation" name="designation[]" 
-                                           placeholder="Enter designation" required>
+                                           placeholder="Enter designation" >
                                 </td>
                                 <td>
                                     <input type="text" class="form-control grade" name="grade[]" placeholder="Enter Grade" >
                                 </td>
                                 <td>
                                     <input type="number" class="form-control sanctioned-post" name="sanctioned_post[]" 
-                                           min="0" value="0" required>
+                                           min="0" value="0" >
                                 </td>
                                 <td>
                                     <input type="number" class="form-control male" name="male[]" min="0" value="0" required>
@@ -549,7 +549,7 @@ $(document).ready(function() {
         const newRow = `
             <tr class="worker-row">
                 <td>
-                    <input type="text" class="form-control designation" name="designation[]" placeholder="Enter designation" required>
+                    <input type="text" class="form-control designation" name="designation[]" placeholder="Enter designation" >
                 </td>
                 <td>
                 <input type="text" class="form-control grade" name="grade[]" placeholder="Enter Grade" >

@@ -1,9 +1,9 @@
 <?php
 session_name('blrr');
 session_start();
-if (!isset($_SESSION['username'])) { 
-    header("Location: ../index.php"); 
-    exit(); 
+if (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
 }
 require_once("config.php");
 include_once '../db/database.php';
@@ -19,9 +19,9 @@ include_once 'header_file.php';
 ?>
 
 <body class="d-flex flex-column min-vh-100">
-  
+
   <!-- Loading Spinner -->
-  <div class="loading-spinner" id="loadingSpinner">
+  <div class="loading-spinner" id="loadingSpinner" style="display:none">
     <div class="spinner-border text-custom-purple" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
@@ -33,31 +33,28 @@ include_once 'header_file.php';
       <div class="imgcontainer">
         <img src="images/bcic_logo.jpg" alt="BCIC Logo" class="avatar" >
       </div>
-      
       <a class="navbar-brand fw-bold" href="dashboard.php">
         বিসিআইসি পত্র প্রাপ্তি রেজিস্টার
       </a>
-      
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <span class="nav-link text-light"><small>Username : 
+            <span class="nav-link text-light"><small>Username :
               <i class="fas fa-user me-1"></i>
               <?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?></small>
             </span>
           </li>
           <li class="nav-item">
-            <span class="nav-link text-light"><small>Office : 
+            <span class="nav-link text-light"><small>Office :
               <i class="fas fa-building me-1"></i>
               <?php echo htmlspecialchars($_SESSION['office'] ?? 'Office'); ?></small>
             </span>
           </li>
-            <li class="nav-item">
-            <span class="nav-link text-light"><small>Logged As a : [--<?php echo $user_type ?? 'user'; ?>--]</small></span>
+          <li class="nav-item">
+            <span class="nav-link text-light"><small>Logged As a : [--<?php echo $_SESSION['user_type'] ?? 'user'; ?>--]</small></span>
           </li>
           <li class="nav-item">
             <a class="nav-link text-light" href="logout.php">
@@ -102,15 +99,13 @@ include_once 'header_file.php';
         <span class="float-end">
          <a href="dashboard.php" class="btn btn-outline-success " ><i class="fa fa-home" style="font-size:16px;color:red"></i>  Home</a>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fa fa-plus"></i> নতুন এন্ট্রি</button>
-          <!-- Your other buttons remain the same -->
     <a href="show_all_file.php" class="btn btn-outline-warning">
         <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>সব ফাইল দেখুন</span>
     </a>
         <a href="file_search_new.php" class="btn btn-outline-primary">
-    <i class="fa fa-search" style="font-size:16px"></i> 
+    <i class="fa fa-search" style="font-size:16px"></i>
      Search</a></span>
-    </div>    
-
+    </div>
 
     <table id="fileTable" class="table table-striped table-bordered ">
         <thead class="table-dark text-center">
@@ -118,15 +113,14 @@ include_once 'header_file.php';
                 <th>ক্রমিক নং</th>
                 <th>এন্ট্রি তারিখ</th>
                 <th>ডকেট নং</th>
-                <th>প্রাপক</th>
-                <th>স্বাক্ষরের তারিখ</th>
-                <th>উপস্থাপনকারী/ প্রেরিত বিভাগ</th>
-                <th>শাখা</th>
-                <th>তারিখ</th>  
+                <th>আগত ফাইল পরিচালকের দপ্তর</th>
+                <th>ফাইল উপস্থাপনকারী বিভাগ/ শাখা</th>                
                 <th>বিষয়</th>
+                <th>প্রাপক</th>
+                <th>চেয়ারম্যান মহোদয়ের স্বাক্ষরের তারিখ</th>
                 <th>গন্তব্য</th>
                 <th>মন্তব্য</th>
-                <th>ক্রিয়া</th>
+                <th>একশন</th>
             </tr>
         </thead>
     </table>
@@ -141,59 +135,78 @@ include_once 'header_file.php';
                 <button type="button" class="btn-close text-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="hidden" name="id" id="id">
-                <input type="hidden" id="year_auto1" name="year_auto1">
+                <input type="hidden" name="id" id="id" value="">
                 <div class="row g-2">
-                    <div class="col-md-4"><label>এন্ট্রি তারিখ:</label><input type="date" name="entry_date" id="entry_date" class="form-control" required value="<?php echo date('Y-m-d');?>">
+                    <div class="col-md-4">
+                        <label>এন্ট্রি তারিখ:</label>
+                      <input type="date" name="entry_date" id="entry_date" class="form-control"
+       value="<?php echo date('Y-m-d'); ?>" required>
 
-                      <script>
+<span id="entry_date_bn">
+    <?php echo englishToBanglaNumber(date('Y-m-d')); ?>
+</span>
+
+                        <script>
                           document.addEventListener('DOMContentLoaded', function () {
                             const dateInput = document.getElementById('entry_date');
                             const docketInput = document.getElementById('d_number');
-
                             dateInput.addEventListener('change', function () {
                               const selectedDate = this.value;
                               if (!selectedDate) return;
-
                               const year = new Date(selectedDate).getFullYear();
-
-                              // Send year to PHP via AJAX
+                              // Send year to PHP via AJAX to get next d_number in Bangla
                               $.post('get_d_number_file.php', { year_auto1: year }, function(response) {
-                                docketInput.value = response; // response should be Bengali number
+                                // If PHP returns Bangla number string
+                                docketInput.value = response;
                               });
                             });
                           });
                         </script>
-
                     </div>
+
                     <div class="col-md-4">
                         <label>ডকেট নং:</label>
-                        <!-- <input type="text" class="form-control bg-light" id="d_number" name="d_number" value="" readonly> -->
-                        <input type="text" class="form-control bg-light" id="d_number" name="d_number" value="<?php echo englishToBanglaNumber($row_d_number_max)?>" readonly>
+                        <input type="text" class="form-control bg-light" id="d_number" name="d_number" value="" readonly>
                     </div>
-                   
+
+                    <div class="col-md-4">
+                        <label>আগত ফাইল পরিচালকের দপ্তর:</label>
+                        <select class="form-select" id="immediate_sender_office" name="immediate_sender_office" required>
+                            <option selected disabled value="">--Select--</option>
+                            <?php
+                            $sql = "SELECT division_bn FROM division WHERE id IN (1,5,6,7,8,9)";
+                            $result = mysqli_query($conn, $sql);
+                            while($row = mysqli_fetch_array($result)) {
+                                echo "<option value='".htmlspecialchars($row['division_bn'])."'>".htmlspecialchars($row['division_bn'])."</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
                     <div class="col-md-4">
                         <label>উপস্থাপনকারী/ প্রেরিত বিভাগ:</label>
-                        <select class="form-select" id="immediate_sender_office" name="immediate_sender_office" required>
+                        <select class="form-select" id="div_dept_office" name="div_dept_office" required>
                             <option selected disabled value="">--Select--</option>
                             <?php
                             $sql = "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
                             $result = mysqli_query($conn, $sql);
                             while($row = mysqli_fetch_array($result)) {
-                                echo "<option value='".$row['division_bn']."'>".$row['division_bn']."</option>";
+                                echo "<option value='".htmlspecialchars($row['division_bn'])."'>".htmlspecialchars($row['division_bn'])."</option>";
                             }
-                            ?>   
+                            ?>
                         </select>
                     </div>
-                    <div class="col-md-6">
+
+                    <div class="col-md-4">
                         <label>শাখা (লিখুন):</label>
-                        <input type="text" class="form-control bg-light" id="section_dept" name="section_dept" value="" >
+                        <input type="text" class="form-control bg-light" id="section_dept" name="section_dept" value="">
                     </div>
-                    
-                    <div class="col-md-6"><label> তারিখ:</label><input type="date" name="div_sign_date" id="div_sign_date" class="form-control" value="<?php echo date('Y-m-d');?>"></div>
+
+                    <div class="col-md-4"><label> তারিখ:</label><input type="date" name="div_sign_date" id="div_sign_date" class="form-control" value="<?php echo date('Y-m-d');?>"></div>
+
                     <div class="col-md-12"><label>বিবরণ/বিষয়/সারসংক্ষেপ/বিষয়বস্তু:</label><input type="text" name="subject" id="subject" class="form-control" required></div>
 
-                       <div class="col-md-6">
+                    <div class="col-md-6">
                         <label>প্রাপক:</label>
                         <select class="form-select" id="recipient" name="recipient" required>
                             <option selected disabled value="">--Select--</option>
@@ -201,28 +214,28 @@ include_once 'header_file.php';
                             $sql = "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
                             $result = mysqli_query($conn, $sql);
                             while($row = mysqli_fetch_array($result)) {
-                                echo "<option value='".$row['division_bn']."'>".$row['division_bn']."</option>";
-                            }
-                            ?>   
-                        </select>
-                    </div>
-                    <div class="col-md-6"><label>স্বাক্ষরের তারিখ:</label><input type="date" name="sign_date" id="sign_date" class="form-control" required value="<?php echo date('Y-m-d');?>"></div>
-                    <div class="col-md-6">
-                        <label>গন্তব্য (একাধিক নির্বাচন করুন):</label>
-                        <select name="destination_dropfile[]" id="destination_dropfile" class="form-select chosen-select" multiple required>
-                             <?php
-                            $sql0 = ($office_title == "chairman") 
-                                ? "SELECT division_bn FROM division"
-                                : "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
-                            $result0 = mysqli_query($conn, $sql0);
-                            while ($row0 = mysqli_fetch_array($result0)) {
-                                echo "<option value='" . $row0['division_bn'] . "'>" . $row0['division_bn'] . "</option>";
+                                echo "<option value='".htmlspecialchars($row['division_bn'])."'>".htmlspecialchars($row['division_bn'])."</option>";
                             }
                             ?>
                         </select>
                     </div>
-                    <div class="col-md-6"><label>গন্তব্য (লিখুন):</label><input type="text" name="comments" id="comments" class="form-control"></div>
-                    <div class="col-md-12"><label>মন্তব্য:</label><input type="text" name="comments" id="comments" class="form-control"></div>
+
+                    <div class="col-md-6"><label>স্বাক্ষরের তারিখ:</label><input type="date" name="sign_date" id="sign_date" class="form-control" required value="<?php echo date('Y-m-d');?>"></div>
+
+                    <div class="col-md-6">
+                        <label>গন্তব্য (একাধিক নির্বাচন করুন):</label>
+                        <select name="destination_dropfile[]" id="destination_dropfile" class="form-select chosen-select" multiple required>
+                             <?php
+                            $sql0 = "SELECT division_bn FROM division WHERE id NOT IN (2,3,4)";
+                            $result0 = mysqli_query($conn, $sql0);
+                            while ($row0 = mysqli_fetch_array($result0)) {
+                                echo "<option value='" . htmlspecialchars($row0['division_bn']) . "'>" . htmlspecialchars($row0['division_bn']) . "</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6"><label>মন্তব্য:</label><input type="text" name="comments" id="comments" class="form-control"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -262,27 +275,36 @@ $(function(){
               data: null,
               render: function (data, type, row, meta) {
                 const rowNum = meta.row + meta.settings._iDisplayStart + 1;
-                // Convert English digits to Bangla digits
                 return rowNum.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]);
               }
             },
-
-            { data: 'entry_date', "render": function (data) {
+            { data: 'entry_date', render: function (data) {
                 return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
-            }
-            },
-            { data: 'd_number',  },
-            { data: 'recipient' },
-            { data: 'sign_date', "render": function (data) {
-                return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
-            } },
+            }},
+            { data: 'd_number' },
             { data: 'immediate_sender_office' },
-            { data: 'section_dept' },
-            { data: 'div_sign_date', "render": function (data) {
-                return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
-            } },          
-            
+            // {
+            //     data: null,
+            //     render: function (data, type, row) {
+            //         return row.div_dept_office + ' - ' + row.section_dept;
+            //     }
+            // },
+            {
+                data: null,
+                render: function (data, type, row) {
+                    if(row.section_dept){
+                        return row.div_dept_office + ' - ' + row.section_dept;
+                    } else {
+                        return row.div_dept_office;
+                    }
+                }
+            },
             { data: 'subject' },
+            { data: 'recipient' },
+
+            { data: 'sign_date', render: function (data) {
+                return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
+            }},
             { data: 'destination_dropfile' },
             { data: 'comments' },
             { data: 'id', render: function(id){
@@ -309,13 +331,16 @@ $(function(){
         }
     });
 
-    // Auto-update d_number only for new entry
+    // Auto-update d_number only for new entry (use file_action next_d_number)
     $('#addModal').on('show.bs.modal', function () {
-        let id = $('#id').val(); // check if id exists
-        if(!id){ // only if new entry
-            $.getJSON('file_action.php?action=next_d_number', function(res){
+        let id = $('#id').val();
+        if(!id){
+            // choose year from entry_date input
+            let entryDate = $('#entry_date').val() || new Date().toISOString().slice(0,10);
+            let year = new Date(entryDate).getFullYear();
+            $.getJSON('file_action.php?action=next_d_number&year='+year, function(res){
                 if(res.status === 200){
-                    $('#d_number').val(res.next_d_number);
+                    $('#d_number').val(res.next_d_number); // already Bangla
                 }
             });
         }
@@ -324,23 +349,21 @@ $(function(){
     // Save (Add/Update)
     $('#fileForm').on('submit', function(e){
         e.preventDefault();
-        let d_number_eng = $('#d_number').val().replace(/[০-৯]/g, function(match){
-            return ['0','1','2','3','4','5','6','7','8','9'][['০','১','২','৩','৪','৫','৬','৭','৮','৯'].indexOf(match)];
-        });
-        $('#d_number').val(d_number_eng);
+
+        // convert Bangla d_number to English before sending (if d_number is Bangla)
+        let dnum = $('#d_number').val();
+        let eng = dnum.replace(/[০-৯]/g, function(match){ return ['0','1','2','3','4','5','6','7','8','9'][['০','১','২','৩','৪','৫','৬','৭','৮','৯'].indexOf(match)]; });
+        $('#d_number').val(eng);
 
         $.post('file_action.php?action=save', $(this).serialize(), function(res){
             alert(res.message);
             if(res.status==200){
                 $('#addModal').modal('hide');
-                // Reset form and reload table after modal is hidden
                 setTimeout(function() {
                     $('#fileForm')[0].reset();
                     $('.chosen-select').val([]).trigger("chosen:updated");
                     table.ajax.reload(null, false);
-                }, 500);
-            } else {
-                alert('Error: ' + res.message);
+                }, 300);
             }
         }, 'json').fail(function(xhr, status, error) {
             alert('Request failed: ' + error);
@@ -352,17 +375,18 @@ $(function(){
         let id = $(this).data('id');
         $.getJSON('file_action.php?action=get&id='+id, function(data){
             $('#id').val(data.id);
-            $('#entry_date').val(data.entry_date);            
+            $('#entry_date').val(data.entry_date);
             $('#recipient').val(data.recipient);
             $('#immediate_sender_office').val(data.immediate_sender_office);
+            $('#div_dept_office').val(data.div_dept_office);
             $('#section_dept').val(data.section_dept);
-            $('#d_number').val(data.d_number); // use existing d_number
+            $('#d_number').val(data.d_number); // server returns Bangla version
             $('#div_sign_date').val(data.div_sign_date);
             $('#sign_date').val(data.sign_date);
             $('#subject').val(data.subject);
             $('#comments').val(data.comments);
 
-            let selected = data.destination_dropfile.split(',');
+            let selected = data.destination_dropfile ? data.destination_dropfile.split(',') : [];
             $('#destination_dropfile').val(selected).trigger("chosen:updated");
 
             $('#addModal').modal('show');
@@ -384,7 +408,6 @@ $(function(){
         $('#fileForm')[0].reset();
         $('#id').val('');
         $('.chosen-select').val([]).trigger("chosen:updated");
-        // Remove any existing backdrop
         $('.modal-backdrop').remove();
         $('body').removeClass('modal-open').css('padding-right','');
     });

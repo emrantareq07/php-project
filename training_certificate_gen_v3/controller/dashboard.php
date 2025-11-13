@@ -45,7 +45,7 @@ $email_id = $_SESSION['user_email'];
 
         <?php if ($user_role === 'sadmin'): ?>
             <!-- Admin Panel -->
-            <h4 class="text-danger">Admin Panel</h4>
+            <h4 class="text-danger">Super Admin Panel</h4>
             <ul>
                 <li><a href="manage_users.php" style="text-decoration: none;">👥 Manage Users</a></li>
                 <li><a href="reports.php" style="text-decoration: none;">📊 View Reports</a></li>
@@ -60,6 +60,20 @@ $email_id = $_SESSION['user_email'];
 
                 </li>
             </ul>
+
+            <?php elseif ($user_role === 'admin'): ?>
+            <!-- Admin Panel -->
+            <h4 class="text-danger">Admin Panel</h4>
+            <ul>
+                <li><a href="manage_users.php" style="text-decoration: none;">👥 Manage Users</a></li>
+                <li><a href="reports.php" style="text-decoration: none;">📊 View Reports</a></li>
+                <li><a href="settings.php" style="text-decoration: none;">⚙️ Training Settings/Setup</a></li>
+                <li><a href="certificate_by_batch.php" style="text-decoration: none;"><i class="fa fa-sticky-note-o"></i>  Certificates</a></li>
+                <li>                  
+
+                </li>
+            </ul>
+
         <?php elseif ($user_role === 'user'): ?>
             <!-- User Panel -->
             <h4 class="text-success">User Dashboard</h4>
@@ -74,7 +88,12 @@ $email_id = $_SESSION['user_email'];
 
         <hr>
         <a href="logout.php" class="btn btn-outline-danger fw-bold">Logout</a>
+        <?php
+        require_once "includes/footer.php"; 
+        ?>
+        
     </div>
+
 </div>
 </body>
 </html>

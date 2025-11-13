@@ -2,7 +2,7 @@
 session_name('viva_exam_db');
 session_start();
 include('../db/db.php');
-
+date_default_timezone_set('Asia/Dhaka');
 // Redirect if not logged in
 if (!isset($_SESSION['username'])) {
     header("Location: ../index.php");
@@ -11,6 +11,8 @@ if (!isset($_SESSION['username'])) {
 
 $username = $_SESSION['username']; // Examiner username
 $today_date = date("Y-m-d");
+
+$current_time = date("g:i A");
 // CREATE or UPDATE
 if (isset($_POST['save_schedule'])) {
     $id = $_POST['schedule_id'] ?? '';
@@ -65,7 +67,7 @@ $schedules = $conn->query("SELECT * FROM exam_schedule_tbl ORDER BY id DESC");
     </div>
     <div class="col-md-3">
       <label>Time</label>
-      <input type="time" name="time" id="time" class="form-control" required>
+      <input type="time" name="time" id="time" class="form-control" required value="<?php echo $current_time; ?>">
     </div>
     <div class="col-md-2">
       <label>Marks</label>

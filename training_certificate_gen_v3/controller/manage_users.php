@@ -15,7 +15,7 @@ if (isset($_GET['delete'])) {
 }
 
 // Fetch Users
-$result = $conn->query("SELECT * FROM users_tbl ORDER BY id DESC");
+$result = $conn->query("SELECT * FROM users_tbl where role='user' ORDER BY id DESC");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,6 +88,7 @@ $result = $conn->query("SELECT * FROM users_tbl ORDER BY id DESC");
       <?php endwhile; ?>
     </tbody>
   </table>
+  <div class="card-footer mb-4 my-2"><h6 class="float-end text-muted">Design & Developed By ICT Division, ICT.</h6></div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

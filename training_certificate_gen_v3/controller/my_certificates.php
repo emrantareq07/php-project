@@ -109,6 +109,7 @@ $result = $conn->query("
       <?php endwhile; ?>
     </tbody>
   </table>
+<div class="card-footer mb-4 my-2"><h6 class="float-end text-muted">Design & Developed By ICT Division, ICT.</h6></div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

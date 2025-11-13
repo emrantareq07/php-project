@@ -1109,6 +1109,9 @@ function generateSinglePrintView(data) {
                     </button>
                 </div>
             </div>
+            <div class="text-center  mt-2">
+            <small class="text-muted bangla-number">প্রতিবেদন তৈরির তারিখ: ${convertDateToBangla(new Date().toISOString().split('T')[0])}</small>
+        </div>
         </body>
         </html>
     `;

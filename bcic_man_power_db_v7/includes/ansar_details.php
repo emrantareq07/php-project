@@ -8,13 +8,11 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 $_SESSION['username'] = 'admin';
-
- $_SESSION['role'] = 'admin'; 
+$_SESSION['role'] = 'admin'; 
 
 $username = $_SESSION['username'];
-$is_admin = ($username === 'admin'); // Check if user is admin
-
-$role = $_SESSION['role'] ?? ''; // ensure role exists
+$is_admin = ($username === 'admin');
+$role = $_SESSION['role'] ?? '';
 $table = 'ansar_tbl';
 
 // Handle actions
@@ -26,7 +24,7 @@ if (isset($_GET['delete_id'])) {
     } else {
         $_SESSION['error'] = "Error deleting record: " . $conn->error;
     }
-    header("Location: staffs_details.php");
+    header("Location: daily_basis_details.php");
     exit;
 }
 
@@ -40,35 +38,29 @@ if (isset($_GET['clone_id'])) {
     } else {
         $_SESSION['error'] = "Error cloning record: " . $conn->error;
     }
-    header("Location: staffs_details.php");
+    header("Location: daily_basis_details.php");
     exit;
 }
 
-// Fetch all officers from all factories
-$sql = "SELECT * FROM $table ORDER BY date DESC ";
+// Fetch all workers from all factories
+$sql = "SELECT * FROM $table ORDER BY date DESC, factory_name ASC";
 $result = $conn->query($sql);
 
+// Group records by month-year for combine print functionality
+$monthGroups = [];
+if ($result && $result->num_rows > 0) {
+    $result->data_seek(0); // Reset pointer
+    while ($row = $result->fetch_assoc()) {
+        $month_year = date("Y-m", strtotime($row['date']));
+        if (!isset($monthGroups[$month_year])) {
+            $monthGroups[$month_year] = [];
+        }
+        $monthGroups[$month_year][] = $row;
+    }
+    $result->data_seek(0); // Reset pointer again for display
+}
 
-// Departments and Grades
-$sections1 = [
-    'General Admin', 'Security', 'Medical', 'College', 'School', 'Library',
-    'Accounts', 'ICT','Commercial', 'Production (Chemical)', 'Production (Chemist)', 
-    'Engineering (Mechanical)', 'Engineering (Electrical + Instrument + Others)',
-    'Engineering (Civil)', 'Forest/FRM'
-];
-
-$sections = [
-    'সাধারণ প্রশাসন', 'নিরাপত্তা', 'চিকিৎসা', 'কলেজ', 'স্কুল', 'লাইব্রেরি',
-    'হিসাব/অর্থ', 'আইসিটি','বাণিজ্যিক', 'প্রোডাকশন (কেমিক্যাল ইঞ্জিনিয়ারিং', 'প্রোডাকশন (কেমিস্ট)', 
-    'ইঞ্জিনিয়ারিং (মেকানিক্যাল)', 'ইঞ্জিনিয়ারিং (ইলেকট্রিক্যাল + ইন্সট্রুমেন্ট + অন্যান্য)',
-    'ইঞ্জিনিয়ারিং (সিভিল)', 'বন/এফআরএম'
-];
-$divisions = [
-    'প্রশাসন',
-    'হিসাব ও অর্থ', 'বাণিজ্যিক', 'কারিগরি'
-];
-
-$grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
+$grades = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'g16', 'g17', 'g18', 'g19', 'g20'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,6 +83,25 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
         color: white;
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .combine-print-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+    }
+    .combine-print-btn:hover {
+        background: linear-gradient(135deg, #20c997 0%, #1e7e34 100%);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .month-group-header {
+        background-color: #e9ecef !important;
+        font-weight: bold;
+    }
+    .badge-count {
+        font-size: 0.8em;
+        margin-left: 5px;
     }
     @media print {
         .no-print, .btn, .alert, .modal, .navbar {
@@ -123,7 +134,7 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
 <body>
 
 <div class="container mt-3 shadow rounded p-4">
-  <h2 class="text-muted text-center text-uppercase fw-bold">Ansar From All Factory</h2>
+  <h2 class="text-muted text-center text-uppercase fw-bold">Daily Basis From All Factory</h2>
   
   <?php if (isset($_SESSION['message'])): ?>
     <div class="alert alert-success alert-dismissible fade show">
@@ -139,14 +150,17 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
     </div>
   <?php endif; ?>
 
-  <div class="mb-3 no-print float-end">   
-    <!-- <button class="btn btn-success" onclick="printAllRecords()">
+  <div class="mb-3 no-print">   
+    <button class="btn btn-success" onclick="printAllRecords()">
       <i class="fas fa-print"></i> Print All
     </button>
-    <a href="add_officer.php" class="btn btn-primary">
+    <button class="btn combine-print-btn" onclick="printCombineRecords()">
+      <i class="fas fa-copy"></i> Print All Combine
+    </button>
+    <a href="add_worker.php" class="btn btn-primary">
       <i class="fas fa-plus"></i> Add New
-    </a> -->
-    <a href="admin_dashboard.php" class="btn btn-primary ">
+    </a>
+    <a href="admin_dashboard.php" class="btn btn-primary">
       <i class="fas fa-arrow-left"></i> Back
     </a>
   </div>
@@ -158,43 +172,85 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
         <th>Date</th>
         <th>Month' Year</th>
         <th>Factory Name</th>
-        <th>Created at</th>
-        <th>Updated at</th>
+        <th>Designations</th>
+        <th>Grades</th>
+        <th>Total Workers</th>
         <th class="no-print">Actions</th>
+        <th class="no-print">Print</th>
       </tr>
     </thead>
     <tbody>
       <?php if ($result && $result->num_rows > 0): ?>
-        <?php while ($row = $result->fetch_assoc()): 
+        <?php 
+        $current_month = '';
+        while ($row = $result->fetch_assoc()): 
           $month_year = date("F' Y", strtotime($row['date']));
-          $factory_name=$row['factory_name'];
+          $month_key = date("Y-m", strtotime($row['date']));
+          $factory_name = $row['factory_name'];
+          
+          // Parse comma-separated data
+          $designations = $row['designation'] ? explode(',', $row['designation']) : [];
+          $grades = $row['grade'] ? explode(',', $row['grade']) : [];
+          $male_counts = $row['male'] ? explode(',', $row['male']) : [];
+          $female_counts = $row['female'] ? explode(',', $row['female']) : [];
+          $total_counts = $row['total'] ? explode(',', $row['total']) : [];
+          
+          $total_workers = array_sum($total_counts);
+          
+          // Check if this is a new month group
+          if ($month_key !== $current_month):
+            $current_month = $month_key;
+            $month_record_count = count($monthGroups[$month_key]);
         ?>
+          <tr class="month-group-header">
+            <td colspan="9" class="text-center">
+              <strong>Month: <?php echo $month_year; ?></strong> 
+              <span class="badge bg-primary badge-count"><?php echo $month_record_count; ?> record<?php echo $month_record_count > 1 ? 's' : ''; ?></span>
+              <button class="btn btn-sm combine-print-btn ms-3 month-print-btn" 
+                      data-month-key="<?php echo $month_key; ?>" 
+                      data-month-name="<?php echo $month_year; ?>">
+                <i class="fas fa-print"></i> Print Combine for <?php echo $month_year; ?>
+              </button>
+            </td>
+          </tr>
+        <?php endif; ?>
+        
           <tr>
             <td><?php echo $row['id']; ?></td>
             <td><?php echo date('d-m-Y', strtotime($row['date'])); ?></td>
             <td><?php echo $month_year; ?></td>
-            <td><?php echo htmlspecialchars($row['factory_name']); ?></td>
-            <td><?php echo date('d-m-Y H:i', strtotime($row['created_at'])); ?></td>
-            <td><?php echo date('d-m-Y H:i', strtotime($row['updated_at'])); ?></td>
+            <td><?php echo htmlspecialchars($factory_name); ?></td>
+            <td>
+              <?php 
+              foreach($designations as $index => $designation) {
+                  echo htmlspecialchars(trim($designation));
+                  if ($index < count($designations) - 1) echo ', ';
+              }
+              ?>
+            </td>
+            <td>
+              <?php 
+              foreach($grades as $index => $grade) {
+                  echo htmlspecialchars(trim($grade));
+                  if ($index < count($grades) - 1) echo ', ';
+              }
+              ?>
+            </td>
+            <td class="text-center"><strong><?php echo $total_workers; ?></strong></td>
             <td class="no-print">
               <div class="btn-group">
                 <!-- View -->
-                <button class="btn btn-info btn-sm" onclick="viewOfficer(<?php echo $row['id']; ?>)"
+                <button class="btn btn-info btn-sm" onclick="viewWorker(<?php echo $row['id']; ?>)"
                         data-bs-toggle="tooltip" title="View">
                   <i class="fas fa-eye"></i>
                 </button>
                 
-               <!-- Edit -->
-               <a href="ansar_info.php?id=<?php echo $row['id']; ?>&factory_name=<?php echo urlencode($row['factory_name']); ?>" class="btn btn-warning btn-sm"
+                <!-- Edit -->
+                <a href="daily_basis_info.php?id=<?php echo $row['id']; ?>&factory_name=<?php echo urlencode($factory_name); ?>" class="btn btn-warning btn-sm"
                    data-bs-toggle="tooltip" title="Edit">
                   <i class="fas fa-edit"></i>
                 </a>
                                 
-                <!-- Print Single -->
-                <button class="btn btn-info btn-sm print-btn" data-id="<?php echo $row['id']; ?>" title="Print">
-                  <i class="fas fa-print"></i>
-                </button>
-                
                 <!-- Clone -->
                 <a href="?clone_id=<?php echo $row['id']; ?>" class="btn btn-secondary btn-sm"
                    data-bs-toggle="tooltip" title="Clone" 
@@ -210,11 +266,19 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
                 </a>
               </div>
             </td>
+            <td class="no-print">
+                <!-- Individual Print Button -->
+                <button class="btn btn-success btn-sm print-btn" 
+                        onclick="printSingleWorker(<?php echo $row['id']; ?>, event)"
+                        title="Print this record">
+                  <i class="fas fa-print"></i> Print
+                </button>
+            </td>
           </tr>
         <?php endwhile; ?>
       <?php else: ?>
         <tr>
-          <td colspan="7" class="text-center">No Workers found</td>
+          <td colspan="9" class="text-center">No Daily Basis Record found</td>
         </tr>
       <?php endif; ?>
     </tbody>
@@ -226,7 +290,7 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Officer Details</h5>
+        <h5 class="modal-title">Worker Details</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" id="viewModalBody">
@@ -237,345 +301,643 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
 </div>
 
 <script>
-
 // Print all records
 function printAllRecords() {
     window.print();
 }
 
-// Print button functionality
-$(document).on('click', '.print-btn', function() {
-    const id = $(this).data('id');
-    const $printBtn = $(this);
+// Print combine records for all months
+function printCombineRecords() {
+    // Get all unique month keys
+    const monthKeys = <?php echo json_encode(array_keys($monthGroups)); ?>;
+    
+    if (monthKeys.length === 0) {
+        alert('No records found to print.');
+        return;
+    }
+    
+    // Create a loading indicator
+    const $printBtn = $('.combine-print-btn:not(.month-print-btn)');
+    const originalHtml = $printBtn.html();
+    $printBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Loading Combined Data...');
 
+    // Process each month sequentially
+    processMonthsForPrint(monthKeys, 0, []);
+}
+
+function processMonthsForPrint(monthKeys, index, allData) {
+    if (index >= monthKeys.length) {
+        // All months processed, generate final print view
+        generateCombineWorkersPrintView(allData);
+        
+        // Re-enable button
+        const $printBtn = $('.combine-print-btn:not(.month-print-btn)');
+        $printBtn.prop('disabled', false).html('<i class="fas fa-copy"></i> Print All Combine');
+        return;
+    }
+
+    const monthKey = monthKeys[index];
+    const monthName = getMonthName(monthKey);
+    
+    $.ajax({
+        url: 'get_combine_daily_data.php',
+        type: 'POST',
+        data: { 
+            month_key: monthKey,
+            action: 'get_combine_data'
+        },
+        success: function(response) {
+            try {
+                if (typeof response !== 'object') response = JSON.parse(response);
+                
+                if (response.success) {
+                    allData.push({
+                        month_key: monthKey,
+                        month_name: monthName,
+                        data: response.data
+                    });
+                } else {
+                    console.error('Error loading data for month ' + monthKey + ': ' + (response.message || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error('Parsing error for month ' + monthKey + ':', e);
+            }
+            
+            // Process next month
+            processMonthsForPrint(monthKeys, index + 1, allData);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading data for month ' + monthKey + ':', error);
+            // Continue with next month even if this one fails
+            processMonthsForPrint(monthKeys, index + 1, allData);
+        }
+    });
+}
+
+// Print combine for specific month
+function printCombineMonth(monthKey, monthDisplayName, event = null) {
+    let $printBtn;
+    
+    if (event) {
+        $printBtn = $(event.target).closest('button');
+    } else {
+        // Fallback: find the button by data attributes
+        $printBtn = $(`.month-print-btn[data-month-key="${monthKey}"]`);
+    }
+    
+    const originalHtml = $printBtn.html();
+    
     $printBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Loading...');
 
     $.ajax({
-        url: 'get_record.php',
+        url: 'get_combine_daily_data.php',
+        type: 'POST',
+        data: { 
+            month_key: monthKey,
+            action: 'get_combine_data'
+        },
+        success: function(response) {
+            try {
+                if (typeof response !== 'object') response = JSON.parse(response);
+                
+                if (response.success) {
+                    generateCombineWorkersPrintView([{
+                        month_key: monthKey,
+                        month_name: monthDisplayName,
+                        data: response.data
+                    }]);
+                } else {
+                    alert('Error loading combine data: ' + (response.message || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error('Parsing error:', e);
+                alert('Error parsing server response.');
+            }
+            
+            $printBtn.prop('disabled', false).html(originalHtml);
+        },
+        error: function(xhr, status, error) {
+            alert('Error loading combine data.');
+            $printBtn.prop('disabled', false).html(originalHtml);
+        }
+    });
+}
+
+// Print single worker record
+function printSingleWorker(id, event) {
+    const $printBtn = $(event.target).closest('button');
+    const originalHtml = $printBtn.html();
+    
+    $printBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Loading...');
+
+    $.ajax({
+        url: 'get_single_daily_data.php',
         type: 'POST',
         data: { id: id },
         success: function(response) {
             try {
                 if (typeof response !== 'object') response = JSON.parse(response);
-
+                
                 if (response.success) {
-                    generatePrintView(response.data);
+                    generateSingleWorkerPrintView(response.data);
                 } else {
-                    alert('Error loading record for printing: ' + (response.message || 'Unknown error'));
+                    alert('Error loading record: ' + (response.message || 'Unknown error'));
                 }
             } catch (e) {
                 console.error('Parsing error:', e);
-                alert('Error parsing server response for printing.');
+                alert('Error parsing server response.');
             }
+            
+            $printBtn.prop('disabled', false).html(originalHtml);
         },
         error: function(xhr, status, error) {
-            alert('Error loading record for printing.');
-        },
-        complete: function() {
-            $printBtn.prop('disabled', false).html('<i class="fas fa-print"></i>');
+            alert('Error loading record.');
+            $printBtn.prop('disabled', false).html(originalHtml);
         }
+    });
+}
+
+// Utility function to get month name from key
+function getMonthName(monthKey) {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(year, month - 1);
+    return date.toLocaleString('en', { month: 'long', year: 'numeric' });
+}
+
+// Event delegation for all buttons
+$(document).ready(function() {
+    // Month-specific combine print buttons
+    $(document).on('click', '.month-print-btn', function(e) {
+        e.preventDefault();
+        const monthKey = $(this).data('month-key');
+        const monthName = $(this).data('month-name');
+        printCombineMonth(monthKey, monthName, e);
+    });
+    
+    // Main combine print button (Print All Combine)
+    $(document).on('click', '.combine-print-btn:not(.month-print-btn)', function(e) {
+        e.preventDefault();
+        printCombineRecords();
+    });
+    
+    // Individual print buttons
+    $(document).on('click', '.print-btn', function(e) {
+        e.preventDefault();
+        const id = $(this).closest('tr').find('td:first').text();
+        printSingleWorker(id, e);
     });
 });
 
-// Function to generate print view with Bangla numbers
-function generatePrintView(data) {
-    // Create print content
+
+
+// Function to generate combine workers print view with grade and designation combined in one table
+function generateCombineWorkersPrintView(monthsData) {
+    if (!monthsData || monthsData.length === 0) {
+        alert('No data available for printing.');
+        return;
+    }
+
     let printContent = `
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Employee Data Report - ${data.date}</title>
+            <title>Combined Workers Report - Bangladesh Chemical Industries Corporation</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <!-- Fonts -->
-            <link rel="preconnect" href="https://fonts.googleapis.com">
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-            <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
-            <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
             <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
-                body { font-family: 'SolaimanLipi', 'Siyam Rupali', 'Arial', sans-serif; margin: 20px; }
-                .print-header { background: #f8f9fa; padding: 20px; border-bottom: 2px solid #dee2e6; margin-bottom: 20px; border-radius: 8px; }
-                .print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 12px; }
-                .print-table th, .print-table td { border: 1px solid #dee2e6; padding: 6px; text-align: center; }
-                .print-table th { background-color: #e9ecef; font-weight: bold; }
-                .department-cell { text-align: left; font-weight: bold; background-color: #f8f9fa !important; min-width: 180px; }
-                .division-cell { text-align: center; font-weight: bold; background-color: #f8f9fa !important; min-width: 100px; vertical-align: middle; }
-                .total-row { background-color: #e9ecef !important; font-weight: bold; }
-                .male-col { background-color: #e3f2fd !important; }
-                .female-col { background-color: #fce4ec !important; }
-                .grade-total { background-color: #f5f5f5 !important; }
-                .section-total { background-color: #e9ecef !important; font-weight: bold; }
-                .grand-total { background-color: #495057 !important; color: white !important; }
-                
+                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
+                body { 
+                    font-family: 'Noto Sans Bengali', 'SolaimanLipi', Arial, sans-serif; 
+                    margin: 20px; 
+                    direction: ltr;
+                }
+                .print-header { 
+                    text-align: center; 
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #333;
+                    padding-bottom: 20px;
+                }
+                .month-section { 
+                    margin-bottom: 40px; 
+                    page-break-after: always; 
+                }
+                .month-section:last-child { 
+                    page-break-after: avoid; 
+                }
+                .month-title { 
+                    background: #f8f9fa; 
+                    padding: 15px; 
+                    border-radius: 5px; 
+                    margin-bottom: 20px;
+                    border-left: 4px solid #007bff;
+                }
+                .summary-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-bottom: 20px;
+                    font-size: 14px;
+                }
+                .summary-table th, .summary-table td { 
+                    border: 1px solid #000; 
+                    padding: 8px; 
+                    text-align: center; 
+                }
+                .summary-table th { 
+                    background-color: #e9ecef; 
+                    font-weight: bold;
+                }
+                .total-row {
+                    background-color: #d1ecf1 !important;
+                    font-weight: bold;
+                }
+                .bangla-number, .bangla-text {
+                    font-family: 'Noto Sans Bengali', 'SolaimanLipi', Arial;
+                    font-size: 14px;
+                }
                 @media print {
                     .no-print { display: none; }
-                    body { margin: 0; }
-                    .print-table { font-size: 10px; }
-                    .print-header { margin: 10px; }
+                    .month-section { page-break-inside: avoid; }
+                    body { margin: 10px; font-size: 12px; }
+                    .summary-table { font-size: 12px; }
                 }
-                .text-center { text-align: center; }
-                .mb-2 { margin-bottom: 10px; }
-                .mb-1 { margin-bottom: 5px; }
-                .mb-0 { margin-bottom: 0; }
-
-                /* Font Definitions */
-                @font-face {
-                  font-family: 'Nikosh';
-                  src: url('fonts/Nikosh.ttf') format('truetype'),
-                       url('fonts/Nikosh.woff') format('woff'),
-                       url('fonts/Nikosh.woff2') format('woff2');
-                  font-weight: normal;
-                  font-style: normal;
-                  font-display: swap;
+                .text-bangla {
+                    font-family: 'Noto Sans Bengali', 'SolaimanLipi', Arial;
                 }
-
-                /* Base Typography */
-                * {
-                  font-family: 'Nikosh', 'SolaimanLipi', 'Open Sans', sans-serif;
+                .bengali-title {
+                    font-family: 'Noto Sans Bengali', 'SolaimanLipi', Arial;
+                    font-weight: bold;
+                    font-size: 16px;
                 }
             </style>
         </head>
         <body>
             <div class="container-fluid">
-                <div class="print-header text-center">
-                    <h2 class="mb-0">বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h2>
-                    <h5 class="mb-0">বিসিআইসি ভবন, ৩০-৩১, দিলকুশা বা/এ, ঢাকা-১০০০।</h5>
-                    <h4 class="mb-1">কারখানা/প্রতিষ্ঠান/প্রকল্পের নাম : <?php echo $factory_name; ?></h4>
-                    <h5 class="mb-0">বিদ্যমান জনবলের পরিসংখ্যান : (${convertDateToBangla(data.date)} তারিখে)</h5>
+                <div class="print-header">
+                    <h2 class="text-bangla">বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h2>
+                    <h5 class="text-bangla">বিসিআইসি ভবন, ৩০-৩১, দিলকুশা বা/এ, ঢাকা-১০০০</h5>
+                    <h4 class="text-bangla">কারখানা/প্রতিষ্ঠান/প্রকল্পের নাম : সমন্বিত রিপোর্ট (দৈনিক ভিত্তিক)</h4>
+                    <h5 class="text-bangla">বিদ্যমান জনবলের পরিসংখ্যান</h5>
+                    <p class="bangla-text">প্রতিবেদন তৈরির তারিখ: ${convertDateToBangla(new Date().toISOString().split('T')[0])}</p>
                 </div>
     `;
 
-    // Create the table structure
-    printContent += `
-        <table class="print-table">
-            <thead>
-                <tr>
-                    <th class="division-cell" rowspan="2">বিভাগ</th>
-                    <th class="department-cell" rowspan="2">উপ-বিভাগ/শাখা</th>
-    `;
-
-    // Add grade headers with Bangla numbers
-    <?php foreach($grades as $grade): ?>
-    printContent += `
-        <th colspan="3" class="text-center">
-            গ্রেড ${englishToBanglaNumber('<?php echo substr($grade, 1); ?>')}
-        </th>
-    `;
-    <?php endforeach; ?>
-
-    printContent += `
-        <th colspan="3" class="text-center">সর্বমোট</th>
-                </tr>
-                <tr>
-    `;
-
-    // Add sub-headers for each grade
-    <?php foreach($grades as $grade): ?>
-    printContent += `
-        <th class="male-col">পুরুষ</th>
-        <th class="female-col">মহিলা</th>
-        <th class="grade-total">মোট</th>
-    `;
-    <?php endforeach; ?>
-
-    printContent += `
-        <th class="male-col">পুরুষ</th>
-        <th class="female-col">মহিলা</th>
-        <th class="grade-total">মোট</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    // Define sections array for JavaScript (Bengali version)
-    const sections = [
-        'সাধারণ প্রশাসন', 'নিরাপত্তা', 'চিকিৎসা', 'কলেজ', 'স্কুল', 'লাইব্রেরি',
-        'হিসাব/অর্থ', 'আইসিটি', 'বাণিজ্যিক', 'প্রোডাকশন (কেমিক্যাল ইঞ্জিনিয়ারিং)', 'প্রোডাকশন (কেমিস্ট)', 
-        'ইঞ্জিনিয়ারিং (মেকানিক্যাল)', 'ইঞ্জিনিয়ারিং (ইলেকট্রিক্যাল + ইন্সট্রুমেন্ট + অন্যান্য)',
-        'ইঞ্জিনিয়ারিং (সিভিল)', 'বন/এফআরএম'
-    ];
-
-    const grades = <?php echo json_encode($grades); ?>;
-
-    // Define division mapping for Bengali sections
-    const divisionMap = {
-        // প্রশাসন বিভাগ
-        'সাধারণ প্রশাসন': 'প্রশাসন',
-        'নিরাপত্তা': 'প্রশাসন',
-        'চিকিৎসা': 'প্রশাসন',
-        'কলেজ': 'প্রশাসন',
-        'স্কুল': 'প্রশাসন',
-        'লাইব্রেরি': 'প্রশাসন',
+    monthsData.forEach(monthData => {
+        if (!monthData.data || monthData.data.length === 0) return;
         
-        // হিসাব ও অর্থ বিভাগ
-        'হিসাব/অর্থ': 'হিসাব ও অর্থ',
-        'আইসিটি': 'হিসাব ও অর্থ',
-        
-        // বাণিজ্যিক বিভাগ
-        'বাণিজ্যিক': 'বাণিজ্যিক',
-        
-        // উৎপাদন বিভাগ
-        'প্রোডাকশন (কেমিক্যাল ইঞ্জিনিয়ারিং)': 'উৎপাদন',
-        'প্রোডাকশন (কেমিস্ট)': 'উৎপাদন',
-        
-        // প্রকৌশল বিভাগ
-        'ইঞ্জিনিয়ারিং (মেকানিক্যাল)': 'প্রকৌশল',
-        'ইঞ্জিনিয়ারিং (ইলেকট্রিক্যাল + ইন্সট্রুমেন্ট + অন্যান্য)': 'প্রকৌশল',
-        'ইঞ্জিনিয়ারিং (সিভিল)': 'প্রকৌশল',
-        
-        // বন বিভাগ
-        'বন/এফআরএম': 'বন'
-    };
+        // Process all records for this month and organize by grade and designation
+        const gradeDesignationSummary = {};
+        let totalSanctioned = 0;
+        let totalMale = 0;
+        let totalFemale = 0;
+        let grandTotal = 0;
+        let totalVacant = 0;
 
-    // Calculate rowspan for each division
-    const divisionCounts = {};
-    sections.forEach(section => {
-        const division = divisionMap[section];
-        divisionCounts[division] = (divisionCounts[division] || 0) + 1;
-    });
+        // Process each record
+        monthData.data.forEach(record => {
+            const designations = record.designation ? record.designation.split(',') : [];
+            const grades = record.grade ? record.grade.split(',') : [];
+            const sanctionedPosts = record.sanctioned_post ? record.sanctioned_post.split(',') : [];
+            const maleCounts = record.male ? record.male.split(',') : [];
+            const femaleCounts = record.female ? record.female.split(',') : [];
+            const totalCounts = record.total ? record.total.split(',') : [];
 
-    // Add data rows with Bangla numbers and rowspan
-    let grandMaleTotal = 0;
-    let grandFemaleTotal = 0;
-    let grandTotal = 0;
+            // Process each designation in the record
+            designations.forEach((designation, index) => {
+                const grade = grades[index] ? grades[index].trim() : '';
+                const designationName = designation.trim();
+                const sanctioned = sanctionedPosts[index] ? parseInt(sanctionedPosts[index]) : 0;
+                const male = maleCounts[index] ? parseInt(maleCounts[index]) : 0;
+                const female = femaleCounts[index] ? parseInt(femaleCounts[index]) : 0;
+                const total = totalCounts[index] ? parseInt(totalCounts[index]) : 0;
+                const vacant = sanctioned - total;
 
-    let currentDivision = '';
-    let divisionRowspan = 0;
-    let divisionRowIndex = 0;
+                // Create unique key for grade-designation combination
+                const key = `${grade}|${designationName}`;
+                
+                if (!gradeDesignationSummary[key]) {
+                    gradeDesignationSummary[key] = {
+                        grade: grade,
+                        designation: designationName,
+                        sanctioned: 0,
+                        male: 0,
+                        female: 0,
+                        total: 0,
+                        vacant: 0
+                    };
+                }
+                
+                gradeDesignationSummary[key].sanctioned += sanctioned;
+                gradeDesignationSummary[key].male += male;
+                gradeDesignationSummary[key].female += female;
+                gradeDesignationSummary[key].total += total;
+                gradeDesignationSummary[key].vacant += vacant;
 
-    sections.forEach((section, index) => {
-        const division = divisionMap[section];
-        
-        // Check if we're starting a new division
-        if (division !== currentDivision) {
-            currentDivision = division;
-            divisionRowspan = divisionCounts[division];
-            divisionRowIndex = 0;
-        }
-
-        let sectionMaleTotal = 0;
-        let sectionFemaleTotal = 0;
-        let sectionTotal = 0;
-
-        grades.forEach(grade => {
-            // Get the values for this section and grade
-            const grade_m_values = data[grade + '_m'] ? data[grade + '_m'].split(',') : [];
-            const grade_f_values = data[grade + '_f'] ? data[grade + '_f'].split(',') : [];
-            const grade_m = grade_m_values[index] || 0;
-            const grade_f = grade_f_values[index] || 0;
-            const grade_total = parseInt(grade_m) + parseInt(grade_f);
-            
-            // Accumulate section totals
-            sectionMaleTotal += parseInt(grade_m);
-            sectionFemaleTotal += parseInt(grade_f);
-            sectionTotal += grade_total;
+                totalSanctioned += sanctioned;
+                totalMale += male;
+                totalFemale += female;
+                grandTotal += total;
+                totalVacant += vacant;
+            });
         });
 
-        // Accumulate grand totals
-        grandMaleTotal += sectionMaleTotal;
-        grandFemaleTotal += sectionFemaleTotal;
-        grandTotal += sectionTotal;
-
-        // Add row with rowspan for first row of each division
-        if (divisionRowIndex === 0) {
-            printContent += `
-                <tr>
-                    <td class="division-cell" rowspan="${divisionRowspan}">${division}</td>
-                    <td class="department-cell">${section}</td>
-            `;
-        } else {
-            printContent += `
-                <tr>
-                    <td class="department-cell">${section}</td>
-            `;
-        }
-
-        // Add grade data
-        grades.forEach(grade => {
-            const grade_m_values = data[grade + '_m'] ? data[grade + '_m'].split(',') : [];
-            const grade_f_values = data[grade + '_f'] ? data[grade + '_f'].split(',') : [];
-            const grade_m = grade_m_values[index] || 0;
-            const grade_f = grade_f_values[index] || 0;
-            const grade_total = parseInt(grade_m) + parseInt(grade_f);
-            
-            printContent += `
-                    <td class="male-col bangla-number">${englishToBanglaNumber(grade_m)}</td>
-                    <td class="female-col bangla-number">${englishToBanglaNumber(grade_f)}</td>
-                    <td class="grade-total bangla-number">${englishToBanglaNumber(grade_total)}</td>
-            `;
-        });
-        
         printContent += `
-                    <td class="male-col section-total bangla-number">${englishToBanglaNumber(sectionMaleTotal)}</td>
-                    <td class="female-col section-total bangla-number">${englishToBanglaNumber(sectionFemaleTotal)}</td>
-                    <td class="grade-total section-total bangla-number">${englishToBanglaNumber(sectionTotal)}</td>
-                </tr>
+            <div class="month-section">
+                <div class="month-title">
+                    <h3 class="bangla-text">মাস: ${convertToBanglaMonth(monthData.month_name)}</h3>
+                    <p class="bangla-text">মোট রেকর্ড: ${englishToBanglaNumber(monthData.data.length)}</p>
+                </div>
+
+                <h4 class="bengali-title">গ্রেড ও পদভিত্তিক সারসংক্ষেপ (দৈনিক ভিত্তিক)</h4>
+                <table class="summary-table">
+                    <thead>
+                        <tr>
+                            <th class="bangla-text" width="8%">ক্রমিক</th>
+                            <th class="bangla-text" width="25%">পদের নাম</th>
+                            <th class="bangla-text" width="10%">গ্রেড</th>
+                            <th class="bangla-text" width="12%">অনুমোদিত পদ</th>
+                            <th class="bangla-text" width="10%">পুরুষ</th>
+                            <th class="bangla-text" width="10%">মহিলা</th>
+                            <th class="bangla-text" width="10%">মোট</th>
+                            <th class="bangla-text" width="12%">খালি পদ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
         `;
 
-        divisionRowIndex++;
-    });
+        // Convert object to array and sort by grade
+        const summaryArray = Object.values(gradeDesignationSummary);
+        summaryArray.sort((a, b) => {
+            // Extract grade number for sorting
+            const gradeA = parseInt(a.grade.replace('Grade ', ''));
+            const gradeB = parseInt(b.grade.replace('Grade ', ''));
+            return gradeA - gradeB;
+        });
 
-    // Add grand totals row with Bangla numbers
-    printContent += `
-        <tr class="total-row">
-            <td class="division-cell grand-total" colspan="2"><strong>সর্বমোট</strong></td>
-    `;
+        // Add rows to table
+        let serial = 1;
+        summaryArray.forEach((item) => {
+            // Add designation row
+            printContent += `
+                <tr>
+                    <td class="bangla-number">${englishToBanglaNumber(serial)}</td>
+                    <td class="bangla-text" style="text-align: left;">${item.designation}</td>
+                    <td class="bangla-text">${convertGradeToBangla(item.grade)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(item.sanctioned)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(item.male)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(item.female)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(item.total)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(item.vacant)}</td>
+                </tr>
+            `;
+            serial++;
+        });
 
-    // Calculate and display grade-wise grand totals with Bangla numbers
-    grades.forEach(grade => {
-        let gradeMaleTotal = 0;
-        let gradeFemaleTotal = 0;
-        let gradeTotal = 0;
-
-        if (data[grade + '_m']) {
-            gradeMaleTotal = data[grade + '_m'].split(',').reduce((sum, val) => sum + parseInt(val || 0), 0);
-        }
-        if (data[grade + '_f']) {
-            gradeFemaleTotal = data[grade + '_f'].split(',').reduce((sum, val) => sum + parseInt(val || 0), 0);
-        }
-        gradeTotal = gradeMaleTotal + gradeFemaleTotal;
-
+        // Add grand total row only
         printContent += `
-            <td class="male-col grand-total bangla-number"><strong>${englishToBanglaNumber(gradeMaleTotal)}</strong></td>
-            <td class="female-col grand-total bangla-number"><strong>${englishToBanglaNumber(gradeFemaleTotal)}</strong></td>
-            <td class="grade-total grand-total bangla-number"><strong>${englishToBanglaNumber(gradeTotal)}</strong></td>
+                        <tr class="total-row">
+                            <td colspan="3" class="bangla-text"><strong>সর্বমোট</strong></td>
+                            <td class="bangla-number"><strong>${englishToBanglaNumber(totalSanctioned)}</strong></td>
+                            <td class="bangla-number"><strong>${englishToBanglaNumber(totalMale)}</strong></td>
+                            <td class="bangla-number"><strong>${englishToBanglaNumber(totalFemale)}</strong></td>
+                            <td class="bangla-number"><strong>${englishToBanglaNumber(grandTotal)}</strong></td>
+                            <td class="bangla-number"><strong>${englishToBanglaNumber(totalVacant)}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         `;
     });
 
     printContent += `
-        <td class="male-col grand-total bangla-number"><strong>${englishToBanglaNumber(grandMaleTotal)}</strong></td>
-        <td class="female-col grand-total bangla-number"><strong>${englishToBanglaNumber(grandFemaleTotal)}</strong></td>
-        <td class="grade-total grand-total bangla-number"><strong>${englishToBanglaNumber(grandTotal)}</strong></td>
-        </tr>
+                <div class="no-print text-center mt-4">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i> প্রিন্ট করুন
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.close()">
+                        <i class="fas fa-times me-1"></i> বন্ধ করুন
+                    </button>
+                </div>
+            </div>
+        </body>
+        </html>
     `;
 
-    printContent += `
+    const printWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=1');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+}
+
+// Function to generate single worker record print view in Bangla
+function generateSingleWorkerPrintView(data) {
+    const designations = data.designation ? data.designation.split(',') : [];
+    const grades = data.grade ? data.grade.split(',') : [];
+    const sanctionedPosts = data.sanctioned_post ? data.sanctioned_post.split(',') : [];
+    const maleCounts = data.male ? data.male.split(',') : [];
+    const femaleCounts = data.female ? data.female.split(',') : [];
+    const totalCounts = data.total ? data.total.split(',') : [];
+    
+    let printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Worker Record - ${data.factory_name || ''}</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
+                body { 
+                    font-family: 'Noto Sans Bengali', Arial, sans-serif; 
+                    margin: 20px; 
+                }
+                .print-header { 
+                    text-align: center; 
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #333;
+                    padding-bottom: 20px;
+                }
+                .detail-table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-bottom: 20px;
+                }
+                .detail-table th, .detail-table td { 
+                    border: 1px solid #ddd; 
+                    padding: 10px; 
+                    text-align: left; 
+                }
+                .detail-table th { 
+                    background-color: #f8f9fa; 
+                    width: 30%; 
+                }
+                .staff-breakdown {
+                    margin-top: 30px;
+                }
+                .breakdown-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 20px;
+                }
+                .breakdown-table th, .breakdown-table td {
+                    border: 1px solid #000;
+                    padding: 8px;
+                    text-align: center;
+                }
+                .breakdown-table th {
+                    background-color: #e9ecef;
+                    font-weight: bold;
+                }
+                .total-row {
+                    background-color: #d1ecf1 !important;
+                    font-weight: bold;
+                }
+                .bangla-text, .bangla-number {
+                    font-family: 'Noto Sans Bengali', Arial, sans-serif;
+                }
+                .bengali-title {
+                    font-family: 'Noto Sans Bengali', Arial, sans-serif;
+                    font-weight: bold;
+                    font-size: 18px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+                @media print {
+                    .no-print { display: none; }
+                    body { margin: 10px; }
+                    .breakdown-table { font-size: 12px; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="print-header">
+                    <h2 class="bangla-text">বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h2>
+                    <h5 class="bangla-text">বিসিআইসি ভবন, ৩০-৩১, দিলকুশা বা/এ, ঢাকা-১০০০</h5>
+                    <h4 class="bangla-text">কারখানা/প্রতিষ্ঠান/প্রকল্পের নাম : ${data.factory_name || ''}</h4>
+                    <h5 class="bangla-text">বিদ্যমান জনবলের পরিসংখ্যান (শ্রমিক)</h5>
+                    <p class="bangla-text">তারিখ: ${data.date ? convertDateToBangla(data.date) : ''}</p>
+                </div>
+                
+                <table class="detail-table">
+                    <tr>
+                        <th class="bangla-text">কারখানার নাম</th>
+                        <td class="bangla-text">${data.factory_name || ''}</td>
+                    </tr>
+                    <tr>
+                        <th class="bangla-text">তারিখ</th>
+                        <td class="bangla-text">${data.date ? convertDateToBangla(data.date) : ''}</td>
+                    </tr>
+                    <tr>
+                        <th class="bangla-text">মোট দৈনিক ভিত্তিক সংখ্যা</th>
+                        <td class="bangla-number"><strong>${data.total ? englishToBanglaNumber(data.total.split(',').reduce((sum, val) => sum + parseInt(val || 0), 0)) : '০'}</strong></td>
+                    </tr>
+                    <tr>
+                        <th class="bangla-text">তৈরির তারিখ</th>
+                        <td class="bangla-text">${data.created_at ? convertDateToBangla(data.created_at.split(' ')[0]) + ' ' + data.created_at.split(' ')[1] : ''}</td>
+                    </tr>
+                    <tr>
+                        <th class="bangla-text">হালনাগাদের তারিখ</th>
+                        <td class="bangla-text">${data.updated_at ? convertDateToBangla(data.updated_at.split(' ')[0]) + ' ' + data.updated_at.split(' ')[1] : ''}</td>
+                    </tr>
+                </table>
+    `;
+
+    // Add staff breakdown table
+    if (designations.length > 0) {
+        printContent += `
+            <div class="staff-breakdown">
+                <h4 class="bengali-title">গ্রেড ও পদভিত্তিক দৈনিক ভিত্তিক বিবরণ</h4>
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th class="bangla-text" width="8%">ক্রমিক</th>
+                            <th class="bangla-text" width="32%">পদের নাম</th>
+                            <th class="bangla-text" width="20%">গ্রেড</th>
+                            <th class="bangla-text" width="12%">অনুমোদিত পদ</th>
+                            <th class="bangla-text" width="10%">পুরুষ</th>
+                            <th class="bangla-text" width="10%">মহিলা</th>
+                            <th class="bangla-text" width="10%">মোট</th>
+                            <th class="bangla-text" width="12%">খালি পদ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        let totalSanctioned = 0;
+        let totalMale = 0;
+        let totalFemale = 0;
+        let grandTotal = 0;
+        let totalVacant = 0;
+
+        designations.forEach((designation, index) => {
+            const sanctioned = sanctionedPosts[index] ? parseInt(sanctionedPosts[index]) : 0;
+            const male = maleCounts[index] ? parseInt(maleCounts[index]) : 0;
+            const female = femaleCounts[index] ? parseInt(femaleCounts[index]) : 0;
+            const total = totalCounts[index] ? parseInt(totalCounts[index]) : 0;
+            const vacant = sanctioned - total;
+            
+            totalSanctioned += sanctioned;
+            totalMale += male;
+            totalFemale += female;
+            grandTotal += total;
+            totalVacant += vacant;
+
+            printContent += `
+                <tr>
+                    <td class="bangla-number">${englishToBanglaNumber(index + 1)}</td>
+                    <td class="bangla-text" style="text-align: left;">${designation.trim()}</td>
+                    <td class="bangla-text">${convertGradeToBangla(grades[index] ? grades[index].trim() : '')}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(sanctioned)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(male)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(female)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(total)}</td>
+                    <td class="bangla-number">${englishToBanglaNumber(vacant)}</td>
+                </tr>
+            `;
+        });
+
+        printContent += `
+                <tr class="total-row">
+                    <td colspan="3" class="bangla-text"><strong>সর্বমোট</strong></td>
+                    <td class="bangla-number"><strong>${englishToBanglaNumber(totalSanctioned)}</strong></td>
+                    <td class="bangla-number"><strong>${englishToBanglaNumber(totalMale)}</strong></td>
+                    <td class="bangla-number"><strong>${englishToBanglaNumber(totalFemale)}</strong></td>
+                    <td class="bangla-number"><strong>${englishToBanglaNumber(grandTotal)}</strong></td>
+                    <td class="bangla-number"><strong>${englishToBanglaNumber(totalVacant)}</strong></td>
+                </tr>
             </tbody>
         </table>
-        
-        <!-- Signature Section -->
+    </div>
+        `;
+    } else {
+        printContent += `
+            <div class="alert alert-info text-center">
+                <p class="bangla-text">এই রেকর্ডের জন্য কোন শ্রমিক ডাটা পাওয়া যায়নি</p>
+            </div>
+        `;
+    }
+
+    // Add signature section
+    printContent += `
         <div class="row mt-5">
             <div class="col-md-6 text-center">
-                <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto; padding-top: 10px;">
-                    <strong>প্রস্তুতকারীর স্বাক্ষর</strong><br>
-                    <small>নাম ও পদবী</small>
+                <div style="border-top: 1px solid #000; width: 250px; margin: 0 auto; padding-top: 10px;">
+                    <strong class="bangla-text">প্রস্তুতকারীর স্বাক্ষর</strong><br>
+                    <small class="bangla-text">নাম ও পদবী</small>
                 </div>
             </div>
             <div class="col-md-6 text-center">
-                <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto; padding-top: 10px;">
-                    <strong>দায়িত্বপ্রাপ্ত কর্মকর্তার স্বাক্ষর</strong><br>
-                    <small>নাম ও পদবী</small>
+                <div style="border-top: 1px solid #000; width: 250px; margin: 0 auto; padding-top: 10px;">
+                    <strong class="bangla-text">দায়িত্বপ্রাপ্ত কর্মকর্তার স্বাক্ষর</strong><br>
+                    <small class="bangla-text">নাম ও পদবী</small>
                 </div>
             </div>
         </div>
 
-        <div class="mt-4 text-center no-print">
+        <div class="no-print text-center mt-4">
             <button class="btn btn-primary" onclick="window.print()">
-                <i class="fas fa-print me-1"></i>প্রিন্ট করুন
+                <i class="fas fa-print me-1"></i> প্রিন্ট করুন
             </button>
             <button class="btn btn-secondary" onclick="window.close()">
-                <i class="fas fa-times me-1"></i>বন্ধ করুন
+                <i class="fas fa-times me-1"></i> বন্ধ করুন
             </button>
         </div>
         <div class="text-center no-print mt-2">
@@ -589,12 +951,9 @@ function generatePrintView(data) {
         </html>
     `;
 
-    // Open print window
-    const printWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=1');
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
     printWindow.document.write(printContent);
     printWindow.document.close();
-    
-    // Focus the print window
     printWindow.focus();
 }
 
@@ -615,9 +974,60 @@ function convertDateToBangla(dateString) {
     return `${englishToBanglaNumber(day)}-${englishToBanglaNumber(month)}-${englishToBanglaNumber(year)}`;
 }
 
-function viewOfficer(id) {
+function convertToBanglaMonth(englishMonth) {
+    const months = {
+        'January': 'জানুয়ারি',
+        'February': 'ফেব্রুয়ারি',
+        'March': 'মার্চ',
+        'April': 'এপ্রিল',
+        'May': 'মে',
+        'June': 'জুন',
+        'July': 'জুলাই',
+        'August': 'আগস্ট',
+        'September': 'সেপ্টেম্বর',
+        'October': 'অক্টোবর',
+        'November': 'নভেম্বর',
+        'December': 'ডিসেম্বর'
+    };
+    
+    // Extract month and year
+    const [month, year] = englishMonth.split(' ');
+    const banglaMonth = months[month] || month;
+    const banglaYear = englishToBanglaNumber(year);
+    
+    return `${banglaMonth} ${banglaYear}`;
+}
+
+function convertGradeToBangla(grade) {
+    const gradeMap = {
+        'Grade 1': 'গ্রেড ১',
+        'Grade 2': 'গ্রেড ২',
+        'Grade 3': 'গ্রেড ৩',
+        'Grade 4': 'গ্রেড ৪',
+        'Grade 5': 'গ্রেড ৫',
+        'Grade 6': 'গ্রেড ৬',
+        'Grade 7': 'গ্রেড ৭',
+        'Grade 8': 'গ্রেড ৮',
+        'Grade 9': 'গ্রেড ৯',
+        'Grade 10': 'গ্রেড ১০',
+        'Grade 11': 'গ্রেড ১১',
+        'Grade 12': 'গ্রেড ১২',
+        'Grade 13': 'গ্রেড ১৩',
+        'Grade 14': 'গ্রেড ১৪',
+        'Grade 15': 'গ্রেড ১৫',
+        'Grade 16': 'গ্রেড ১৬',
+        'Grade 17': 'গ্রেড ১৭',
+        'Grade 18': 'গ্রেড ১৮',
+        'Grade 19': 'গ্রেড ১৯',
+        'Grade 20': 'গ্রেড ২০'
+    };
+    
+    return gradeMap[grade] || grade;
+}
+
+function viewWorker(id) {
     $.ajax({
-        url: 'view_officer.php',
+        url: 'view_worker.php',
         type: 'GET', 
         data: {id: id},
         success: function(response) {
