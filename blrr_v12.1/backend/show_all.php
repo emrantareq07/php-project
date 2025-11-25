@@ -26,9 +26,9 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
 
 ?>
 
-<div class="container-fluid">
+<!-- <div class="container-fluid"> -->
     <div class="table-wrapper border border-muted rounded shadow p-2 my-1">  
-        <div class="container my-1">  
+        <div class="container-fluid my-1">  
             <span class="float-end mb-2">         
 
                 <?php
@@ -273,7 +273,8 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
             </table>
         </div>
     </div>
-</div>
+<!-- </div> -->
+
 <!-- DATA TABLES + EXPORT JS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <!-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"> -->
@@ -374,6 +375,28 @@ $(document).ready(function(){
     // var officeTitle = "<?php echo $office_title ?? ''; ?>";
     var officeTitle = "চেয়ারম্যান সচিবালয়";
 
+    // Bangla → English number convert
+    function bnToEn(text) {
+        return text.toString().replace(/[০১২৩৪৫৬৭৮৯]/g, d => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+    }
+
+    // EXACT SEARCH
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        let keyword = $('#friendsTable_filter input').val().trim();
+        
+        if (keyword === "") return true;
+
+        keyword = bnToEn(keyword);
+
+        for (let i = 0; i < data.length; i++) {
+            let value = bnToEn(data[i].toString().trim());
+            if (value === keyword) {
+                return true;
+            }
+        }
+
+        return false;
+    });
 
     // ✅ Initialize DataTable properly
     var table = $('#friendsTable').DataTable({
@@ -398,21 +421,39 @@ $(document).ready(function(){
             <?php if($user_type=='user' && $table_name=='chairman'): ?>
             {
                 "data": "entry_date",
-                "render": function (data) {
+                "render": function (data, type, row) {
+                    if (type === 'sort' || type === 'type') {
+                        return data; // Return original for sorting/filtering
+                    }
                     return data ? new Date(data).toLocaleDateString('bn-BD') : '';
                 }
             },
             <?php endif; ?>
             { "data": "recipient" },
-            {
-                "data": "d_number",
-                "render": function (data) {
-                    return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
-                }
+            // {
+            //     "data": "d_number",
+            //     "render": function (data, type, row) {
+            //         if (type === 'sort' || type === 'filter') {
+            //             return data; // Return original for sorting/filtering
+            //         }
+            //         return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
+            //     }
+            // },
+            { 
+        "data": "d_number",
+        "render": function (data) {
+            return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
             },
+        "searchable": true,  // enable search
+        
+        
+        },
             {
                 "data": "ref_number",
-                "render": function (data) {
+                "render": function (data, type, row) {
+                    if (type === 'sort' || type === 'filter') {
+                        return data; // Return original for sorting/filtering
+                    }
                     return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
                 }
             },
@@ -442,7 +483,9 @@ $(document).ready(function(){
                             <button class="btn btn-danger deleteBtn" data-id="${row.id}" title="Delete"><i class="fas fa-trash"></i></button>
                             <button class="btn btn-info viewBtn" data-id="${row.id}" title="View"><i class="fas fa-eye"></i></button>
                         </div>`;
-                }
+                },
+                "searchable": true,
+                "orderable": false
             }
         ],
         "language": {
@@ -469,7 +512,7 @@ $(document).ready(function(){
         buttons: [
             { 
                 extend:'pdfHtml5', 
-                text:'PDF', 
+                text: '<i class="fa fa-file-pdf"></i> PDF', 
                 className:'btn btn-danger btn-sm', 
                 exportOptions:{columns:':not(:last-child)'},
                 title: '',
@@ -481,7 +524,7 @@ $(document).ready(function(){
             },
             { 
                 extend:'excelHtml5', 
-                text:'Excel', 
+                text: '<i class="fa fa-file-excel"></i> Excel', 
                 className:'btn btn-success btn-sm', 
                 exportOptions:{columns:':not(:last-child)'},
                 title: '',
@@ -501,7 +544,7 @@ $(document).ready(function(){
             },
             {
                 extend:'print',
-                text:'Print',
+                text: '<i class="fa fa-print"></i> Print',
                 className:'btn btn-secondary btn-sm',
                 exportOptions:{columns:':not(:last-child)'},
                 title: '',
@@ -548,6 +591,10 @@ $(document).ready(function(){
             // Reset counter on each table draw (pagination, search, etc.)
             globalCounter = 1;
         }
+    });
+
+    $('#friendsTable_filter input').off().on('keyup', function () {
+        table.draw();
     });
 
     // ✅ Save, Edit, View, Delete, Reset (unchanged below)

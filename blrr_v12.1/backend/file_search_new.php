@@ -11,7 +11,7 @@ $username     = $_SESSION['username'];
 $user_type    = $_SESSION['user_type'];
 $office       = $_SESSION['office'];
 $office_title = $_SESSION['office_title'];
-
+$officeTitle = "চেয়ারম্যান সচিবালয়";
 include('header.php');
 include_once '../db/database.php';
 date_default_timezone_set("Asia/Dhaka");
@@ -117,7 +117,7 @@ $table_name = 'chairmanfile'; // Fixed table (you can make it dynamic if needed)
                 <td><?= englishToBanglaNumber(date('d-m-Y', strtotime($row['entry_date']))) ?></td>
                 <td><?= $row['immediate_sender_office'] ?></td>
                 <td><?= englishToBanglaNumber($row['d_number']) ?></td>
-                <td><?= englishToBanglaNumber(date('d-m-Y', strtotime($row['send_date']))) ?></td>
+                <td><?= englishToBanglaNumber(date('d-m-Y', strtotime($row['sign_date']))) ?></td>
                 <td><?= $row['subject'] ?></td>
                 <td><?= $row['destination_dropfile'] ?></td>
                 <td><?= $row['comments'] ?></td>
@@ -133,26 +133,54 @@ $table_name = 'chairmanfile'; // Fixed table (you can make it dynamic if needed)
     </table>
   </div>
 </div>
+<?php
+$date_range_text = "";
+if (isset($_POST['submit'])) {
+    $date_range_text =
+        "তারিখ: " .
+        englishToBanglaNumber(date('d-m-Y', strtotime($_POST['date1']))) .
+        " থেকে " .
+        englishToBanglaNumber(date('d-m-Y', strtotime($_POST['date2'])));
+}
+?>
 
 <script>
 document.getElementById('print').addEventListener('click', function () {
-  var printContents = document.getElementById('printableArea').innerHTML;
-  var title = `
-  <div style="text-align:center;">
-    <h4>বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h4>
-    <h5>পত্র প্রাপ্তি রেজিস্টার</h5>
-    <p>দপ্তর: <?= $office_title ?></p>
-    <?php if (isset($_POST['submit'])) { ?>
-    <p>তারিখ: <?= englishToBanglaNumber(date('d-m-Y', strtotime($_POST['date1']))) ?> থেকে <?= englishToBanglaNumber(date('d-m-Y', strtotime($_POST['date2']))) ?></p>
-    <?php } ?>
-  </div>`;
 
-  var originalContents = document.body.innerHTML;
-  document.body.innerHTML = title + printContents;
-  window.print();
-  document.body.innerHTML = originalContents;
-  location.reload();
+    var printContents = document.getElementById('printableArea').innerHTML;
+    
+     function enToBn(num) {
+            return num.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]);
+        }
+
+    // Header (PHP variables inserted safely)
+    var title = `
+        <div style="text-align:center;  margin-top:0px;">
+            <h4>বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h4>
+            <h5>ফাইল প্রাপ্তি রেজিস্টার</h5>
+            <p>দপ্তর: <?= $officeTitle ?></p>
+            <p><?= $date_range_text ?></p>
+        </div>
+    `;
+
+    // Footer
+    var today = new Date();
+    var footer = `
+        <div style="text-align:center; margin-top:5px; padding-top:5px; border-top:1px solid #c7c9c8; font-size:11px; color:#666;">
+                <small><i class="fa fa-copyright"></i> ${enToBn(today.getFullYear())} BCIC. [--Design & Developed by ICT Division, BCIC.--]</small>
+            </div>
+    `;
+
+    var originalBody = document.body.innerHTML;
+
+    document.body.innerHTML = title + printContents + footer;
+
+    window.print();
+
+    document.body.innerHTML = originalBody;
+    location.reload();
 });
 </script>
+
 
 <?php include('footer.php'); ?>

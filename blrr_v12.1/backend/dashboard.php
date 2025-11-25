@@ -26,9 +26,9 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
 
 ?>
 
-<div class="container-fluid">
+<!-- <div class="container-fluid"> -->
     <div class="table-wrapper border border-muted rounded shadow p-2 my-1">  
-        <div class="container my-1">  
+        <div class="container-fluid my-1">  
             <span class="float-end d-flex flex-wrap gap-2 align-items-center">
     <!-- Button to open modal -->
     <button class="btn btn-outline-primary mb-2" data-bs-toggle="modal" data-bs-target="#entryModal">
@@ -300,7 +300,8 @@ $upcoming_meeting_count = $row11['upcoming_meeting_count'];
             </table>
         </div>
     </div>
-</div>
+<!-- </div> -->
+
 <!-- DATA TABLES + EXPORT JS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
@@ -405,32 +406,47 @@ $(document).ready(function(){
     var tableName = "<?php echo $table_name; ?>";
     var userType = "<?php echo $user_type; ?>";
 
+     // Bangla → English number convert
+    function bnToEn(text) {
+        return text.toString().replace(/[০১২৩৪৫৬৭৮৯]/g, d => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+    }
 
-// $.fn.dataTable.ext.search.push(function(settings, searchData, index, rowData, counter) {
-//     var term = $('#friendsTable_filter input').val() || '';
-//     if (!term) return true;
+    /* -------------------------------------------------------
+       🔥 MULTI-KEYWORD + PARTIAL MATCH + AND LOGIC SEARCH
+       ✔ Bangla + English
+       ✔ Partial match
+       ✔ Multi keywords
+       ✔ Search only in selected columns
+    ----------------------------------------------------------*/
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
 
-//     term = term.trim();
+        let input = $('#friendsTable_filter input').val().trim();
+        if (input === "") return true;
 
-//     // Convert Bengali digits to English in search term
-//     var searchTerm = term.replace(/[০১২৩৪৫৬৭৮৯]/g, function(d) {
-//         return '0123456789'[d];
-//     });
+        // convert Bangla numbers & split by space
+        let keywords = input.split(/\s+/).map(k => bnToEn(k.trim())).filter(k => k !== "");
 
-//     // Convert Bengali digits to English in each row for comparison
-//     for (var i = 0; i < searchData.length; i++) {
-//         var cell = searchData[i].replace(/[০১২৩৪৫৬৭৮৯]/g, function(d) {
-//             return '0123456789'[d];
-//         });
-//         if (cell.indexOf(searchTerm) !== -1) return true;
-//     }
+        // Columns to search (0-based index)
+        // Skip first (SL) and last (action)
+        let searchColumns = [1,2,3,4,5,6,7,8,9,10,11];
 
-//     return false;
-// });
+        // row values converted to lowercase + english numbers
+        let rowValues = searchColumns.map(i =>
+            bnToEn((data[i] || "").toString().trim().toLowerCase())
+        );
+
+        // AND LOGIC → each keyword must match in at least one column
+        return keywords.every(keyword =>
+            rowValues.some(val => val.includes(keyword))
+        );
+    });
 
 
 // Initialize DataTable with export buttons
 var table = $('#friendsTable').DataTable({
+    // processing: true,
+    // serverSide: true,
+    pageLength: 50,
     "ajax": {
         "url": "get_data.php?table_name=" + tableName,
         "dataSrc": "data"
@@ -459,14 +475,14 @@ var table = $('#friendsTable').DataTable({
         //     }
         // },
         { 
-    "data": "d_number",
-    "render": function (data) {
-        return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
-    },
-    "searchable": true,  // enable search
-    "type": "numeric-bn" // use custom search
-    
-},
+        "data": "d_number",
+        "render": function (data) {
+            return data ? data.toString().replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d]) : '';
+            },
+        "searchable": true,  // enable search
+        "type": "numeric-bn" // use custom search
+        
+        },
 
         {
             "data": "ref_number",
@@ -522,7 +538,7 @@ var table = $('#friendsTable').DataTable({
         }
         return 'দেখানো হচ্ছে ' + enToBn(start) + ' থেকে ' + enToBn(end) + ' পর্যন্ত, মোট ' + enToBn(total) + ' এন্ট্রি';
     },
-    "order": [[0, 'asc']],
+    "order": [[5, 'DESC']],
     // ✅ Enable Buttons Extension
     // dom: 'Bfrtip',
     dom: '<"row"<"col-sm-4"l><"col-sm-4"B><"col-sm-4"f>>rtip',
@@ -534,12 +550,12 @@ buttons: {
         }
     },
  buttons: [
-    { extend:'pdfHtml5', text:'PDF', className:'btn-danger', exportOptions:{columns:':not(:last-child)'} },
-    { extend:'excelHtml5', text:'Excel', className:'btn-success', exportOptions:{columns:':not(:last-child)'} },
+    { extend:'pdfHtml5', text: '<i class="fa fa-file-pdf"></i> Pdf', className:'btn-danger', exportOptions:{columns:':not(:last-child)'} },
+    { extend:'excelHtml5', text: '<i class="fa fa-file-excel"></i> Excel', className:'btn-success', exportOptions:{columns:':not(:last-child)'} },
     { extend:'csvHtml5', text:'CSV', className:'btn-primary', exportOptions:{columns:':not(:last-child)'} },
     {
         extend:'print',
-        text:'Print',
+        text: '<i class="fa fa-print"></i> Print',
         className:'btn-danger',
         exportOptions:{columns:':not(:last-child)'},
         title: '',
@@ -580,12 +596,12 @@ buttons: {
                 table.style.margin = '0 auto';
                 table.style.width = '100%';
                 table.style.fontSize = '14px';
-                table.style.border = '1px solid #c7c9c8';
+                table.style.border = 'thin solid #aaa'; // ✅ thinner gray border
                 table.style.borderCollapse = 'collapse';
 
                 var cells = table.querySelectorAll('th, td');
                 for (var j = 0; j < cells.length; j++) {
-                    cells[j].style.border = '1px solid #c7c9c8';
+                    cells[j].style.border = 'thin solid #aaa'; // ✅ thinner gray border
                     cells[j].style.padding = '4px';
                 }
             }
@@ -610,6 +626,10 @@ buttons: {
 
 }
 });
+$('#friendsTable_filter input').off().on('keyup', function () {
+    table.draw();
+});
+
 
 
     // Save form using the button click

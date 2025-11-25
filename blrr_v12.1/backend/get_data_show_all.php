@@ -1,47 +1,87 @@
 <?php
-// Set headers first to prevent any output
-header('Content-Type: application/json');
+// ----------------------------------------
+// JSON + UTF-8 HEADER
+// ----------------------------------------
+header('Content-Type: application/json; charset=utf-8');
+mb_internal_encoding("UTF-8");
 
 include '../db/db.php';
-$today_date=date("Y-m-d");
-$year_auto = date("Y", strtotime($today_date));
-// Enable error reporting for debugging (remove in production)
+
+// ----------------------------------------
+// Prevent Undefined Warning
+// ----------------------------------------
 error_reporting(0);
 ini_set('display_errors', 0);
 
+// ----------------------------------------
+// Validate table name (PREVENT SQL Injection)
+// ----------------------------------------
+$allowed_tables = ['chairman', 'chairman_office', 'friends_table', 'office_table']; 
+// 👉 add your valid table list here
+
 $table_name = $_GET['table_name'] ?? 'chairman';
 
-// Validate table name to prevent SQL injection
-// $allowed_tables = ['chairman', 'division', 'director'];
-// if (!in_array($table_name, $allowed_tables)) {
-//     echo json_encode(['data' => []]);
-//     exit;
-// }
+if (!in_array($table_name, $allowed_tables)) {
+    echo json_encode(['data' => [], 'error' => 'Invalid table']);
+    exit;
+}
 
-$sql = "SELECT 
-    id, entry_date, recipient, d_number, ref_number, send_date, 
-    sender, div_dept_office, subject,destination, destination_drop, distribution_date, 
-    medium, status, chairman_note, comments 
-FROM $table_name 
-ORDER BY id DESC";
+// ----------------------------------------
+// Fetch data
+// ----------------------------------------
+$sql = "
+    SELECT 
+        id,
+        entry_date,
+        recipient,
+        d_number,
+        ref_number,
+        send_date,
+        sender,
+        div_dept_office,
+        subject,
+        destination,
+        destination_drop,
+        distribution_date,
+        medium,
+        status,
+        chairman_note,
+        comments
+    FROM $table_name
+    ORDER BY id DESC
+";
 
 $result = mysqli_query($conn, $sql);
 
-$data = array();
-// if ($result) {
-//     while ($row = mysqli_fetch_assoc($result)) {
-//         $data[] = $row;
-//     }
-// }
-if($result){
-    while($row = mysqli_fetch_assoc($result)){
-        $destination_drop = rtrim($row['destination_drop'], ',');
-        if(!empty($row['destination'])){
-            $destination_drop .= (!empty($destination_drop) ? ', ' : '') . $row['destination'];
+$data = [];
+
+// ----------------------------------------
+// Process rows
+// ----------------------------------------
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+
+        // --------- FIX: Clean destination & destination_drop ----------
+        $dest1 = trim($row['destination_drop'] ?? '', " ,");
+        $dest2 = trim($row['destination'] ?? '', " ,");
+
+        if ($dest1 !== '' && $dest2 !== '') {
+            $final_destination = $dest1 . ", " . $dest2;
+        } elseif ($dest1 !== '') {
+            $final_destination = $dest1;
+        } else {
+            $final_destination = $dest2;
         }
-        $row['destination_drop'] = $destination_drop;
+
+        $row['destination_drop'] = $final_destination;
+
+        // Add modified row
         $data[] = $row;
     }
 }
-echo json_encode(['data' => $data]);
+
+// ----------------------------------------
+// Output JSON for DataTables
+// ----------------------------------------
+echo json_encode(['data' => $data], JSON_UNESCAPED_UNICODE);
 ?>

@@ -19,6 +19,58 @@ $action = $_GET['action'] ?? '';
 switch($action){
 
 case 'fetch':
+
+    $columns = ['id','entry_date','recipient','immediate_sender_office','div_dept_office','section_dept','d_number','sign_date','div_sign_date','subject','destination_dropfile','comments'];
+    $limit = intval($_POST['length'] ?? 10);
+    $start = intval($_POST['start'] ?? 0);
+    $orderIdx = intval($_POST['order'][0]['column'] ?? 0);
+    $order_col = $columns[$orderIdx] ?? 'id';
+    $order_dir = ($_POST['order'][0]['dir'] ?? 'DESC') === 'asc' ? 'ASC' : 'DESC';
+    $search_value = $conn->real_escape_string($_POST['search']['value'] ?? '');
+
+    // 👉 FIX: get today's date
+    $today = date("Y-m-d");
+
+    // 👉 Base filter to show only today’s records
+    $where = "WHERE entry_date = '$today'";
+
+    // 👉 Maintain your search logic
+    if($search_value){
+        $where .= " AND (recipient LIKE '%$search_value%' 
+                     OR subject LIKE '%$search_value%' 
+                     OR d_number LIKE '%$search_value%' 
+                     OR destination_dropfile LIKE '%$search_value%')";
+    }
+
+    // Count total for today only
+    $totalData = $conn->query("SELECT COUNT(*) as cnt FROM chairmanfile WHERE entry_date='$today'")->fetch_assoc()['cnt'];
+
+    // Count filtered
+    $totalFiltered = $totalData;
+    if($search_value){
+        $totalFiltered = $conn->query("SELECT COUNT(*) as cnt FROM chairmanfile $where")->fetch_assoc()['cnt'];
+    }
+
+    // Final data fetch
+    $query = "SELECT * FROM chairmanfile $where ORDER BY d_number DESC, $order_col $order_dir LIMIT $start, $limit";
+    $res = $conn->query($query);
+
+    $data=[];
+    while($row=$res->fetch_assoc()){
+        $row['d_number'] = englishToBanglaNumber($row['d_number']);
+        $data[] = $row;
+    }
+
+    echo json_encode([
+        'draw'=> intval($_POST['draw'] ?? 0),
+        'recordsTotal'=> intval($totalData),
+        'recordsFiltered'=> intval($totalFiltered),
+        'data'=> $data
+    ]);
+    break;
+
+
+    case 'fetch_all':
     $columns = ['id','entry_date','recipient','immediate_sender_office','div_dept_office','section_dept','d_number','sign_date','div_sign_date','subject','destination_dropfile','comments'];
     $limit = intval($_POST['length'] ?? 10);
     $start = intval($_POST['start'] ?? 0);
@@ -29,7 +81,7 @@ case 'fetch':
 
     $where = "";
     if($search_value){
-        $where = "WHERE recipient LIKE '%$search_value%' OR subject LIKE '%$search_value%' OR destination_dropfile LIKE '%$search_value%'";
+        $where = "WHERE recipient LIKE '%$search_value%' OR subject LIKE '%$search_value%' OR d_number LIKE '%$search_value%' OR destination_dropfile LIKE '%$search_value%'";
     }
 
     $totalData = $conn->query("SELECT COUNT(*) as cnt FROM chairmanfile")->fetch_assoc()['cnt'];

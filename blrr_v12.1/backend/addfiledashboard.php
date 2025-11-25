@@ -111,8 +111,8 @@ include_once 'header_file.php';
         <span class="float-end">
          <a href="dashboard.php" class="btn btn-outline-success " ><i class="fa fa-home" style="font-size:16px;color:red"></i>  Home</a>
         <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal"><i class="fa fa-plus"></i> নতুন এন্ট্রি</button>
-    <a href="show_all_file.php" class="btn btn-outline-warning">
-        <i class="fa fa-file-archive-o" style="font-size:16px;color:red"></i> <span>সব ফাইল দেখুন</span>
+    <a href="show_all_file.php" class="btn btn-warning">
+        <i class="fa fa-file-archive" style="font-size:16px;color:red"></i> <span>সব ফাইল দেখুন</span>
     </a>
         <a href="file_search_new.php" class="btn btn-outline-primary">
     <i class="fa fa-search" style="font-size:16px"></i>
@@ -152,11 +152,11 @@ include_once 'header_file.php';
                     <div class="col-md-4">
                         <label>এন্ট্রি তারিখ:</label>
                       <input type="date" name="entry_date" id="entry_date" class="form-control"
-       value="<?php echo date('Y-m-d'); ?>" required>
+                               value="<?php echo date('Y-m-d'); ?>" required>
 
-<span id="entry_date_bn">
-    <?php echo englishToBanglaNumber(date('Y-m-d')); ?>
-</span>
+                        <span id="entry_date_bn">
+                            <?php echo englishToBanglaNumber(date('Y-m-d')); ?>
+                        </span>
 
                         <script>
                           document.addEventListener('DOMContentLoaded', function () {
@@ -186,7 +186,7 @@ include_once 'header_file.php';
                         <select class="form-select" id="immediate_sender_office" name="immediate_sender_office" required>
                             <option selected disabled value="">--Select--</option>
                             <?php
-                            $sql = "SELECT division_bn FROM division WHERE id IN (1,5,6,7,8,9,10,11)";
+                            $sql = "SELECT division_bn FROM division WHERE id IN (1,5,6,7,8,9,10,11,19,24)";
                             $result = mysqli_query($conn, $sql);
                             while($row = mysqli_fetch_array($result)) {
                                 echo "<option value='".htmlspecialchars($row['division_bn'])."'>".htmlspecialchars($row['division_bn'])."</option>";
@@ -265,7 +265,7 @@ include_once 'header_file.php';
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-custom-purple text-white">
-                    <h5 class="modal-title">এন্ট্রি বিস্তারিত</h5>
+                    <h5 class="modal-title">ফাইল এন্ট্রি বিস্তারিত</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body" id="viewModalBody">
@@ -297,21 +297,6 @@ include_once 'header_file.php';
 
 <script>
 
-//     function showToast(message, type='success') {
-//     const toastEl = document.getElementById('liveToast');
-//     const toastBody = document.getElementById('toastMessage');
-
-//     toastBody.innerText = message;
-
-//     // Change background color based on type
-//     toastEl.className = `toast align-items-center text-bg-${type} border-0`;
-
-//     const toast = new bootstrap.Toast(toastEl);
-//     toast.show();
-// }
-
-
-
 $(function(){
     $('.chosen-select').chosen({width:"100%"});
 
@@ -319,6 +304,7 @@ $(function(){
     let table = $('#fileTable').DataTable({
         processing: true,
         serverSide: true,
+        pageLength: 50,
         ajax: { url: 'file_action.php?action=fetch', type: 'POST' },
         columns: [
             {
@@ -372,7 +358,7 @@ $(function(){
             // { extend: 'print', className: 'btn btn-primary btn-sm', text: '<i class="fa fa-print"></i> Print' }
        {
     extend: 'print',
-    text: 'Print',
+    text: '<i class="fa fa-print"></i> Print',
     className: 'btn btn-danger btn-sm',
     exportOptions: { columns: ':not(:last-child)' },
     title: '',
@@ -403,7 +389,7 @@ $(function(){
         $(body).prepend(`
             <div style="text-align:center; margin-bottom:0; padding-bottom:0; border-bottom:0;">
                 <h4 style="margin:0;">বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h4>
-                <h5 style="margin:5px 0;">পত্র প্রাপ্তি রেজিস্টার</h5>
+                <h5 style="margin:5px 0;">ফাইল প্রাপ্তি রেজিস্টার</h5>
                 <p style="margin:0;" class="mb-0">দপ্তর : ${officeTitle}</p>
                 <p style="margin:0;" class="mb-0">তারিখ : ${formattedDate}</p>
             </div>
@@ -546,18 +532,19 @@ $('#fileTable').on('click', '.viewBtn', function() {
             var modalContent = `
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>এন্ট্রি তারিখ:</strong> ${data.entry_date ? new Date(data.entry_date).toLocaleDateString('bn-BD') : ''}</p>
+                        <p><strong> এন্ট্রি তারিখ:</strong> ${data.entry_date ? new Date(data.entry_date).toLocaleDateString('bn-BD') : ''}</p>
                         <p><strong>প্রাপক:</strong> ${data.recipient || ''}</p>
                         <p><strong>ডকেট নং:</strong> ${data.d_number || ''}</p>
                         <p><strong>স্মারক নং:</strong> ${enToBn(data.ref_number || '')}</p>
+                        <p><strong>আগত ফাইল পরিচালকের দপ্তর :</strong> ${data.immediate_sender_office || ''}</p>
                         <p><strong>পাঠানোর তারিখ:</strong> ${data.send_date ? new Date(data.send_date).toLocaleDateString('bn-BD') : ''}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>প্রেরক:</strong> ${data.sender || ''}</p>
-                        <p><strong>ডিভিশন/অফিস:</strong> ${data.div_dept_office || ''}${data.section_dept ? ' - ' + data.section_dept : ''}</p>
+                        
+                        <p><strong>ফাইল উপস্থাপনকারী বিভাগ/শাখ:</strong> ${data.div_dept_office || ''}${data.section_dept ? ' - ' + data.section_dept : ''}</p>
                         <p><strong>বিষয়বস্তু:</strong> ${data.subject || ''}</p>
                         <p><strong>গন্তব্য অফিস:</strong> ${destinations}</p>
-                        <p><strong>বিতরণ তারিখ:</strong> ${data.distribution_date ? new Date(data.distribution_date).toLocaleDateString('bn-BD') : ''}</p>
+                        <p><strong>চেয়ারম্যান স্বাক্ষরের তারিখ:</strong> ${data.sign_date ? new Date(data.sign_date).toLocaleDateString('bn-BD') : ''}</p>
                     </div>
                 </div>
                 <div class="row mt-3">
