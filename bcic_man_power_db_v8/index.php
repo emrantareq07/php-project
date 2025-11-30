@@ -53,20 +53,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $log->bind_param("ssssss", $username, $event_type, $ip, $user_agent, $status, $login_time);
             $log->execute();
             $log->close();
-
-           if (
-                ($_SESSION['role'] !== 'admin' || $_SESSION['username'] !== 'admin') &&
-                ($_SESSION['role'] !== 'sadmin' || $_SESSION['username'] !== 'sadmin')
-            ) {
-                echo "<script>window.location.href='includes/dashboard.php';</script>";
-                exit;
-            }
-            // elseif($_SESSION['role'] !== 'sadmin' && $_SESSION['username'] !== 'sadmin') {
-            //     echo "<script>window.location.href='includes/sadmin_dashboard.php';</script>";
-            //     exit;
-            //     }
-            else {
+            
+            if ($_SESSION['role'] === 'admin' && $_SESSION['username'] === 'admin') {
                 echo "<script>window.location.href='includes/admin_dashboard.php';</script>";
+                exit;
+            } elseif ($_SESSION['role'] === 'sadmin' && $_SESSION['username'] === 'sadmin') {
+                echo "<script>window.location.href='includes/sadmin_dashboard.php';</script>";
+                exit;
+            } else {
+                echo "<script>window.location.href='includes/dashboard.php';</script>";
                 exit;
             }
 

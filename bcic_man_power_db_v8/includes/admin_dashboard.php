@@ -7,6 +7,7 @@ if (!isset($_SESSION['username'])) {
     header("Location: ../index.php");
     exit;
 }
+
 // NOTE: You previously had hard-coded admin session assignment here.
 // If you want real login behavior, remove the next two lines in production.
 $_SESSION['username'] = 'admin';
@@ -14,7 +15,6 @@ $_SESSION['role'] = 'admin';
 
 $username = $_SESSION['username'];
 $is_admin = ($username === 'admin'); // Check if user is admin
-
 $role = $_SESSION['role'] ?? ''; // ensure role exists
 
 // Table names
@@ -26,9 +26,10 @@ $ansar_tbl       = 'ansar_tbl';
 
 // Bangla number conversion
 function englishToBanglaNumber($number) {
-    $englishNumbers = range(0, 9);
+    $englishNumbers = ['0','1','2','3','4','5','6','7','8','9'];
     $banglaNumbers = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-    return str_replace($englishNumbers, $banglaNumbers, $number);
+    // ensure string
+    return str_replace($englishNumbers, $banglaNumbers, (string)$number);
 }
 
 // ---------- HELPER FUNCTIONS ----------
@@ -36,123 +37,206 @@ function englishToBanglaNumber($number) {
 // Parse CSV column of numbers and sum them (safe)
 function sumCsvColumn($csv) {
     if ($csv === null || $csv === '') return 0;
-    // remove possible spaces, then split
     $parts = array_map('trim', explode(',', $csv));
     $sum = 0;
     foreach ($parts as $p) {
-        // allow numeric strings; non-numeric -> intval gives 0
+        // handle possible non-numeric chars - extract numbers
+        $p = preg_replace('/\D+/', '', $p);
+        if ($p === '') continue;
         $sum += intval($p);
     }
     return $sum;
 }
 
 // Sum male/female from tables where male/female columns store CSV numeric strings
-// If $username provided, restrict by factory_name
-function getCsvTableGenderSum($conn, $table, $username = null) {
+// If $factory_name provided, restrict by factory_name
+// If $yearMonth provided (format 'YYYY-MM'), restrict by date LIKE 'YYYY-MM%'
+function getCsvTableGenderSum($conn, $table, $factory_name = null, $yearMonth = null) {
     $sumMale = 0;
     $sumFemale = 0;
-    if ($username) {
-        $sql = "SELECT male, female FROM $table WHERE factory_name = ?";
+
+    // Build SQL with optional filters
+    $sql = "SELECT male, female FROM `$table`";
+    $where = [];
+    $params = [];
+    $types = '';
+
+    if ($factory_name) {
+        $where[] = "factory_name = ?";
+        $params[] = $factory_name;
+        $types .= 's';
+    }
+    if ($yearMonth) {
+        $where[] = "`date` LIKE ?";
+        $params[] = $yearMonth . '%';
+        $types .= 's';
+    }
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(' AND ', $where);
+    }
+
+    // Prepared statement if we have params, otherwise simple query
+    if (!empty($params)) {
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $sumMale += sumCsvColumn($row['male'] ?? '');
-            $sumFemale += sumCsvColumn($row['female'] ?? '');
+        if ($stmt === false) {
+            // fallback to query
+            $result = $conn->query($sql);
+        } else {
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $result = $stmt->get_result();
         }
     } else {
-        $sql = "SELECT male, female FROM $table";
         $result = $conn->query($sql);
+    }
+
+    if ($result) {
         while ($row = $result->fetch_assoc()) {
             $sumMale += sumCsvColumn($row['male'] ?? '');
             $sumFemale += sumCsvColumn($row['female'] ?? '');
         }
     }
+
     return ['male' => $sumMale, 'female' => $sumFemale];
 }
 
 // Total people from CSV-style table (male+female)
-function getCsvTotalPeopleCount($conn, $table, $username = null) {
-    $g = getCsvTableGenderSum($conn, $table, $username);
+function getCsvTotalPeopleCount($conn, $table, $factory_name = null, $yearMonth = null) {
+    $g = getCsvTableGenderSum($conn, $table, $factory_name, $yearMonth);
     return ($g['male'] + $g['female']);
 }
 
-// Count rows (entries) - unchanged
-function getTotalRows($conn, $table, $username = null) {
-    if ($username) {
-        $sql = "SELECT COUNT(*) AS total FROM $table WHERE factory_name = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-    } else {
-        $sql = "SELECT COUNT(*) AS total FROM $table";
-        $result = $conn->query($sql);
+// Count rows (entries) with optional factory and yearMonth filters
+function getTotalRows($conn, $table, $factory_name = null, $yearMonth = null) {
+    $sql = "SELECT COUNT(*) AS total FROM `$table`";
+    $where = [];
+    $params = [];
+    $types = '';
+
+    if ($factory_name) {
+        $where[] = "factory_name = ?";
+        $params[] = $factory_name;
+        $types .= 's';
     }
-    $row = $result->fetch_assoc();
+    if ($yearMonth) {
+        $where[] = "`date` LIKE ?";
+        $params[] = $yearMonth . '%';
+        $types .= 's';
+    }
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(' AND ', $where);
+    }
+
+    if (!empty($params)) {
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            $res = $conn->query($sql);
+            $row = $res ? $res->fetch_assoc() : null;
+        } else {
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $row = $res ? $res->fetch_assoc() : null;
+        }
+    } else {
+        $res = $conn->query($sql);
+        $row = $res ? $res->fetch_assoc() : null;
+    }
+
     return $row['total'] ?? 0;
 }
 
-// Officers numeric columns summation (unchanged)
-function getOfficerGenderSum($conn, $table, $prefixList, $username = null) {
+// Officers numeric columns summation (supports prefixes like g2_m, g2_f) with optional factory and yearMonth
+function getOfficerGenderSum($conn, $table, $prefixList, $factory_name = null, $yearMonth = null) {
     $sumMale = 0;
     $sumFemale = 0;
-    foreach ($prefixList as $g) {
-        if ($username) {
-            $sql = "SELECT 
-                        COALESCE(SUM({$g}_m), 0) AS male,
-                        COALESCE(SUM({$g}_f), 0) AS female
-                    FROM $table
-                    WHERE factory_name = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-        } else {
-            $sql = "SELECT 
-                        COALESCE(SUM({$g}_m), 0) AS male,
-                        COALESCE(SUM({$g}_f), 0) AS female
-                    FROM $table";
-            $result = $conn->query($sql);
-        }
-        $row = $result->fetch_assoc();
-        $sumMale += $row['male'];
-        $sumFemale += $row['female'];
+
+    // Build base SELECT that sums all columns in one query for performance
+    $maleSums = [];
+    $femaleSums = [];
+    foreach ($prefixList as $p) {
+        $maleSums[] = "COALESCE(SUM(`{$p}_m`),0)";
+        $femaleSums[] = "COALESCE(SUM(`{$p}_f`),0)";
     }
+    $maleExpr = implode(' + ', $maleSums);
+    $femaleExpr = implode(' + ', $femaleSums);
+
+    $sql = "SELECT ($maleExpr) AS male, ($femaleExpr) AS female FROM `$table`";
+    $where = [];
+    $params = [];
+    $types = '';
+
+    if ($factory_name) {
+        $where[] = "factory_name = ?";
+        $params[] = $factory_name;
+        $types .= 's';
+    }
+    if ($yearMonth) {
+        $where[] = "`date` LIKE ?";
+        $params[] = $yearMonth . '%';
+        $types .= 's';
+    }
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(' AND ', $where);
+    }
+
+    if (!empty($params)) {
+        $stmt = $conn->prepare($sql);
+        if ($stmt === false) {
+            $res = $conn->query($sql);
+            $row = $res ? $res->fetch_assoc() : null;
+        } else {
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $row = $res ? $res->fetch_assoc() : null;
+        }
+    } else {
+        $res = $conn->query($sql);
+        $row = $res ? $res->fetch_assoc() : null;
+    }
+
+    if ($row) {
+        $sumMale = intval($row['male']);
+        $sumFemale = intval($row['female']);
+    }
+
     return ['male' => $sumMale, 'female' => $sumFemale];
 }
 
-// get distinct factories
+// get distinct factories across all candidate tables
 function getAllFactories($conn) {
     $factories = [];
     $tables = ['officers_tbl', 'staffs_tbl', 'workers_tbl', 'daily_basis_tbl', 'ansar_tbl'];
     foreach ($tables as $table) {
-        $sql = "SELECT DISTINCT factory_name FROM $table WHERE factory_name != 'admin'";
-        $result = $conn->query($sql);
-        while ($row = $result->fetch_assoc()) {
-            $factory_name = $row['factory_name'];
-            if (!in_array($factory_name, $factories)) {
-                $factories[] = $factory_name;
+        $sql = "SELECT DISTINCT factory_name FROM `$table` WHERE factory_name IS NOT NULL AND factory_name != '' AND factory_name != 'admin'";
+        $res = $conn->query($sql);
+        if ($res) {
+            while ($row = $res->fetch_assoc()) {
+                $factory_name = $row['factory_name'];
+                if (!in_array($factory_name, $factories)) {
+                    $factories[] = $factory_name;
+                }
             }
         }
     }
+    sort($factories);
     return $factories;
 }
 
 // Get factory-wise data for admin — use CSV parsers for CSV-storing tables
-function getFactoryData($conn, $factory_name) {
+function getFactoryData($conn, $factory_name, $yearMonth = null) {
     $officerGrades = ['g2','g3','g4','g5','g6','g7','g8','g9','g10'];
 
     $data = [
         'factory_name' => $factory_name,
-        // officers: numeric columns
-        'officer' => getOfficerGenderSum($conn, 'officers_tbl', $officerGrades, $factory_name),
+        // officers: numeric columns (support month filtering)
+        'officer' => getOfficerGenderSum($conn, 'officers_tbl', $officerGrades, $factory_name, $yearMonth),
         // staff/worker/daily/ansar: CSV-style male/female columns
-        'staff' => getCsvTableGenderSum($conn, 'staffs_tbl', $factory_name),
-        'worker' => getCsvTableGenderSum($conn, 'workers_tbl', $factory_name),
-        'daily_basis' => getCsvTableGenderSum($conn, 'daily_basis_tbl', $factory_name),
-        'ansar' => getCsvTableGenderSum($conn, 'ansar_tbl', $factory_name)
+        'staff' => getCsvTableGenderSum($conn, 'staffs_tbl', $factory_name, $yearMonth),
+        'worker' => getCsvTableGenderSum($conn, 'workers_tbl', $factory_name, $yearMonth),
+        'daily_basis' => getCsvTableGenderSum($conn, 'daily_basis_tbl', $factory_name, $yearMonth),
+        'ansar' => getCsvTableGenderSum($conn, 'ansar_tbl', $factory_name, $yearMonth)
     ];
 
     // Calculate totals
@@ -165,17 +249,77 @@ function getFactoryData($conn, $factory_name) {
     return $data;
 }
 
+// ---------- GET LAST UPDATED MONTH ----------
+// For admin: across all factories & tables
+// For factory: only for that factory
+
+$tables = [$officer_tbl, $staff_tbl, $worker_tbl, $daily_basis_tbl, $ansar_tbl];
+
+$lastDate = null;
+
+foreach($tables as $t){
+    // Build SQL depending on admin or single factory
+    if ($is_admin) {
+        $sql = "SELECT `date` FROM `$t` WHERE `date` IS NOT NULL AND `date` != '' ORDER BY `date` DESC LIMIT 1";
+        $res = $conn->query($sql);
+        $row = $res ? $res->fetch_assoc() : null;
+    } else {
+        $sql = "SELECT `date` FROM `$t` WHERE factory_name = ? AND `date` IS NOT NULL AND `date` != '' ORDER BY `date` DESC LIMIT 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+    }
+
+    if($row && !empty($row['date'])){
+        // normalize date string
+        $d = $row['date'];
+        // ensure Y-m-d parseable
+        $ts = strtotime($d);
+        if ($ts !== false) {
+            $formatted = date('Y-m-d', $ts);
+        } else {
+            // fallback if only YYYY-MM present
+            $formatted = $d;
+        }
+        if(!$lastDate || $formatted > $lastDate){
+            $lastDate = $formatted;
+        }
+    }
+}
+
+// if no data found, use today
+if(!$lastDate){
+    $lastDate = date('Y-m-d');
+}
+
+// convert to year-month
+$m = date('m', strtotime($lastDate));
+$y = date('Y', strtotime($lastDate));
+$yearMonth = "$y-$m"; // for LIKE filter
+
+// Bangla month/year
+$monthNamesBn = [
+    '01'=>'জানুয়ারি','02'=>'ফেব্রুয়ারি','03'=>'মার্চ','04'=>'এপ্রিল','05'=>'মে','06'=>'জুন',
+    '07'=>'জুলাই','08'=>'আগস্ট','09'=>'সেপ্টেম্বর','10'=>'অক্টোবর','11'=>'নভেম্বর','12'=>'ডিসেম্বর'
+];
+
+$monthBn = $monthNamesBn[$m] ?? $m;
+$yearBn  = englishToBanglaNumber($y);
+
 // ---------- FETCH DATA ----------
+
 $officerGrades = ['g2','g3','g4','g5','g6','g7','g8','g9','g10'];
 
 if ($is_admin) {
-    // ADMIN VIEW: All factories data
+    // ADMIN VIEW: All factories data (for last month)
     $all_factories = getAllFactories($conn);
     $factory_data = [];
     $grand_totals = ['male' => 0, 'female' => 0, 'total' => 0];
 
     foreach ($all_factories as $factory) {
-        $data = getFactoryData($conn, $factory);
+        $data = getFactoryData($conn, $factory, $yearMonth);
         $factory_data[$factory] = $data;
 
         $grand_totals['male'] += $data['total_male'];
@@ -183,26 +327,45 @@ if ($is_admin) {
         $grand_totals['total'] += $data['total_people'];
     }
 
-    // Overall totals for admin
+    // Overall totals for admin (for last month)
     $total_people = $grand_totals['total'];
     $total_people_male = $grand_totals['male'];
     $total_people_female = $grand_totals['female'];
 
-} else {
-    // FACTORY VIEW: Single factory data
-    // officers numeric
-    $officerGender = getOfficerGenderSum($conn, $officer_tbl, $officerGrades, $username);
-    // staff/worker/daily/ansar CSV-style
-    $staffGender = getCsvTableGenderSum($conn, $staff_tbl, $username);
-    $workerGender = getCsvTableGenderSum($conn, $worker_tbl, $username);
-    $dailyGender = getCsvTableGenderSum($conn, $daily_basis_tbl, $username);
-    $ansarGender = getCsvTableGenderSum($conn, $ansar_tbl, $username);
+    // For admin, also provide totals per-category aggregated across factories (for charts)
+    $admin_officer = ['male'=>0,'female'=>0];
+    $admin_staff   = ['male'=>0,'female'=>0];
+    $admin_worker  = ['male'=>0,'female'=>0];
+    $admin_daily   = ['male'=>0,'female'=>0];
+    $admin_ansar   = ['male'=>0,'female'=>0];
+    foreach ($factory_data as $f => $d) {
+        $admin_officer['male'] += $d['officer']['male'];
+        $admin_officer['female'] += $d['officer']['female'];
+        $admin_staff['male'] += $d['staff']['male'];
+        $admin_staff['female'] += $d['staff']['female'];
+        $admin_worker['male'] += $d['worker']['male'];
+        $admin_worker['female'] += $d['worker']['female'];
+        $admin_daily['male'] += $d['daily_basis']['male'];
+        $admin_daily['female'] += $d['daily_basis']['female'];
+        $admin_ansar['male'] += $d['ansar']['male'];
+        $admin_ansar['female'] += $d['ansar']['female'];
+    }
 
-    $total_officers = getTotalRows($conn, $officer_tbl, $username);
-    $total_staff = getTotalRows($conn, $staff_tbl, $username);
-    $total_workers = getTotalRows($conn, $worker_tbl, $username);
-    $total_daily = getTotalRows($conn, $daily_basis_tbl, $username);
-    $total_ansar = getTotalRows($conn, $ansar_tbl, $username);
+} else {
+    // FACTORY VIEW: Single factory data for last month
+    // officers numeric
+    $officerGender = getOfficerGenderSum($conn, $officer_tbl, $officerGrades, $username, $yearMonth);
+    // staff/worker/daily/ansar CSV-style
+    $staffGender = getCsvTableGenderSum($conn, $staff_tbl, $username, $yearMonth);
+    $workerGender = getCsvTableGenderSum($conn, $worker_tbl, $username, $yearMonth);
+    $dailyGender = getCsvTableGenderSum($conn, $daily_basis_tbl, $username, $yearMonth);
+    $ansarGender = getCsvTableGenderSum($conn, $ansar_tbl, $username, $yearMonth);
+
+    $total_officers = getTotalRows($conn, $officer_tbl, $username, $yearMonth);
+    $total_staff = getTotalRows($conn, $staff_tbl, $username, $yearMonth);
+    $total_workers = getTotalRows($conn, $worker_tbl, $username, $yearMonth);
+    $total_daily = getTotalRows($conn, $daily_basis_tbl, $username, $yearMonth);
+    $total_ansar = getTotalRows($conn, $ansar_tbl, $username, $yearMonth);
 
     // Gender totals
     $officer_male   = $officerGender['male'];
@@ -222,19 +385,21 @@ if ($is_admin) {
     $total_people        = $total_people_male + $total_people_female;
 }
 
-// Convert to Bangla
-$total_people_b          = englishToBanglaNumber($total_people);
-$total_people_male_b     = englishToBanglaNumber($total_people_male);
-$total_people_female_b   = englishToBanglaNumber($total_people_female);
+// Convert to Bangla (ensure variables exist)
+$total_people_b          = englishToBanglaNumber($total_people ?? 0);
+$total_people_male_b     = englishToBanglaNumber($total_people_male ?? 0);
+$total_people_female_b   = englishToBanglaNumber($total_people_female ?? 0);
 
 if (!$is_admin) {
     // Factory-specific Bangla numbers (entries)
-    $total_officers_b = englishToBanglaNumber($total_officers);
-    $total_staff_b    = englishToBanglaNumber($total_staff);
-    $total_workers_b  = englishToBanglaNumber($total_workers);
-    $total_daily_b    = englishToBanglaNumber($total_daily);
-    $total_ansar_b    = englishToBanglaNumber($total_ansar);
+    $total_officers_b = englishToBanglaNumber($total_officers ?? 0);
+    $total_staff_b    = englishToBanglaNumber($total_staff ?? 0);
+    $total_workers_b  = englishToBanglaNumber($total_workers ?? 0);
+    $total_daily_b    = englishToBanglaNumber($total_daily ?? 0);
+    $total_ansar_b    = englishToBanglaNumber($total_ansar ?? 0);
 }
+
+// ---------- END DATA PREP ----------
 ?>
 <!DOCTYPE html>
 <html lang="bn">
@@ -242,22 +407,18 @@ if (!$is_admin) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard | Man Power Management</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
 <!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Akaya+Kanadaka&family=Aladin&family=Arimo:ital,wght@0,400..700;1,400..700&family=Asimovian&family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Cinzel:wght@400..900&family=Gluten:wght@100..900&family=Itim&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Katibeh&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400..700;1,400..700&family=Merienda:wght@300..900&family=Montserrat+Alternates:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Righteous&family=Rowdies:wght@300;400;700&family=Sansita+Swashed:wght@300..900&family=Trochut:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
 
 <style>
 .akaya-kanadaka-regular {
@@ -268,7 +429,8 @@ if (!$is_admin) {
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
                
-body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f8f9fa; }
+/*body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f8f9fa; }*/
+body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
 .sidebar { height: 100vh; width: 220px; position: fixed; background: #007bff; color: #fff; padding-top: 1rem; transition: .3s; }
 .sidebar.collapsed { width: 60px; }
 .sidebar a { color: #fff; text-decoration: none; display: block; padding: .75rem 1rem; border-radius: 5px; margin-bottom: .25rem; }
@@ -282,6 +444,9 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
 .factory-card { transition: transform 0.2s; }
 .factory-card:hover { transform: translateY(-2px); }
 
+* {
+  font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif;
+}
 /* Font Definitions */
 @font-face {
   font-family: 'Nikosh';
@@ -291,11 +456,6 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-}
-
-/* Base Typography */
-* {
-  font-family: 'Nikosh', 'SolaimanLipi', 'Open Sans', sans-serif;
 }
 </style>
 </head>
@@ -320,9 +480,7 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
     <a href="user_manage.php"><i class="fa fa-shield-alt me-2"></i> User Manage</a>
     <?php 
     }
-
     ?>
-
     <a href="logout.php"><i class="fa fa-sign-out-alt me-2"></i>Logout</a>
     <a href="#" id="toggleSidebar"><i class="fa fa-bars me-2"></i>Collapse</a>
 </div>
@@ -343,13 +501,13 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
         <!-- ADMIN VIEW: All Factories -->
         <div class="card p-4 mb-4">
             <h5 class="mb-3"><i class="fas fa-industry me-2"></i>সমস্ত কারখানা সারসংক্ষেপ</h5>
-            <?php //echo $role; ?>
+
             <!-- Grand Total Card -->
             <div class="row mb-4">
                 <div class="col-md-4">
                     <div class="card p-3 text-center text-white bg-primary">
                         <i class="fa fa-users fs-2"></i>
-                        <h5 class="mt-2">মোট কর্মী (সকল কারখানা)</h5>
+                        <h5 class="mt-2">মোট কর্মী (<?= htmlspecialchars($monthBn) ?> <?= htmlspecialchars($yearBn) ?>)</h5>
                         <p class="fs-4"><?php echo $total_people_b; ?></p>
                         <div class="people-count">
                             <span class="badge bg-info">পুরুষ: <?php echo $total_people_male_b; ?></span>
@@ -368,6 +526,7 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
 
             <!-- Factories Table -->
             <div class="table-responsive">
+                <h5 class="mb-3">ক্যাটাগরি অনুযায়ী সারসংক্ষেপ (<?= $monthBn ?> <?= $yearBn ?>)</h5>
                 <table class="table table-bordered factory-table">
                     <thead class="table-light text-center">
                         <tr>
@@ -385,7 +544,7 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
                     <tbody class="text-center">
                         <?php foreach ($factory_data as $factory => $data): ?>
                         <tr>
-                            <td><strong><?php echo $factory; ?></strong></td>
+                            <td><strong><?php echo htmlspecialchars($factory); ?></strong></td>
                             <td class="text-center"><?php echo englishToBanglaNumber($data['officer']['male'] + $data['officer']['female']); ?></td>
                             <td class="text-center"><?php echo englishToBanglaNumber($data['staff']['male'] + $data['staff']['female']); ?></td>
                             <td class="text-center"><?php echo englishToBanglaNumber($data['worker']['male'] + $data['worker']['female']); ?></td>
@@ -405,7 +564,7 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card p-4">
-                    <h5 class="mb-3">কারখানা অনুযায়ী মোট কর্মী</h5>
+                    <h5 class="mb-3">কারখানা অনুযায়ী মোট কর্মী (<?= htmlspecialchars($monthBn) ?> <?= htmlspecialchars($yearBn) ?>)</h5>
                     <canvas id="factoryChart"></canvas>
                 </div>
             </div>
@@ -424,7 +583,7 @@ body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f
             <div class="col-md-4">
                 <div class="card p-3 text-center text-white bg-primary">
                     <i class="fa fa-users fs-2"></i>
-                    <h5 class="mt-2">মোট কর্মী</h5>
+                    <h5 class="mt-2">মোট কর্মী (<?= htmlspecialchars($monthBn) ?> <?= htmlspecialchars($yearBn) ?>)</h5>
                     <p class="fs-4"><?php echo $total_people_b; ?></p>
                     <div class="people-count">
                         <span class="badge bg-info">পুরুষ: <?php echo $total_people_male_b; ?></span>
@@ -521,11 +680,15 @@ const factoryCtx = document.getElementById('factoryChart').getContext('2d');
 new Chart(factoryCtx, {
     type: 'bar',
     data: {
-        labels: [<?php echo "'" . implode("','", array_keys($factory_data)) . "'"; ?>],
+        labels: <?php echo json_encode(array_keys($factory_data)); ?>,
         datasets: [{
             label: 'মোট কর্মী',
+            // Chart.js accepts arrays or single color; using single color is fine
             backgroundColor: '#28a745',
-            data: [<?php echo implode(',', array_map(function($data) { return $data['total_people']; }, $factory_data)); ?>]
+            data: <?php 
+                $vals = array_map(function($d){ return $d['total_people']; }, $factory_data);
+                echo json_encode(array_values($vals));
+            ?>
         }]
     },
     options: { 
@@ -533,9 +696,7 @@ new Chart(factoryCtx, {
         scales: { y: { beginAtZero: true } },
         plugins: {
             legend: {
-                labels: {
-                    font: { size: 14 }
-                }
+                display: false
             }
         }
     }
@@ -548,7 +709,7 @@ new Chart(adminGenderCtx, {
     data: {
         labels: ['পুরুষ', 'মহিলা'],
         datasets: [{
-            data: [<?php echo $total_people_male . ',' . $total_people_female; ?>],
+            data: [<?php echo intval($total_people_male) . ',' . intval($total_people_female); ?>],
             backgroundColor: ['#0d6efd', '#fd7e14']
         }]
     },
@@ -556,10 +717,7 @@ new Chart(adminGenderCtx, {
         responsive: true,
         plugins: {
             legend: {
-                position: 'bottom',
-                labels: {
-                    font: { size: 14 }
-                }
+                position: 'bottom'
             }
         }
     }
@@ -579,22 +737,22 @@ new Chart(genderCtx, {
                 label: 'পুরুষ', 
                 backgroundColor: '#0d6efd', 
                 data: [
-                    <?= $officer_male ?>, 
-                    <?= $staff_male ?>, 
-                    <?= $worker_male ?>,
-                    <?= $daily_male ?>,
-                    <?= $ansar_male ?>
+                    <?= intval($officer_male) ?>, 
+                    <?= intval($staff_male) ?>, 
+                    <?= intval($worker_male) ?>,
+                    <?= intval($daily_male) ?>,
+                    <?= intval($ansar_male) ?>
                 ] 
             },
             { 
                 label: 'মহিলা', 
                 backgroundColor: '#fd7e14', 
                 data: [
-                    <?= $officer_female ?>, 
-                    <?= $staff_female ?>, 
-                    <?= $worker_female ?>,
-                    <?= $daily_female ?>,
-                    <?= $ansar_female ?>
+                    <?= intval($officer_female) ?>, 
+                    <?= intval($staff_female) ?>, 
+                    <?= intval($worker_female) ?>,
+                    <?= intval($daily_female) ?>,
+                    <?= intval($ansar_female) ?>
                 ] 
             }
         ]
@@ -620,11 +778,11 @@ new Chart(categoryCtx, {
         labels: ['অফিসার', 'স্টাফ', 'ওয়ার্কার', 'দৈনিক ভিত্তি', 'আনসার'],
         datasets: [{
             data: [
-                <?= $officer_male + $officer_female ?>,
-                <?= $staff_male + $staff_female ?>,
-                <?= $worker_male + $worker_female ?>,
-                <?= $daily_male + $daily_female ?>,
-                <?= $ansar_male + $ansar_female ?>
+                <?= intval($officer_male + $officer_female) ?>,
+                <?= intval($staff_male + $staff_female) ?>,
+                <?= intval($worker_male + $worker_female) ?>,
+                <?= intval($daily_male + $daily_female) ?>,
+                <?= intval($ansar_male + $ansar_female) ?>
             ],
             backgroundColor: [
                 '#28a745',
