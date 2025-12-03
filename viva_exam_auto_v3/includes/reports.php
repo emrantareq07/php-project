@@ -36,21 +36,55 @@ if (!isset($_SESSION['username'])) {
 date_default_timezone_set("Asia/Dhaka");
 
 // ✅ Combine all committees from all tables (unique only)
-$query = "
-    SELECT committe_name, MAX(date) AS date, MAX(time) AS time 
-    FROM (
-        SELECT committe_name, date, time FROM exam_schedule_tbl
-        UNION ALL
-        SELECT committe_name, NULL AS date, NULL AS time FROM committee_tbl
-        UNION ALL
-        SELECT committe_name, NULL AS date, NULL AS time FROM candidates_tbl
-    ) AS all_committees
-    WHERE committe_name IS NOT NULL AND committe_name != ''
-    GROUP BY committe_name
-    ORDER BY date DESC, committe_name ASC
-";
+// $query = "
+//     SELECT committe_name, MAX(date) AS date, MAX(time) AS time 
+//     FROM (
+//         SELECT committe_name, date, time FROM exam_schedule_tbl
+//         UNION ALL
+//         SELECT committe_name, NULL AS date, NULL AS time FROM committee_tbl
+//         UNION ALL
+//         SELECT committe_name, NULL AS date, NULL AS time FROM candidates_tbl
+//     ) AS all_committees
+//     WHERE committe_name IS NOT NULL AND committe_name != ''
+//     GROUP BY committe_name
+//     ORDER BY date DESC, committe_name ASC
+// ";
+
+// $result = mysqli_query($conn, $query);
+
+
+
+
+// $query = "
+//     SELECT DISTINCT
+//         c.committe_name,
+//         c.designation,
+//         e.date,
+//         e.time
+//     FROM candidates_tbl AS c
+//     LEFT JOIN exam_schedule_tbl AS e
+//            ON c.committe_name = e.committe_name
+//     ORDER BY c.committe_name, c.designation
+// ";
+
+$query = "SELECT DISTINCT
+    B.committe_name,
+    A.designation,
+    B.date,
+    B.time
+FROM 
+    exam_schedule_tbl B
+LEFT JOIN 
+    candidates_tbl A ON B.committe_name = A.committe_name
+WHERE 
+    A.designation IS NOT NULL
+ORDER BY 
+    B.committe_name, A.designation";
 
 $result = mysqli_query($conn, $query);
+
+
+
 ?>
 
 
@@ -79,7 +113,7 @@ $result = mysqli_query($conn, $query);
                     <tr>
                         <th>#</th>
                         <th>Committee Name</th>
-                        <!-- <th>Title</th> -->
+                        <th>Designation</th> 
                         <th>Exam Date</th>
                         <th>Exam Time</th>
                         <th>Action</th>
@@ -93,7 +127,7 @@ $result = mysqli_query($conn, $query);
                         <tr class="text-center">
                             <td><?= $i++ ?></td>
                             <td class="fw-bold"><?= htmlspecialchars($row['committe_name']) ?></td>
-                            <!-- <td class="fw-bold"><?= htmlspecialchars($row['title']) ?></td> -->
+                            <td class="fw-bold"><?= htmlspecialchars($row['designation']) ?></td> 
                             <td><?= date('d-m-Y', strtotime($row['date'])) ?></td>
                             <td><?= date('h:i A', strtotime($row['time'])) ?></td>
                             <td>

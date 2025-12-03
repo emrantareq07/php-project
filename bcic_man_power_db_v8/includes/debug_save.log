@@ -465,3 +465,9 @@
 2025-11-09 16:47:07 - Processing 15 section entries
 2025-11-09 16:47:07 - Preparing INSERT for new record
 2025-11-09 16:47:07 - Inserted new record ID 3
+2025-12-02 12:05:15 - === SAVE_DATA STARTED ===
+2025-12-02 12:05:15 - ID: null, Load ID: 1
+2025-12-02 12:05:15 - Processing 15 section entries
+2025-12-02 12:05:15 - Preparing INSERT for new record
+2025-12-02 12:05:15 - Load mode detected - skipping duplicate check for Load ID: 1
+2025-12-02 12:05:15 - Inserted new record ID 4 from Load ID: 1

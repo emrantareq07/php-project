@@ -16,45 +16,49 @@ if (isset($_POST['save_schedule'])) {
     $marks     = $_POST['marks'] ?? 0;
     $committee = $_POST['committe_name'] ?? '';
 
-    $viva_dates = $_POST['viva_date'] ?? [];
-    $times      = $_POST['time'] ?? [];
-    $raw_titles = $_POST['title'] ?? []; // raw designations user selected/typed
+    $viva_dates   = $_POST['viva_date'] ?? [];
+    $times        = $_POST['time'] ?? [];
+    $raw_titles   = $_POST['title'] ?? []; // raw designations user selected/typed
 
     // Build formatted titles
     $titles = [];
-    foreach ($raw_titles as $t) {
-        $t = trim($t);
-        // if empty skip
-        if ($t === '') {
-            $titles[] = $t;
+    foreach ($raw_titles as $designation) {
+        $designation = trim($designation);
+        if ($designation === '') {
+            $titles[] = $designation;
             continue;
         }
-        $titles[] = $t . " পদে মৌখিক পরীক্ষায় অংশগ্রহনকারী প্রার্থীদের " . $committee . " কর্তৃক প্রদত্ত নম্বর শীট।";
+        $titles[] = $designation . " পদে মৌখিক পরীক্ষায় অংশগ্রহনকারী প্রার্থীদের " . $committee . " কর্তৃক প্রদত্ত নম্বর শীট।";
     }
 
     // Update single row
     if ($id !== "") {
-        // Use first row values provided in arrays for update mode
         $vdate  = $viva_dates[0] ?? null;
         $vtime  = $times[0] ?? null;
         $vtitle = $titles[0] ?? '';
+        $vdesignation = $raw_titles[0] ?? ''; // <-- add designation
 
-        $stmt = $conn->prepare("UPDATE exam_schedule_tbl SET date=?, time=?, marks=?, title=?, committe_name=? WHERE id=?");
-        $stmt->bind_param("ssdssi", $vdate, $vtime, $marks, $vtitle, $committee, $id);
+        $stmt = $conn->prepare("UPDATE exam_schedule_tbl 
+            SET date=?, time=?, marks=?, title=?, designation=?, committe_name=? 
+            WHERE id=?");
+        $stmt->bind_param("ssdsssi", $vdate, $vtime, $marks, $vtitle, $vdesignation, $committee, $id);
         $stmt->execute();
         $stmt->close();
 
     } else {
         // Insert multiple rows
         foreach ($viva_dates as $key => $vdate) {
-            $vdate  = $viva_dates[$key];
-            $vtime  = $times[$key] ?? null;
-            $vtitle = $titles[$key] ?? '';
+            $vdate       = $viva_dates[$key];
+            $vtime       = $times[$key] ?? null;
+            $vtitle      = $titles[$key] ?? '';
+            $vdesignation= $raw_titles[$key] ?? ''; // <-- add designation
 
-            if (trim($vdate) === '') continue; // skip empty date rows
+            if (trim($vdate) === '') continue;
 
-            $stmt = $conn->prepare("INSERT INTO exam_schedule_tbl (date, time, marks, title, committe_name) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssdss", $vdate, $vtime, $marks, $vtitle, $committee);
+            $stmt = $conn->prepare("INSERT INTO exam_schedule_tbl 
+                (date, time, marks, title, designation, committe_name) 
+                VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdsss", $vdate, $vtime, $marks, $vtitle, $vdesignation, $committee);
             $stmt->execute();
             $stmt->close();
         }
@@ -172,7 +176,7 @@ $schedules = $conn->query("SELECT * FROM exam_schedule_tbl ORDER BY id DESC");
         <th>ID</th>
         <th>Date</th>
         <th>Time</th>
-        <th>Marks</th>
+        <th>Viva Marks</th>
         <th>Committee</th>
         <th>Title</th>
         <th>Created</th>
@@ -184,7 +188,7 @@ $schedules = $conn->query("SELECT * FROM exam_schedule_tbl ORDER BY id DESC");
       <tr>
         <td><?= $row['id'] ?></td>
         <td><?= $row['date'] ?></td>
-        <td><?= $row['time'] ?></td>
+        <td><?= date("h:i A", strtotime($row['time'])) ?></td>
         <td><?= $row['marks'] ?></td>
         <td><?= htmlspecialchars($row['committe_name']) ?></td>
         <td><?= htmlspecialchars($row['title']) ?></td>
