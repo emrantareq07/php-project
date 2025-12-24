@@ -1,0 +1,226 @@
+<?php
+session_name('factory_work_request_db');
+
+require_once '../db/config.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: ../index.php");
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+$message = '';
+$error = '';
+
+// Fetch current user data
+$sql = "SELECT * FROM users WHERE id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$stmt->close();
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $full_name = trim($_POST['full_name'] ?? '');
+    $designation = trim($_POST['designation'] ?? '');
+    $division = trim($_POST['division'] ?? '');
+    $section = trim($_POST['section'] ?? '');
+    
+    // Validation
+    if (empty($full_name)) {
+        $error = "Full name is required";
+    } elseif (empty($designation)) {
+        $error = "Designation is required";
+    } elseif (empty($division)) {
+        $error = "Division is required";
+    } elseif (empty($section)) {
+        $error = "Section is required";
+    } else {
+        // Update user data
+        $update_sql = "UPDATE users SET 
+                      full_name = ?, 
+                      designation = ?, 
+                      division = ?, 
+                      section = ?,
+                      updated_at = NOW()
+                      WHERE id = ?";
+        
+        $update_stmt = $conn->prepare($update_sql);
+        $update_stmt->bind_param("ssssi", $full_name, $designation, $division, $section, $user_id);
+        
+        if ($update_stmt->execute()) {
+            // Update session data
+            $_SESSION['full_name'] = $full_name;
+            $_SESSION['designation'] = $designation;
+            $_SESSION['division'] = $division;
+            $_SESSION['section'] = $section;
+            
+            $message = "Profile updated successfully!";
+            
+            // Refresh user data
+            $sql = "SELECT * FROM users WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
+        } else {
+            $error = "Failed to update profile: " . $conn->error;
+        }
+        $update_stmt->close();
+    }
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Profile</title>
+    <style>
+        /* Add similar styles as registration page */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 10px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 500px; 
+        }
+        h2 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px; 
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: #555;
+            font-weight: 600;
+        }
+        input[type="text"], 
+        select { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e1e5eb; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            transition: all 0.3s;
+        }
+        input:focus, 
+        select:focus { 
+            outline: none; 
+            border-color: #667eea; 
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); 
+        }
+        .btn { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            width: 100%; 
+            border-radius: 6px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .message { 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .success { 
+            background-color: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Update Profile</h2>
+        
+        <?php if ($message): ?>
+            <div class="message success"><?php echo $message; ?></div>
+        <?php endif; ?>
+        
+        <?php if ($error): ?>
+            <div class="message error"><?php echo $error; ?></div>
+        <?php endif; ?>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Designation</label>
+                <input type="text" name="designation" value="<?php echo htmlspecialchars($user['designation']); ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Division</label>
+                <select name="division" required>
+                    <option value="">Select Division</option>
+                    <option value="IT" <?php echo $user['division'] == 'IT' ? 'selected' : ''; ?>>IT Department</option>
+                    <option value="HR" <?php echo $user['division'] == 'HR' ? 'selected' : ''; ?>>Human Resources</option>
+                    <option value="Finance" <?php echo $user['division'] == 'Finance' ? 'selected' : ''; ?>>Finance</option>
+                    <option value="Operations" <?php echo $user['division'] == 'Operations' ? 'selected' : ''; ?>>Operations</option>
+                    <option value="Marketing" <?php echo $user['division'] == 'Marketing' ? 'selected' : ''; ?>>Marketing</option>
+                    <option value="Sales" <?php echo $user['division'] == 'Sales' ? 'selected' : ''; ?>>Sales</option>
+                    <option value="R&D" <?php echo $user['division'] == 'R&D' ? 'selected' : ''; ?>>Research & Development</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Section</label>
+                <input type="text" name="section" value="<?php echo htmlspecialchars($user['section']); ?>" required>
+            </div>
+            
+            <button type="submit" class="btn">Update Profile</button>
+        </form>
+        
+        <div class="back-link">
+            <a href="dashboard.php">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
