@@ -1,627 +1,770 @@
-<?php 
-include 'vehicle_crud.php'; 
-include 'include/header.php';
+<?php
+session_name('transport_db');
+session_start();
+
+date_default_timezone_set("Asia/Dhaka");
+
+include 'db/db_connection.php';
+
+if (isset($_SESSION['username'])) {
+    header("Location: includes/dashboard.php");
+    exit;
+}
+
+// Helper: Get user IP
+function getUserIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
+    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    else return $_SERVER['REMOTE_ADDR'];
+}
+
+$login_failed = false;
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+
+    $ip = getUserIP();
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    $status = 'failed';
+    $event_type = 'login';
+    $login_time = date('Y-m-d H:i:s');
+
+    // Fetch user using PDO
+    $stmt = $conn->prepare("SELECT username, password, role FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
+        $status = 'success';
+
+        // Insert login success log
+        $log = $conn->prepare("
+            INSERT INTO log_table (username, event_type, ip_address, user_agent, status, login_time)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $log->execute([$username, $event_type, $ip, $user_agent, $status, $login_time]);
+
+        // Redirect
+        if ($user['role'] === 'admin' && $username === 'admin') {
+            header("Location: includes/admin_dashboard.php");
+            exit;
+        } elseif ($user['role'] === 'sadmin' && $username === 'sadmin') {
+            header("Location: includes/sadmin_dashboard.php");
+            exit;
+        } else {
+            header("Location: includes/dashboard.php");
+            exit;
+        }
+    }
+
+    // Login Failed → Log attempt
+    $log = $conn->prepare("
+        INSERT INTO log_table (username, event_type, ip_address, user_agent, status, login_time)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ");
+    $log->execute([$username, $event_type, $ip, $user_agent, 'failed', $login_time]);
+
+    $login_failed = true;
+}
+
 ?>
-<div class="container-fluid ">
-<div class="container-fluid mt-2 p-2">
-    <div class="row align-items-center">
-        <div class="col-sm-4"><h1 class="mb-4 text-uppercase fw-bold text-muted">BCIC Vehicle Database</h1></div>
-        <div class="col-sm-4 text-center">
-            
-        </div>
-        <div class="col-sm-4 text-end">
-            <!-- Add Vehicle Button -->
-            <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addVehicleModal"><i class="fa fa-plus" style="font-size:16px;"></i> 
-                Add Vehicle
-            </button>
-           <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='report.php'">
-                <i class="fa fa-file-pdf-o" style="font-size:16px;"></i> Report
-            </button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCIC Vehicle Database | Login</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-             <button type="button" class="btn btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#addVehicleModal"><i class="fa fa-sign-out" style="font-size:16px"></i>
-                Logout
-            </button>
-           <!--  <a href="backend/logout.php" class="btn btn-danger d-inline-block">
-                <i class="fa fa-sign-out" style="font-size:16px"></i> <span>Logout</span>
-            </a> -->
-        </div>
-    </div>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #00bcd4;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
 
-    <div class="row">
-        <div class="col-12">
-            <!-- Responsive Table Wrapper -->
-            <div class="table-responsive">
-                <table id="vehicleTable" class="table table-striped table-bordered" style="width: 100%;">
-                    <thead>
-                        <tr>
-                           <!-- <th>ID</th>-->
-						   <th>অবস্থা</th>
-							<th>যানবাহনের ধরন</th>
-                            <th>রেজিষ্টেশন নম্বর</th>                            
-                            <th>প্রাপ্তির উৎস</th>
-                            <th>ক্রয়/প্রাপ্তির সাল</th>
-                            <th>চালিত কি:মি: </th>
-                            <th>ব্যবহারকারীর নাম</th>
-                            <th>পদবী</th>
-                            <th>চালকের নাম </th>
-                            <th>চালকের ধরন</th>
-                            <th>বৈকল্যের সাল</th>
-                            <th>বৈকল্যের কারণ</th>
-                            <th>মেরামত</th>
-                            <th>গৃহীত ব্যবস্থা</th>
-                            <th>মন্তব্য</th>
-                            <th>এ্যাকশন</th> 
+        /* Animated Background Elements */
+        .vehicle-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
 
-                            <!-- <th>ID</th> 
-                            <th>Vehicle Status</th>
-                            <th>Reg No</th>
-                            <th>Vehicle Type</th>
-                            <th>Vehicle Source</th>
-                            <th>Sourcing/Buying Year</th>
-                            <th>Driven KM</th>
-                            <th>User Name</th>
-                            <th>User Designation</th>
-                            <th>Driver Name</th>
-                            <th>Driver Appointment Type</th>
-                            <th>Year of Impairment</th>
-                            <th>Cause of Impairment</th>
-                            <th>Repair Status</th>
-                            <th>Action Taken</th>
-                            <th>Remarks</th>
-                            <th>Actions</th>-->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($vehicles as $vehicle): ?>
-                        <tr>
-                            <!-- <td><?php //echo htmlspecialchars($vehicle['id']); ?></td> -->
-                            <td><?php echo htmlspecialchars($vehicle['vehicle_status']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['reg_no']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['vehicle_type']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['vehicle_source']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['sourcing_buying_year']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['driven_km']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['user_name']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['user_designation']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['driver_name']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['driver_appt_type']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['yearofimpairment']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['causeofimpairment']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['repair_status']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['action_taken']); ?></td>
-                            <td><?php echo htmlspecialchars($vehicle['remarks']); ?></td>
-                            <td>
-                                <a href="#" class="btn btn-sm btn-warning edit-btn" data-id="<?php echo $vehicle['id']; ?>"><i class="fa fa-edit" style="font-size:16px;"></i></a>
-                                <a href="index.php?delete=<?php echo $vehicle['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')"><i class="fa fa-trash" style="font-size:16px;"></i></a>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div> <!-- End of .table-responsive -->
-        </div>
-    </div>
-</div>
-</div>
+        .car-animation {
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+            width: 80px;
+            height: 80px;
+            animation: float 20s linear infinite;
+            opacity: 0.1;
+        }
 
-    <!-- Add Vehicle Modal -->
-<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addVehicleModalLabel">Add Vehicle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post">
-                    <!-- Vehicle Status -->
-                    <div class="row g-2">
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="vehicle_status" class="form-label">Vehicle Status</label>
-                                <!-- <input type="text" class="form-control" id="vehicle_status" name="vehicle_status" required> -->
-                                <select class="form-select form-control" id="vehicle_status" name="vehicle_status" required aria-label="Default select example">
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="ব্যবহৃত">ব্যবহৃত</option>
-                                    <option value="ব্যবহার অনুপযোগী">ব্যবহার অনুপযোগী</option>                            
-                                </select>
-                            </div>
-                        </div>
+        .car-1 { top: 15%; left: -100px; animation-delay: 0s; animation-duration: 25s; }
+        .car-2 { top: 30%; left: -100px; animation-delay: 5s; animation-duration: 30s; }
+        .car-3 { top: 50%; left: -100px; animation-delay: 10s; animation-duration: 35s; }
+        .car-4 { top: 70%; left: -100px; animation-delay: 15s; animation-duration: 40s; }
 
-                    <!-- Registration Number -->
-                     <div class="col-md">
-                    <div class="mb-3">
-                        <label for="reg_no" class="form-label">Registration Number</label>
-                        <input type="text" class="form-control" id="reg_no" name="reg_no" required>
-                    </div></div>
+        .road-line {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
 
-                    <!-- Vehicle Type -->
-                     <div class="col-md">
-                    <div class="mb-3">
-                        <label for="vehicle_type" class="form-label">Vehicle Type</label>
-                        <!-- <input type="text" class="form-control" id="vehicle_type" name="vehicle_type" required> -->
-                        <select class="form-select form-control" id="vehicle_type" name="vehicle_type" required aria-label="Default select example">
-                            <option selected disabled value="">--Select--</option>
-                            <option value="কার">কার</option>
-                            <option value="পাজেরো">পাজেরো</option>
-                            <option value="মাইক্রোবাস">মাইক্রোবাস</option>
-                            <option value="জিপ">জিপ</option>
-                            
-                        </select>
-                        </div>
-                    </div>
-                </div>
+        .road-line::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            animation: roadLine 1.5s linear infinite;
+        }
 
-                    <div class="row g-2">
-                        <div class="col-md">
-                    <!-- Vehicle Source -->
-                    <div class="mb-3">
-                        <label for="vehicle_source" class="form-label">Vehicle Source</label>
-                        <input type="text" class="form-control" id="vehicle_source" name="vehicle_source" required>
-                    </div></div>
+        @keyframes float {
+            0% { transform: translateX(-100px) rotate(0deg); }
+            100% { transform: translateX(calc(100vw + 100px)) rotate(0deg); }
+        }
 
-                    <!-- Sourcing/Buying Year -->
-                    <div class="col-md">
-                    <div class="mb-3">
-                        <label for="sourcing_buying_year" class="form-label">Sourcing/Buying Year</label>
-                        <input type="number" class="form-control" id="sourcing_buying_year" name="sourcing_buying_year" min="1900" max="2099" required>
-                    </div></div>
+        @keyframes roadLine {
+            0% { transform: translateX(-50px); }
+            100% { transform: translateX(calc(100vw + 50px)); }
+        }
 
-                    <!-- Driven KM -->
-                    <div class="col-md">
-                    <div class="mb-3">
-                        <label for="driven_km" class="form-label">Driven KM</label>
-                        <input type="number" class="form-control" id="driven_km" name="driven_km" required>
-                    </div>
-                    </div>
-                </div>
-                    <div class="row g-2">
-                        <div class="col-md">
-                    <!-- User Name -->
-                    <div class="mb-3">
-                        <label for="user_name" class="form-label">User Name</label>
-                        <input type="text" class="form-control" id="user_name" name="user_name" required>
-                    </div></div>
+        /* Pulse Animation for Logo */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
 
-                    <!-- User Designation -->
-                    <div class="col-md">
-                    <div class="mb-3">
-                        <label for="user_designation" class="form-label">User Designation</label>
-                        <input type="text" class="form-control" id="user_designation" name="user_designation" required>
-                    </div></div>
-                </div>
-                    <div class="row g-2">
-                        <div class="col-md">
-                    <!-- Driver Name -->
-                    <div class="mb-3">
-                        <label for="driver_name" class="form-label">Driver Name</label>
-                        <input type="text" class="form-control" id="driver_name" name="driver_name" required>
-                    </div></div>
+        /* Shake Animation for Failed Login */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
 
-                    <!-- Driver Appointment Type -->
-                    <div class="col-md">
-                    <div class="mb-3">
-                        <label for="driver_appt_type" class="form-label">Driver Appointment Type</label>
-                        <!-- <input type="text" class="form-control" id="driver_appt_type" name="driver_appt_type" required> -->
-                        <select class="form-select form-control" id="driver_appt_type" name="driver_appt_type" required aria-label="Default select example">
-                            <option selected disabled value="">--Select--</option>
-                            <option value="আউটসোর্সিং">আউটসোর্সিং</option>
-                            <option value="স্থায়ী">স্থায়ী</option>
-                            <option value="দৈনিক ভিত্তিক">দৈনিক ভিত্তিক</option>
-                        </select>
-                    </div>
-                    </div>
-                </div>
-                    <div class="row g-2">
-                        <div class="col-md">
-                    <!-- Year of Impairment -->
-                    <div class="mb-3">
-                        <label for="yearofimpairment" class="form-label">Year of Impairment</label>
-                        <input type="number" class="form-control" id="yearofimpairment" name="yearofimpairment" min="1900" max="2099">
-                    </div></div>
+        .login-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
 
-                    <!-- Cause of Impairment -->
-                    <div class="col-md">
-                    <div class="mb-3">
-                        <label for="causeofimpairment" class="form-label">Cause of Impairment</label>
-                        <!-- <textarea class="form-control" id="causeofimpairment" name="causeofimpairment" rows="3"></textarea> -->
-                        <input type="text" class="form-control" id="causeofimpairment" name="causeofimpairment">
-                    </div></div></div>
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-                    <div class="row g-2">
-                    <div class="col-md">
-                    <!-- Repair Status -->
-                    <div class="mb-3">
-                        <label for="repair_status" class="form-label">Repair Status</label>
-                        <!-- <input type="text" class="form-control" id="repair_status" name="repair_status"> -->
-                         <select class="form-select form-control" id="repair_status" name="repair_status" required aria-label="Default select example">
-                            <option selected disabled value="">--Select--</option>
-                            <option value="যোগ্য">যোগ্য</option>
-                            <option value="অযোগ্য">অযোগ্য</option>                            
-                        </select>
-                    </div></div>
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
 
-                    <!-- Action Taken -->
-                    <div class="col-md">
-                    <div class="mb-3">
-                        <label for="action_taken" class="form-label">Action Taken</label>
-                        <!-- <textarea class="form-control" id="action_taken" name="action_taken" rows="3"></textarea> -->
-                        <select class="form-select form-control" id="action_taken" name="action_taken" required aria-label="Default select example">
-                            <option selected disabled value="">--Select--</option>
-                            <option value="বিক্রয়">বিক্রয়</option>
-                            <option value="নিলাম">নিলাম</option>  
-                            <option value="জমাকরণ">জমাকরণ</option>
-                            <option value="অন্যান্য">অন্যান্য</option>                           
-                        </select>
-                    </div></div></div>
-                    <!-- jQuery Script -->
-                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <script>
-                    $(document).ready(function () {
-                        $('#vehicle_status').change(function () {
-                            let selectedValue = $(this).val();
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-                            if (selectedValue === 'ব্যবহৃত') {
-                                $('#yearofimpairment, #causeofimpairment, #action_taken, #repair_status')
-                                    .prop('disabled', true).val('');
-                                $('#vehicle_source, #driven_km, #user_name, #user_designation, #driver_name, #driver_appt_type')
-                                    .prop('disabled', false); // Ensure these fields are enabled
-                            } 
-                            else if (selectedValue === 'ব্যবহার অনুপযোগী') {
-                                $('#vehicle_source, #driven_km, #user_name, #user_designation, #driver_name, #driver_appt_type')
-                                    .prop('disabled', true).val('');
-                                $('#yearofimpairment, #causeofimpairment, #action_taken, #repair_status')
-                                    .prop('disabled', false); // Ensure impairment fields are enabled
-                            } 
-                            else {
-                                // Enable all fields if neither option is selected
-                                $('#yearofimpairment, #causeofimpairment, #action_taken, #repair_status, #vehicle_source, #driven_km, #user_name, #user_designation, #driver_name, #driver_appt_type')
-                                    .prop('disabled', false);
-                            }
-                        });
-                    });
+        .logo-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+            animation: pulse 3s infinite;
+        }
 
-                    </script>
+        .logo-container i {
+            font-size: 3rem;
+            color: white;
+        }
 
-                    <!-- Remarks -->
-                    <div class="mb-3">
-                        <label for="remarks" class="form-label">Remarks</label>
-                        <!-- <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea> -->
-                        <input type="text" class="form-control" id="remarks" name="remarks">
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-                    </div>
+        .login-subtitle {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
 
-                    <!-- Submit Button -->
-                    <button type="submit" name="add" class="btn btn-primary">Add Vehicle</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
 
-<!-- Edit Vehicle Modal -->
-<div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editVehicleModalLabel">Edit Vehicle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="post">
-                    <!-- Hidden ID Field -->
-                    <input type="hidden" id="edit_id" name="id">
+        .input-group {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
 
-                    <!-- Vehicle Status -->
-                    <div class="row g-2">
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_vehicle_status" class="form-label">Vehicle Status</label>
-                                <select class="form-select form-control" id="edit_vehicle_status" name="vehicle_status" required aria-label="Default select example">
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="ব্যবহৃত">ব্যবহৃত</option>
-                                    <option value="ব্যবহার অনুপযোগী">ব্যবহার অনুপযোগী</option>
-                                </select>
-                            </div>
-                        </div>
+        .input-group:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
 
-                        <!-- Registration Number -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_reg_no" class="form-label">Registration Number</label>
-                                <input type="text" class="form-control" id="edit_reg_no" name="reg_no" required>
-                            </div>
-                        </div>
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: none;
+            color: var(--primary-color);
+            width: 45px;
+            justify-content: center;
+        }
 
-                        <!-- Vehicle Type -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_vehicle_type" class="form-label">Vehicle Type</label>
-                                <select class="form-select form-control" id="edit_vehicle_type" name="vehicle_type" required aria-label="Default select example">
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="কার">কার</option>
-                                    <option value="পাজেরো">পাজেরো</option>
-                                    <option value="মাইক্রোবাস">মাইক্রোবাস</option>
-                                    <option value="জিপ">জিপ</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+        .form-control {
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+        }
 
-                    <div class="row g-2">
-                        <!-- Vehicle Source -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_vehicle_source" class="form-label">Vehicle Source</label>
-                                <input type="text" class="form-control" id="edit_vehicle_source" name="vehicle_source" required>
-                            </div>
-                        </div>
+        .form-control:focus {
+            box-shadow: none;
+        }
 
-                        <!-- Sourcing/Buying Year -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_sourcing_buying_year" class="form-label">Sourcing/Buying Year</label>
-                                <input type="number" class="form-control" id="edit_sourcing_buying_year" name="sourcing_buying_year" min="1900" max="2099" required>
-                            </div>
-                        </div>
+        .toggle-password {
+            cursor: pointer;
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
 
-                        <!-- Driven KM -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_driven_km" class="form-label">Driven KM</label>
-                                <input type="number" class="form-control" id="edit_driven_km" name="driven_km" required>
-                            </div>
-                        </div>
-                    </div>
+        .toggle-password:hover {
+            background-color: #e9ecef;
+        }
 
-                    <div class="row g-2">
-                        <!-- User Name -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_user_name" class="form-label">User Name</label>
-                                <input type="text" class="form-control" id="edit_user_name" name="user_name" required>
-                            </div>
-                        </div>
+        .btn-login {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
 
-                        <!-- User Designation -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_user_designation" class="form-label">User Designation</label>
-                                <input type="text" class="form-control" id="edit_user_designation" name="user_designation" required>
-                            </div>
-                        </div>
-                    </div>
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.5);
+        }
 
-                    <div class="row g-2">
-                        <!-- Driver Name -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_driver_name" class="form-label">Driver Name</label>
-                                <input type="text" class="form-control" id="edit_driver_name" name="driver_name" required>
-                            </div>
-                        </div>
+        .btn-login:active {
+            transform: translateY(0);
+        }
 
-                        <!-- Driver Appointment Type -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_driver_appt_type" class="form-label">Driver Appointment Type</label>
-                                <select class="form-select form-control" id="edit_driver_appt_type" name="driver_appt_type" required aria-label="Default select example">
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="আউটসোর্সিং">আউটসোর্সিং</option>
-                                    <option value="স্থায়ী">স্থায়ী</option>
-                                    <option value="দৈনিক ভিত্তিক">দৈনিক ভিত্তিক</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
 
-                    <div class="row g-2">
-                        <!-- Year of Impairment -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_yearofimpairment" class="form-label">Year of Impairment</label>
-                                <input type="number" class="form-control" id="edit_yearofimpairment" name="yearofimpairment" min="1900" max="2099">
-                            </div>
-                        </div>
+        .btn-login:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
 
-                        <!-- Cause of Impairment -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_causeofimpairment" class="form-label">Cause of Impairment</label>
-                                <input type="text" class="form-control" id="edit_causeofimpairment" name="causeofimpairment">
-                            </div>
-                        </div>
-                    </div>
+        @keyframes ripple {
+            0% { transform: scale(0, 0); opacity: 0.5; }
+            100% { transform: scale(20, 20); opacity: 0; }
+        }
 
-                    <div class="row g-2">
-                        <!-- Repair Status -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_repair_status" class="form-label">Repair Status</label>
-                                <select class="form-select form-control" id="edit_repair_status" name="repair_status" required aria-label="Default select example">
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="যোগ্য">যোগ্য</option>
-                                    <option value="অযোগ্য">অযোগ্য</option>
-                                </select>
-                            </div>
-                        </div>
+        .footer-text {
+            text-align: center;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+        }
 
-                        <!-- Action Taken -->
-                        <div class="col-md">
-                            <div class="mb-3">
-                                <label for="edit_action_taken" class="form-label">Action Taken</label>
-                                <select class="form-select form-control" id="edit_action_taken" name="action_taken" required aria-label="Default select example">
-                                    <option selected disabled value="">--Select--</option>
-                                    <option value="বিক্রয়">বিক্রয়</option>
-                                    <option value="নিলাম">নিলাম</option>
-                                    <option value="জমাকরণ">জমাকরণ</option>
-                                    <option value="অন্যান্য">অন্যান্য</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                    $(document).ready(function () {
-                        $('#edit_vehicle_status').change(function () {
-                            let selectedValue = $(this).val();
+        /* Toast container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
 
-                            if (selectedValue === 'ব্যবহৃত') {
-                                $('#edit_yearofimpairment, #edit_causeofimpairment, #edit_action_taken, #edit_repair_status')
-                                    .prop('disabled', true);
-                                $('#edit_vehicle_source, #edit_driven_km, #edit_user_name, #edit_user_designation, #edit_driver_name, #edit_driver_appt_type')
-                                    .prop('disabled', false); // Ensure these fields are enabled
-                            } 
-                            else if (selectedValue === 'ব্যবহার অনুপযোগী') {
-                                $('#edit_vehicle_source, #edit_driven_km, #edit_user_name, #edit_user_designation, #edit_driver_name, #edit_driver_appt_type')
-                                    .prop('disabled', true);
-                                $('#edit_yearofimpairment, #edit_causeofimpairment, #edit_action_taken, #edit_repair_status')
-                                    .prop('disabled', false); // Ensure impairment fields are enabled
-                            } 
-                            else {
-                                // Enable all fields if neither option is selected
-                                $('#edit_yearofimpairment, #edit_causeofimpairment, #edit_action_taken, #edit_repair_status, #edit_vehicle_source, #edit_driven_km, #edit_user_name, #edit_user_designation, #edit_driver_name, #edit_driver_appt_type')
-                                    .prop('disabled', false);
-                            }
-                        });
-                    });
+        .toast {
+            background: rgba(220, 53, 69, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.3);
+        }
 
-                    </script>
+        /* Loading Animation - FIXED: Hidden by default */
+        .loader {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+        }
 
-                    <!-- Remarks -->
-                    <div class="mb-3">
-                        <label for="edit_remarks" class="form-label">Remarks</label>
-                        <input type="text" class="form-control" id="edit_remarks" name="remarks">
-                    </div>
+        .loader.show {
+            display: flex !important;
+            opacity: 1;
+        }
 
-                    <!-- Submit Button -->
-                    <button type="submit" name="update" class="btn btn-primary">Update Vehicle</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+        .loader.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
 
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-<!-- DataTables Buttons Extension -->
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
-
-    <!-- Initialize DataTables -->
-
-    <script>
-        $(document).ready(function() {
-    $('#vehicleTable').DataTable({
-        dom: "<'row'<'col-md-4'l><'col-md-4 text-start'B><'col-md-4'f>>" + 
-             "<'row'<'col-md-12'tr>>" +
-             "<'row'<'col-md-5'i><'col-md-7'p>>",
-        buttons: [
-            {
-                extend: 'copy',
-                exportOptions: {
-                    columns: ':not(:last-child)' // Excludes the last column (Actions)
-                }
-            },
-            {
-                extend: 'csv',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                }
-            },
-            {
-                extend: 'excel',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                }
-            },
-            {
-                extend: 'pdf',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                }
-            },
-            {
-                extend: 'print',
-                exportOptions: {
-                    columns: ':not(:last-child)' // Excludes the last column (Actions)
-                }
+        /* Responsive Design */
+        @media (max-width: 576px) {
+            .login-container {
+                padding: 15px;
             }
-        ]
+            
+            .login-card {
+                padding: 1.5rem;
+            }
+            
+            .login-title {
+                font-size: 1.5rem;
+            }
+            
+            .logo-container {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .logo-container i {
+                font-size: 2.5rem;
+            }
+            
+            .car-animation {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .login-card {
+                background: rgba(33, 37, 41, 0.95);
+                color: #f8f9fa;
+            }
+            
+            .login-subtitle,
+            .footer-text {
+                color: #adb5bd;
+            }
+            
+            .form-label {
+                color: #dee2e6;
+            }
+            
+            .input-group {
+                border-color: #495057;
+                background: #343a40;
+            }
+            
+            .input-group-text {
+                background-color: #495057;
+                color: #dee2e6;
+            }
+            
+            .form-control {
+                background: #343a40;
+                color: #f8f9fa;
+            }
+            
+            .loader {
+                background: rgba(33, 37, 41, 0.95);
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Animated Background Elements -->
+<div class="vehicle-bg">
+    <div class="car-animation car-1"></div>
+    <div class="car-animation car-2"></div>
+    <div class="car-animation car-3"></div>
+    <div class="car-animation car-4"></div>
+    <div class="road-line"></div>
+</div>
+
+<div class="login-container">
+    <div class="login-card">
+        <!-- Loading Overlay - Initially hidden -->
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div class="text-center mt-3">
+                <p class="text-primary fw-semibold">Authenticating...</p>
+                <p class="text-muted small">Please wait while we verify your credentials</p>
+            </div>
+        </div>
+
+        <div class="login-header">
+            <div class="logo-container">
+                <i class="fas fa-car"></i>
+            </div>
+            <h1 class="login-title">BCIC Vehicle Database</h1>
+            <p class="login-subtitle">Sign in to manage vehicle fleet</p>
+        </div>
+
+        <form method="POST" action="" id="loginForm">
+            <div class="mb-4">
+                <label class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="Enter your username" 
+                           required
+                           autocomplete="username"
+                           autofocus>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" 
+                           name="password" 
+                           id="password" 
+                           class="form-control" 
+                           placeholder="Enter your password" 
+                           required
+                           autocomplete="current-password">
+                    <span class="input-group-text toggle-password" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-login" id="loginBtn">
+                    <i class="fas fa-sign-in-alt me-2"></i> Login to Dashboard
+                </button>
+            </div>
+        </form>
+
+        <div class="footer-text">
+            &copy; <?php echo date("Y"); ?> Bangladesh Chemical Industries Corporation | All Rights Reserved
+            <div class="mt-2">
+                <small>Secure Access • Vehicle Management System</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container">
+<?php if($login_failed): ?>
+    <div class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true" id="errorToast">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <strong>Login Failed!</strong> Invalid username or password.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+<?php endif; ?>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// Password Toggle
+function togglePassword() {
+    const password = document.getElementById("password");
+    const eyeIcon = document.getElementById("eyeIcon");
+    
+    if (password.type === "password") {
+        password.type = "text";
+        eyeIcon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+        password.type = "password";
+        eyeIcon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+}
+
+// Show loader function
+function showLoader() {
+    const loader = document.getElementById('loader');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    if (loader) {
+        loader.classList.remove('hide');
+        loader.classList.add('show');
+    }
+    
+    if (loginBtn) {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
+    }
+}
+
+// Hide loader function
+function hideLoader() {
+    const loader = document.getElementById('loader');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    if (loader) {
+        loader.classList.remove('show');
+        loader.classList.add('hide');
+        
+        // Hide completely after animation
+        setTimeout(() => {
+            loader.style.display = 'none';
+        }, 300);
+    }
+    
+    if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i> Login to Dashboard';
+    }
+}
+
+// Auto-hide toast after 5 seconds
+document.addEventListener('DOMContentLoaded', function() {
+    const errorToast = document.getElementById('errorToast');
+    if (errorToast) {
+        errorToast.style.animation = 'shake 0.5s ease-in-out';
+        
+        const toast = new bootstrap.Toast(errorToast, { 
+            delay: 5000,
+            autohide: true 
+        });
+        toast.show();
+        
+        setTimeout(() => {
+            errorToast.style.animation = '';
+        }, 500);
+    }
+    
+    // Form submission handler
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    loginForm.addEventListener('submit', function(e) {
+        // Basic form validation
+        const username = document.querySelector('input[name="username"]').value.trim();
+        const password = document.querySelector('input[name="password"]').value.trim();
+        
+        if (!username || !password) {
+            e.preventDefault();
+            alert('Please enter both username and password');
+            return;
+        }
+        
+        // Show loading animation
+        showLoader();
+        
+        // Set timeout to hide loader if submission takes too long
+        setTimeout(() => {
+            hideLoader();
+        }, 10000); // 10 seconds timeout
+    });
+    
+    // Input focus effects
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Enter to submit form
+        if (e.ctrlKey && e.key === 'Enter') {
+            loginForm.requestSubmit();
+        }
+        
+        // Esc to clear form
+        if (e.key === 'Escape') {
+            loginForm.reset();
+            document.querySelector('[autofocus]').focus();
+        }
+    });
+    
+    // Focus username field on page load
+    document.querySelector('[autofocus]').focus();
+    
+    // Add hover effect to login button
+    const loginButton = document.getElementById('loginBtn');
+    if (loginButton) {
+        loginButton.addEventListener('mouseenter', function() {
+            if (!this.disabled) {
+                this.style.transform = 'translateY(-2px) scale(1.02)';
+            }
+        });
+        
+        loginButton.addEventListener('mouseleave', function() {
+            if (!this.disabled) {
+                this.style.transform = 'translateY(0) scale(1)';
+            }
+        });
+    }
+    
+    // Prevent multiple submissions
+    let isSubmitting = false;
+    loginForm.addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return;
+        }
+        isSubmitting = true;
     });
 });
 
-// $(document).ready(function() {
-//     $('#vehicleTable').DataTable({
-//         dom: "<'row'<'col-md-6 text-start'lB><'col-md-6'f>>" + // Add 'l' for page length dropdown
-//              "<'row'<'col-md-12'tr>>" +
-//              "<'row'<'col-md-5'i><'col-md-7'p>>",
-//         buttons: [
-//             'copy', 'csv', 'excel', 'pdf', 'print'
-//         ]
-//     });
-// });
+// Create floating vehicle icons with background images
+function createFloatingVehicles() {
+    const vehicleTypes = ['car', 'truck', 'bus', 'motorcycle'];
+    
+    // Define SVG data URLs for different vehicle types
+    const svgData = {
+        car: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z'/%3E%3C/svg%3E",
+        truck: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/%3E%3C/svg%3E",
+        bus: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z'/%3E%3C/svg%3E",
+        motorcycle: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19.44 9.03L15.41 5H11v2h3.59l2 2H5c-2.8 0-5 2.2-5 5s2.2 5 5 5c2.46 0 4.45-1.69 4.9-4h1.65l2.77-2.77c-.21.54-.32 1.14-.32 1.77 0 2.8 2.2 5 5 5s5-2.2 5-5c0-2.65-1.97-4.77-4.56-4.97zM7.82 15C7.4 16.15 6.28 17 5 17c-1.63 0-3-1.37-3-3s1.37-3 3-3c1.28 0 2.4.85 2.82 2H5v2h2.82zM19 17c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z'/%3E%3C/svg%3E"
+    };
+    
+    const vehicleContainer = document.querySelector('.vehicle-bg');
+    
+    // Add initial cars with background images
+    const cars = document.querySelectorAll('.car-animation');
+    cars.forEach((car, index) => {
+        const type = vehicleTypes[index % vehicleTypes.length];
+        car.style.backgroundImage = `url("${svgData[type]}")`;
+    });
+    
+    // Add more floating vehicles
+    for (let i = 0; i < 6; i++) {
+        const vehicle = document.createElement('div');
+        vehicle.className = 'car-animation';
+        vehicle.style.top = `${Math.random() * 80 + 10}%`;
+        vehicle.style.left = '-100px';
+        vehicle.style.animationDelay = `${Math.random() * 20}s`;
+        vehicle.style.animationDuration = `${Math.random() * 20 + 20}s`;
+        vehicle.style.opacity = Math.random() * 0.1 + 0.05;
+        
+        const type = vehicleTypes[Math.floor(Math.random() * vehicleTypes.length)];
+        vehicle.style.backgroundImage = `url("${svgData[type]}")`;
+        
+        vehicleContainer.appendChild(vehicle);
+    }
+}
 
-// $(document).ready(function() {
-//     $('#vehicleTable').DataTable({
-//         dom: "<'row'<'col-md-4'l><'col-md-4 text-start'B><'col-md-4'f>>" + 
-//              "<'row'<'col-md-12'tr>>" +
-//              "<'row'<'col-md-5'i><'col-md-7'p>>",
-//         buttons: [
-//             'copy', 'csv', 'excel', 'pdf', 'print'
-//         ]
-//     });
-// });
+// Initialize floating vehicles when page loads
+window.addEventListener('load', createFloatingVehicles);
 
-    </script>
-
-    <!-- JavaScript for Edit Modal -->
-    <script>
-        // Function to populate the edit modal with data
-        function populateEditModal(vehicle) {
-            document.getElementById('edit_id').value = vehicle.id;
-            document.getElementById('edit_vehicle_status').value = vehicle.vehicle_status;
-            document.getElementById('edit_reg_no').value = vehicle.reg_no;
-            document.getElementById('edit_vehicle_type').value = vehicle.vehicle_type;
-            document.getElementById('edit_vehicle_source').value = vehicle.vehicle_source;
-            document.getElementById('edit_sourcing_buying_year').value = vehicle.sourcing_buying_year;
-            document.getElementById('edit_driven_km').value = vehicle.driven_km;
-            document.getElementById('edit_user_name').value = vehicle.user_name;
-            document.getElementById('edit_user_designation').value = vehicle.user_designation;
-            document.getElementById('edit_driver_name').value = vehicle.driver_name;
-            document.getElementById('edit_driver_appt_type').value = vehicle.driver_appt_type;
-            document.getElementById('edit_yearofimpairment').value = vehicle.yearofimpairment;
-            document.getElementById('edit_causeofimpairment').value = vehicle.causeofimpairment;
-            document.getElementById('edit_repair_status').value = vehicle.repair_status;
-            document.getElementById('edit_action_taken').value = vehicle.action_taken;
-            document.getElementById('edit_remarks').value = vehicle.remarks;
-        }
-
-        // Event listener for edit buttons
-        document.addEventListener('DOMContentLoaded', function () {
-            const editButtons = document.querySelectorAll('.edit-btn');
-            editButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const vehicleId = this.getAttribute('data-id');
-                    fetch(`get_vehicle.php?id=${vehicleId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            populateEditModal(data);
-                            new bootstrap.Modal(document.getElementById('editVehicleModal')).show();
-                        });
-                });
-            });
-        });
-    </script>
+// Add a subtle fade-in animation for the login card
+window.addEventListener('load', function() {
+    const loginCard = document.querySelector('.login-card');
+    if (loginCard) {
+        loginCard.style.opacity = '0';
+        loginCard.style.transform = 'translateY(20px)';
+        loginCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            loginCard.style.opacity = '1';
+            loginCard.style.transform = 'translateY(0)';
+        }, 100);
+    }
+});
+</script>
 </body>
 </html>

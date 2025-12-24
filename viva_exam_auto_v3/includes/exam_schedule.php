@@ -131,6 +131,25 @@ $schedules = $conn->query("SELECT * FROM exam_schedule_tbl ORDER BY id DESC");
       <div class="small-note mt-1">Change committee to load relevant designations.</div>
     </div>
 
+      <div class="col-md-4">
+      <label>Candidates List</label>
+      <select name="committe_name" id="committe_name" class="form-select" required>
+        <option value="">Select Committee</option>
+        <?php
+        // load distinct committees (from committee_tbl or candidates_tbl - choose your source)
+        $result_committe = mysqli_query($conn, "SELECT DISTINCT committe_name FROM committee_tbl");
+        if (!$result_committe) {
+            $result_committe = mysqli_query($conn, "SELECT DISTINCT committe_name FROM candidates_tbl");
+        }
+        while ($r = mysqli_fetch_assoc($result_committe)) {
+            $val = htmlspecialchars($r['committe_name']);
+            echo "<option value='{$val}'>{$val}</option>";
+        }
+        ?>
+      </select>
+      <div class="small-note mt-1">Change committee to load relevant designations.</div>
+    </div>
+
     <div class="col-md-2 text-end mt-3">
       <button type="button" id="addRow" class="btn btn-sm btn-success">+ Add Row</button>
     </div>
