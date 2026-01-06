@@ -43,11 +43,13 @@ function englishToBanglaNumber($number) {
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
 
 body {
-    font-family: 'Noto Sans Bengali', sans-serif;
+/*    font-family: 'Noto Sans Bengali', sans-serif;*/
+ body { font-family: 'Noto Sans Bengali', sans-serif; background: #f9f9f9; }
 }
     /* Print Styles */
     @media print {
@@ -67,21 +69,19 @@ body {
       }
     }
 
-    /* Font Definitions */
-    @font-face {
-      font-family: 'Nikosh';
-      src: url('fonts/Nikosh.ttf') format('truetype'),
-           url('fonts/Nikosh.woff') format('woff'),
-           url('fonts/Nikosh.woff2') format('woff2');
-      font-weight: normal;
-      font-style: normal;
-      font-display: swap;
-    }
-
-    /* Base Typography */
-    * {
-      font-family: 'Nikosh', 'SolaimanLipi', 'Open Sans', sans-serif;
-    }
+* {
+  font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif;
+}
+/* Font Definitions */
+@font-face {
+  font-family: 'Nikosh';
+  src: url('fonts/Nikosh.ttf') format('truetype'),
+       url('fonts/Nikosh.woff') format('woff'),
+       url('fonts/Nikosh.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
     /* Color Variables */
     :root {

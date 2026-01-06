@@ -570,10 +570,28 @@ $schedules = $conn->query("SELECT * FROM exam_schedule_tbl ORDER BY id DESC");
   <!-- Chosen JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
   <style>
+/*@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');*/
+               
+/*body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f8f9fa; }*/
+/*body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}*/
       body { font-family: 'Noto Sans Bengali', sans-serif; background: #f9f9f9; }
       .small-note { font-size: 0.9rem; color: #666; }
       .chosen-container-multi .chosen-choices { min-height: 45px; }
+/*      * {
+  font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif;
+}*/
+/* Font Definitions */
+/*@font-face {
+  font-family: 'Nikosh';
+  src: url('fonts/Nikosh.ttf') format('truetype'),
+       url('fonts/Nikosh.woff') format('woff'),
+       url('fonts/Nikosh.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}*/
   </style>
 </head>
 

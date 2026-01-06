@@ -70,7 +70,8 @@ if (empty($committeeMembers)) {
 <title>Candidate List - <?= htmlspecialchars($committee) ?></title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-<style>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+<style>    
 @media print { 
     .no-print { display:none !important; } 
     body { font-size: 12px; }
@@ -79,7 +80,8 @@ if (empty($committeeMembers)) {
     .header h3 { font-size: 16px; }
     .header h4 { font-size: 14px; }
 }
-body { background:#fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+/*body { background:#fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }*/
+ body { font-family: 'Noto Sans Bengali', sans-serif; background: #f9f9f9; }
 .header { text-align:center; margin-bottom:20px; border-bottom: 2px solid #007bff; padding-bottom: 15px; }
 .header h2 { color:#2c3e50; margin-bottom:5px; }
 .header h3 { color:#34495e; margin-bottom:10px; }

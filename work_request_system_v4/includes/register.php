@@ -3,175 +3,9 @@
 session_name('factory_work_request_db');
 
 require_once '../db/config.php';
-
+require_once 'header_reg.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-        }
-        
-        .form-container {
-            padding: 40px;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        input[type="text"],
-        input[type="password"],
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5eb;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .error {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .btn-submit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-        
-        .login-link {
-            text-align: center;
-            margin-top: 25px;
-            color: #666;
-        }
-        
-        .login-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-container {
-                padding: 30px 20px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -202,17 +36,30 @@ require_once '../db/config.php';
                 <div class="form-row">
                     <div class="form-group">
                         <label for="designation">Designation *</label>
-                        <input type="text" id="designation" name="designation" required 
-                               placeholder="Enter your designation">
+                        <select id="designation" name="designation" required>
+                            <option value="">Select Designation</option>
+                            <?php 
+                            $sql_desg = "SELECT designation FROM designation";
+                            $result_desg = mysqli_query($conn, $sql_desg);
+                            if ($result_desg && mysqli_num_rows($result_desg) > 0) {
+                                while ($row_desg = mysqli_fetch_assoc($result_desg)) {
+                                    $designation = htmlspecialchars($row_desg['designation']);
+                                    echo "<option value=\"$designation\">$designation</option>";
+                                }
+                            } else {
+                                echo "<option disabled>No Designation found</option>";
+                            }
+                            ?>
+                        </select>
                         <div class="error" id="designation_error"></div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="division">Division *</label>
                         <select id="division" name="division" required>
                             <option value="">Select Division</option>
                             <?php 
-                            $sql_com = "SELECT  division FROM division";
+                            $sql_com = "SELECT division FROM division";
                             $result_committe = mysqli_query($conn, $sql_com);
                             if ($result_committe && mysqli_num_rows($result_committe) > 0) {
                                 while ($row_committe = mysqli_fetch_assoc($result_committe)) {
@@ -227,16 +74,14 @@ require_once '../db/config.php';
                         <div class="error" id="division_error"></div>
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="section">Section *</label>
-                        <select id="division" name="division" required>
+                        <select id="section" name="section" required>
                             <option value="">Select Section</option>
-                        <!-- <input type="text" id="section" name="section" required 
-                               placeholder="Enter your section"> -->
                             <?php 
-                            $sql_section = "SELECT  name FROM section";
+                            $sql_section = "SELECT name FROM section";
                             $result_section = mysqli_query($conn, $sql_section);
                             if ($result_section && mysqli_num_rows($result_section) > 0) {
                                 while ($row_section = mysqli_fetch_assoc($result_section)) {
@@ -247,9 +92,10 @@ require_once '../db/config.php';
                                 echo "<option disabled>No section found</option>";
                             }
                             ?>
-                            </select>
+                        </select>
                         <div class="error" id="section_error"></div>
                     </div>
+
                     
                     <div class="form-group">
                         <label for="password">Password *</label>

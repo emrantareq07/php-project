@@ -26,8 +26,8 @@ if ($conn->connect_error) {
 $user_id = $_SESSION['user_id'];
 $full_name = $_SESSION['full_name'];
 $designation = $_SESSION['designation'];
-$division = $_SESSION['division'];
-$section = $_SESSION['section'];
+$user_division = $_SESSION['division']; // Changed variable name to avoid conflict
+$user_section = $_SESSION['section'];   // Changed variable name to avoid conflict
 
 $message = '';
 $error = '';
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "ssssssssissss",
                 $date, $w_req_type, $w_location, $w_description,
                 $w_com_division, $w_com_section, $status, $remarks,
-                $user_id, $full_name, $designation, $division, $section
+                $user_id, $full_name, $designation, $user_division, $user_section
             );
             
             if ($stmt->execute()) {
@@ -117,7 +117,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$conn->close();
+// Get divisions for dropdown (moved before HTML output)
+$divisions = [];
+$sections = [];
+
+$sql_div = "SELECT division FROM division";
+$result_div = $conn->query($sql_div);
+if ($result_div && $result_div->num_rows > 0) {
+    while ($row = $result_div->fetch_assoc()) {
+        $divisions[] = $row['division'];
+    }
+}
+
+$sql_sec = "SELECT name FROM section";
+$result_sec = $conn->query($sql_sec);
+if ($result_sec && $result_sec->num_rows > 0) {
+    while ($row = $result_sec->fetch_assoc()) {
+        $sections[] = $row['name'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -126,6 +144,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Request Form</title>
     <style>
+        /* Your CSS styles remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -404,8 +423,8 @@ $conn->close();
                     <div class="user-name"><?php echo htmlspecialchars($full_name); ?></div>
                     <div class="user-details">
                         <?php echo htmlspecialchars($designation); ?> | 
-                        <?php echo htmlspecialchars($division); ?> - 
-                        <?php echo htmlspecialchars($section); ?>
+                        <?php echo htmlspecialchars($user_division); ?> - 
+                        <?php echo htmlspecialchars($user_section); ?>
                     </div>
                 </div>
             </div>
@@ -440,7 +459,7 @@ $conn->close();
                     <div class="form-group">
                         <label for="date" class="required">Date of Request</label>
                         <input type="date" id="date" name="date" 
-                               value="<?php echo date('Y-m-d'); ?>" 
+                               value="<?php echo htmlspecialchars($_POST['date'] ?? date('Y-m-d')); ?>" 
                                max="<?php echo date('Y-m-d'); ?>" required>
                     </div>
                     
@@ -452,6 +471,7 @@ $conn->close();
                             <option value="Civil" <?php echo ($_POST['w_req_type'] ?? '') == 'Civil' ? 'selected' : ''; ?>>Civil Works</option>
                             <option value="Transport" <?php echo ($_POST['w_req_type'] ?? '') == 'Transport' ? 'selected' : ''; ?>>Transport</option>
                             <option value="Electrical" <?php echo ($_POST['w_req_type'] ?? '') == 'Electrical' ? 'selected' : ''; ?>>Electrical</option>
+                            <option value="Mechanical" <?php echo ($_POST['w_req_type'] ?? '') == 'Mechanical' ? 'selected' : ''; ?>>Mechanical</option>
                         </select>
                     </div>
                 </div>
@@ -479,22 +499,34 @@ $conn->close();
                         <label for="w_com_division" class="required">Work Completion Division</label>
                         <select id="w_com_division" name="w_com_division" required>
                             <option value="">Select Division</option>
-                            <option value="IT" <?php echo ($_POST['w_com_division'] ?? '') == 'IT' ? 'selected' : ''; ?>>IT Department</option>
-                            <option value="HR" <?php echo ($_POST['w_com_division'] ?? '') == 'HR' ? 'selected' : ''; ?>>Human Resources</option>
-                            <option value="Finance" <?php echo ($_POST['w_com_division'] ?? '') == 'Finance' ? 'selected' : ''; ?>>Finance</option>
-                            <option value="Operations" <?php echo ($_POST['w_com_division'] ?? '') == 'Operations' ? 'selected' : ''; ?>>Operations</option>
-                            <option value="MTS" <?php echo ($_POST['w_com_division'] ?? '') == 'MTS' ? 'selected' : ''; ?>>MTS</option>
-                            <option value="Procurement" <?php echo ($_POST['w_com_division'] ?? '') == 'Procurement' ? 'selected' : ''; ?>>Procurement</option>
-                            <option value="Other" <?php echo ($_POST['w_com_division'] ?? '') == 'Other' ? 'selected' : ''; ?>>Other</option>
+                            <?php 
+                            if (!empty($divisions)) {
+                                foreach ($divisions as $division) {
+                                    $selected = (($_POST['w_com_division'] ?? '') === $division) ? 'selected' : '';
+                                    echo "<option value=\"" . htmlspecialchars($division) . "\" $selected>" . htmlspecialchars($division) . "</option>";
+                                }
+                            } else {
+                                echo "<option disabled>No division found</option>";
+                            }
+                            ?>
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="w_com_section" class="required">Work Completion Section</label>
-                        <input type="text" id="w_com_section" name="w_com_section" 
-                               placeholder="e.g., Network Section, Electrical Maintenance"
-                               value="<?php echo htmlspecialchars($_POST['w_com_section'] ?? ''); ?>" 
-                               required>
+                        <select id="w_com_section" name="w_com_section" required>
+                            <option value="">Select Section</option>
+                            <?php 
+                            if (!empty($sections)) {
+                                foreach ($sections as $section) {
+                                    $selected = (($_POST['w_com_section'] ?? '') === $section) ? 'selected' : '';
+                                    echo "<option value=\"" . htmlspecialchars($section) . "\" $selected>" . htmlspecialchars($section) . "</option>";
+                                }
+                            } else {
+                                echo "<option disabled>No section found</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
                 
@@ -520,7 +552,7 @@ $conn->close();
                         </label>
                         
                         <label class="urgency-badge badge-very-urgent" for="status_very_urgent">
-                            <input type="radio" id="status_very_urgent" name="status" value="very urgent" 
+                            <input type="radio" id="status_very-urgent" name="status" value="very urgent" 
                                    <?php echo ($_POST['status'] ?? '') == 'very urgent' ? 'checked' : ''; ?> hidden>
                             🚨 Very Urgent
                             <small style="display: block; font-weight: normal; font-size: 12px;">
@@ -661,3 +693,7 @@ $conn->close();
     </script>
 </body>
 </html>
+<?php
+// Close connection at the very end
+$conn->close();
+?>
