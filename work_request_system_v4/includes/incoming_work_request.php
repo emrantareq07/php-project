@@ -1075,6 +1075,13 @@ $conn->close();
                                             <th>Requester</th>
                                             <th>Created</th>
                                             <th>Updated</th>
+                                            <?php //if($request['remarks'] || $request['w_com_div_remarks']){
+                                                ?>
+                                                <th>Comments</th>
+                                                <?php
+                                                //}
+                                                 ?>
+                                            
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -1126,6 +1133,16 @@ $conn->close();
                                                         <?php echo date('h:i A', strtotime($request['updated_at'])); ?>
                                                     </small>
                                                 </td>
+
+                                                  <td>
+                                                    <!-- <div><?php echo date('d/m/Y', strtotime($request['updated_at'])); ?></div> -->
+                                                    <small class="text-muted">Requester:
+                                                        <?php echo htmlspecialchars($request['remarks']);?>
+                                                    </small>
+                                                    <small class="text-muted">Work Completion Division:
+                                                        <?php echo htmlspecialchars($request['w_com_div_remarks']);?>
+                                                    </small>
+                                                </td>
                                                 <td>
                                                     <div class="d-flex">
                                                         <a href="view_w_request.php?id=<?php echo $request['id']; ?>" 
@@ -1137,8 +1154,8 @@ $conn->close();
                                                                  $request['requester_id'] == $user_id || 
                                                                  $routine_role === 'section_head' || 
                                                                  $routine_role === 'division_head'): ?>
-                                                            <a href="update_status.php?id=<?php echo $request['id']; ?>" 
-                                                               class="action-btn action-edit" title="Update Status">
+                                                            <a href="add_comments.php?id=<?php echo $request['id']; ?>" 
+                                                               class="action-btn action-edit" title="Add Comments">
                                                                 <i class="fas fa-edit"></i>
                                                             </a>
                                                         <?php endif; ?>

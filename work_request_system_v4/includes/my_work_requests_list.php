@@ -523,6 +523,7 @@ $conn->close();
                                 <th>Urgency</th>
                                 <th>Created</th>
                                 <th>Completed</th>
+                                <th>Comments</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -562,19 +563,35 @@ $conn->close();
                                         </small>
                                     </td>
                                    <td>
-    <?php if ($request['w_com_status'] != 'incomplete') { ?>
-        <?php echo date('d/m/Y', strtotime($request['updated_at'])); ?>
-        <small style="display: block; color: #666;">
-            <?php echo date('h:i A', strtotime($request['updated_at'])); ?>
-        </small>
-    <?php } ?>
-</td>
+                                        <?php if ($request['w_com_status'] != 'incomplete') { ?>
+                                            <?php echo date('d/m/Y', strtotime($request['updated_at'])); ?>
+                                            <small style="display: block; color: #666;">
+                                                <?php echo date('h:i A', strtotime($request['updated_at'])); ?>
+                                            </small>
+                                        <?php } ?>
+                                    </td>
+                                    <td>
+                                        <?php //echo date('d/m/Y', strtotime($request['created_at'])); ?>
+                                        <small style="display: block; color: #666;"> 
+                                            <?php echo $request['remarks']; ?>
+                                        </small>
+                                    </td>
                                     <td>
                                         <div class="actions">
                                             <a href="view_request.php?id=<?php echo $request['id']; ?>" 
                                                class="action-btn" title="View">
                                                 👁️
                                             </a>
+                                            <?php if($request['w_com_status']=='complete'){
+                                                ?>
+                                                <a href="add_comments.php?id=<?php echo $request['id']; ?>" 
+                                               class="action-btn" title="Add Comments">
+                                                
+                                            </a>
+                                                <?php
+                                            }
+                                            ?>
+                                            
                                             <?php if ($user_role === 'admin' || $user_role === 'sadmin'): ?>
                                                 <a href="edit_request.php?id=<?php echo $request['id']; ?>" 
                                                    class="action-btn" title="Edit">

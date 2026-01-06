@@ -14,8 +14,13 @@ $emp_id = $_SESSION['emp_id'];
 $full_name = $_SESSION['full_name'];
 $role = $_SESSION['role'];
 
-// Define work request types
-$work_types = ['ICT', 'Civil', 'Transport', 'Electrical', 'Mechanical'];
+$sql_count = "SELECT count(*) as incoming_w_req FROM work_request_tbl WHERE w_com_status ='incomplete'";
+$stmt = $conn->prepare($sql_count);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$count_w_req = $result->fetch_assoc();
+$count_w_req=$count_w_req['incoming_w_req'];
 
 // Fetch complete user data from database
 $sql = "SELECT * FROM users WHERE id = ?";
@@ -30,84 +35,7 @@ $_SESSION['section']  = $user['section'];
 $routine_role = $user['routine_role'];
 
 $stmt->close();
-
-// Initialize arrays for work type counts
-$work_type_counts = [];
-$total_incomplete_requests = 0;
-
-// Get counts for section heads and division heads only
-if ($routine_role === 'section_head' || $routine_role === 'division_head') {
-    
-    // Get the user's division and section
-    $user_division = $user['division'];
-    $user_section = $user['section'];
-    
-    // Query to count incomplete requests by work type for the user's division/section
-    if ($routine_role === 'section_head') {
-        // Section heads see requests for their specific section
-        $sql_count = "SELECT w_req_type, COUNT(*) as count 
-                     FROM work_request_tbl 
-                     WHERE w_com_status = 'incomplete' 
-                     AND w_com_division = ? 
-                     AND w_com_section = ?
-                     GROUP BY w_req_type";
-        $stmt = $conn->prepare($sql_count);
-        $stmt->bind_param("ss", $user_division, $user_section);
-    } else {
-        // Division heads see requests for their entire division
-        $sql_count = "SELECT w_req_type, COUNT(*) as count 
-                     FROM work_request_tbl 
-                     WHERE w_com_status = 'incomplete' 
-                     AND w_com_division = ?
-                     GROUP BY w_req_type";
-        $stmt = $conn->prepare($sql_count);
-        $stmt->bind_param("s", $user_division);
-    }
-    
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    // Initialize all work types with 0 count
-    foreach ($work_types as $type) {
-        $work_type_counts[$type] = 0;
-    }
-    
-    // Fill with actual counts from database
-    while ($row = $result->fetch_assoc()) {
-        $work_type = $row['w_req_type'];
-        if (in_array($work_type, $work_types)) {
-            $work_type_counts[$work_type] = $row['count'];
-            $total_incomplete_requests += $row['count'];
-        }
-    }
-    $stmt->close();
-    
-    // Get total incomplete count for notification badge
-    $sql_total = "SELECT COUNT(*) as total 
-                 FROM work_request_tbl 
-                 WHERE w_com_status = 'incomplete'";
-    
-    if ($routine_role === 'section_head') {
-        $sql_total .= " AND w_com_division = ? AND w_com_section = ?";
-        $stmt = $conn->prepare($sql_total);
-        $stmt->bind_param("ss", $user_division, $user_section);
-    } else {
-        $sql_total .= " AND w_com_division = ?";
-        $stmt = $conn->prepare($sql_total);
-        $stmt->bind_param("s", $user_division);
-    }
-    
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $total_row = $result->fetch_assoc();
-    $notification_count = $total_row['total'] ?? 0;
-    $stmt->close();
-} else {
-    // For non-section/division heads, set notification count to 0
-    $notification_count = 0;
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -288,7 +216,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
         
         .page-title p {
             color: var(--gray-color);
-            margin: 0.15rem 0 0;
+            margin: 0.25rem 0 0;
             font-size: 0.875rem;
         }
         
@@ -357,7 +285,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
             color: white;
             border-radius: 16px;
             padding: 2.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
         }
@@ -376,7 +304,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
         .welcome-card h2 {
             font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
             position: relative;
             z-index: 1;
         }
@@ -394,7 +322,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
         
         .stat-card {
@@ -432,7 +360,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
             color: var(--gray-color);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
         }
         
         .stat-value {
@@ -441,89 +369,12 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
             color: var(--dark-color);
         }
         
-        /* Work Type Counts Section */
-        .work-type-counts {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-        }
-        
-        .work-type-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .work-type-header h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        
-        .work-type-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-        
-        .work-type-card {
-            background: var(--primary-light);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        
-        .work-type-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .work-type-icon {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            color: var(--primary-color);
-        }
-        
-        .work-type-name {
-            font-size: 0.9rem;
-            color: var(--gray-color);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .work-type-count {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--dark-color);
-        }
-        
-        .work-type-count.zero {
-            color: var(--gray-color);
-            opacity: 0.6;
-        }
-        
-        .total-count-badge {
-            background: var(--danger-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-        
         /* Profile Info Card */
         .profile-info-card {
             background: white;
             border-radius: 16px;
             padding: 2rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-color);
         }
@@ -532,7 +383,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
         }
@@ -625,7 +476,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
         }
         
         .actions-header h3 {
@@ -838,14 +689,10 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                 </div>
                 
                 <div class="nav-actions">
-                    <?php if($routine_role === 'section_head' || $routine_role === 'division_head'): ?>
-                        <button class="notification-btn">
-                            <i class="fas fa-bell"></i>
-                            <?php if($notification_count > 0): ?>
-                                <span class="notification-badge"><?php echo $notification_count; ?></span>
-                            <?php endif; ?>
-                        </button>
-                    <?php endif; ?>
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge"><?php $count_w_req; ?></span>
+                    </button>
                     <a href="logout.php" class="logout-btn" style="text-decoration: none;">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout
@@ -866,31 +713,19 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                     $roleClass = '';
                     switch ($role) {
                         case 'admin':
-                            $roleClass = 'badge bg-success';
+                            $roleClass = 'badge bg-success'; // red for admin
                             break;
                         case 'sadmin':
-                            $roleClass = 'badge bg-danger';
+                            $roleClass = 'badge bg-danger'; // blue for super admin
                             break;
                         case 'user':
                         default:
-                            $roleClass = 'badge bg-warning';
+                            $roleClass = 'badge bg-warning'; // green for user
                             break;
                     }
                     ?>
                     <span class="<?php echo $roleClass; ?>">
                         <?php echo ucfirst($role); ?>
-                    </span>
-                    <span class="text-white badge bg-primary">
-                        <?php 
-                            if ($routine_role === 'section_head') {
-                                echo 'Section Head';
-                            } elseif ($routine_role === 'division_head') {
-                                echo 'Division Head';
-                            } else {
-                                // show nothing
-                                echo 'Employee';
-                            }
-                        ?>
                     </span>
                     <?php if($role === 'admin' || $role === 'sadmin'): ?>
                         You have administrative privileges to manage users and requests.
@@ -898,50 +733,15 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                     Last login: <?php echo date('F j, Y, g:i a'); ?>
                 </p>
             </div>
-            
-            <!-- Work Type Counts (Only for Section Heads and Division Heads) -->
-            <?php if($routine_role === 'section_head' || $routine_role === 'division_head'): ?>
-                <div class="work-type-counts">
-                    <div class="work-type-header">
-                        <h3>
-                            <i class="fas fa-chart-pie me-2"></i>
-                            Incomplete Incoming Requests by Work Type
-                            <?php if($total_incomplete_requests > 0): ?>
-                                <span class="total-count-badge ms-2">Total: <?php echo $total_incomplete_requests; ?></span>
-                            <?php endif; ?>
-                        </h3>
-                        <span class="text-muted">
-                            <?php echo $routine_role === 'section_head' ? 'Your Section' : 'Your Division'; ?>
-                        </span>
-                    </div>
-                    
-                    <div class="work-type-grid">
-                        <?php 
-                        // Define icons for each work type
-                        $work_type_icons = [
-                            'ICT' => 'fas fa-laptop',
-                            'Civil' => 'fas fa-hard-hat',
-                            'Transport' => 'fas fa-truck',
-                            'Electrical' => 'fas fa-bolt',
-                            'Mechanical' => 'fas fa-cogs'
-                        ];
-                        
-                        foreach ($work_types as $type): 
-                            $count = $work_type_counts[$type];
-                        ?>
-                            <div class="work-type-card">
-                                <div class="work-type-icon">
-                                    <i class="<?php echo $work_type_icons[$type]; ?>"></i>
-                                </div>
-                                <div class="work-type-name"><?php echo $type; ?></div>
-                                <div class="work-type-count <?php echo $count == 0 ? 'zero' : ''; ?>">
-                                    <?php echo $count; ?>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
+            <!-- <div class="welcome-card">
+                <h2>Welcome to Work Request System!</h2>
+                <p>You're logged in as<span class="badge bg-success"> <?php echo ucfirst($role); ?>.
+                <?php //if($role === 'admin' || $role === 'sadmin'): ?>
+                    You have administrative privileges to manage users and requests.
+                <?php //endif; ?></span>
+                    Last login: <?php //echo date('F j, Y, g:i a'); ?>
+                </p>
+            </div> -->            
             
             <!-- Stats Grid -->
             <div class="stats-grid">
@@ -1148,7 +948,6 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                             </div>
                             <div class="action-title">ICT Requests</div>
                         </a>
-                        <!-- <a href="settings.php" class="action-btn">⚙️ System Settings</a> -->
                         
                         <a href="reports.php" class="action-card">
                             <div class="action-icon">
@@ -1156,13 +955,6 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                             </div>
                             <div class="action-title">System Reports</div>
                         </a>
-                         <a href="settings.php" class="action-card">
-                            <div class="action-icon">
-                                <i class="fas fa-cogs"></i>
-                            </div>
-                            <div class="action-title">⚙️ System Settings</div>
-                        </a>
-
                     <?php endif; ?>
                     
                     <?php if($user['routine_role'] === 'section_head' || $user['routine_role'] === 'division_head'): ?>
@@ -1200,6 +992,27 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                     }, index * 100);
                 });
             }, 300);
+            
+            // Update last login time
+            function updateTime() {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true 
+                };
+                const timeString = now.toLocaleDateString('en-US', options);
+                
+                // You can display this somewhere if needed
+                console.log('Current time:', timeString);
+            }
+            
+            // Update time initially and every minute
+            updateTime();
+            setInterval(updateTime, 60000);
             
             // Mobile sidebar toggle (if needed)
             const sidebarToggle = document.createElement('button');

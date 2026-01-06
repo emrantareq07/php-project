@@ -22,6 +22,38 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $stmt->close();
 
+// Get dropdown data BEFORE form submission handling
+$designations = [];
+$divisions = [];
+$sections = [];
+
+// Get designations
+$sql_desg = "SELECT designation FROM designation";
+$result_desg = $conn->query($sql_desg);
+if ($result_desg && $result_desg->num_rows > 0) {
+    while ($row_desg = $result_desg->fetch_assoc()) {
+        $designations[] = $row_desg['designation'];
+    }
+}
+
+// Get divisions
+$sql_div = "SELECT division FROM division";
+$result_div = $conn->query($sql_div);
+if ($result_div && $result_div->num_rows > 0) {
+    while ($row_div = $result_div->fetch_assoc()) {
+        $divisions[] = $row_div['division'];
+    }
+}
+
+// Get sections
+$sql_section = "SELECT name FROM section";
+$result_section = $conn->query($sql_section);
+if ($result_section && $result_section->num_rows > 0) {
+    while ($row_section = $result_section->fetch_assoc()) {
+        $sections[] = $row_section['name'];
+    }
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $full_name = trim($_POST['full_name'] ?? '');
@@ -74,6 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $update_stmt->close();
     }
 }
+
+// Close connection after getting all data
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
@@ -193,26 +228,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="form-group">
                 <label>Designation</label>
-                <input type="text" name="designation" value="<?php echo htmlspecialchars($user['designation']); ?>" required>
+                <select name="designation" required>
+                    <option value="">Select Designation</option>
+                    <?php 
+                    if (!empty($designations)) {
+                        foreach ($designations as $desg) {
+                            $selected = ($user['designation'] == $desg) ? 'selected' : '';
+                            echo "<option value=\"" . htmlspecialchars($desg) . "\" $selected>" . htmlspecialchars($desg) . "</option>";
+                        }
+                    } else {
+                        echo "<option disabled>No Designation found</option>";
+                    }
+                    ?>
+                </select>
             </div>
             
             <div class="form-group">
                 <label>Division</label>
                 <select name="division" required>
                     <option value="">Select Division</option>
-                    <option value="IT" <?php echo $user['division'] == 'IT' ? 'selected' : ''; ?>>IT Department</option>
-                    <option value="HR" <?php echo $user['division'] == 'HR' ? 'selected' : ''; ?>>Human Resources</option>
-                    <option value="Finance" <?php echo $user['division'] == 'Finance' ? 'selected' : ''; ?>>Finance</option>
-                    <option value="Operations" <?php echo $user['division'] == 'Operations' ? 'selected' : ''; ?>>Operations</option>
-                    <option value="Marketing" <?php echo $user['division'] == 'Marketing' ? 'selected' : ''; ?>>Marketing</option>
-                    <option value="Sales" <?php echo $user['division'] == 'Sales' ? 'selected' : ''; ?>>Sales</option>
-                    <option value="R&D" <?php echo $user['division'] == 'R&D' ? 'selected' : ''; ?>>Research & Development</option>
+                    <?php 
+                    if (!empty($divisions)) {
+                        foreach ($divisions as $div) {
+                            $selected = ($user['division'] == $div) ? 'selected' : '';
+                            echo "<option value=\"" . htmlspecialchars($div) . "\" $selected>" . htmlspecialchars($div) . "</option>";
+                        }
+                    } else {
+                        echo "<option disabled>No division found</option>";
+                    }
+                    ?>
                 </select>
             </div>
             
             <div class="form-group">
                 <label>Section</label>
-                <input type="text" name="section" value="<?php echo htmlspecialchars($user['section']); ?>" required>
+                <select name="section" required>
+                    <option value="">Select Section</option>
+                    <?php 
+                    if (!empty($sections)) {
+                        foreach ($sections as $sec) {
+                            $selected = ($user['section'] == $sec) ? 'selected' : '';
+                            echo "<option value=\"" . htmlspecialchars($sec) . "\" $selected>" . htmlspecialchars($sec) . "</option>";
+                        }
+                    } else {
+                        echo "<option disabled>No section found</option>";
+                    }
+                    ?>
+                </select>
             </div>
             
             <button type="submit" class="btn">Update Profile</button>
