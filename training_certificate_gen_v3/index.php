@@ -1,4 +1,5 @@
 <?php
+session_name('training_certificate_gen_db');
 session_start();
 include 'controller/db.php'; // Adjust if needed
 
@@ -55,28 +56,64 @@ $result = $check->get_result();
 }
 
 /* ===============================
-   USER LOGIN
+   USER LOGIN - COMPATIBLE WITH EXISTING CODE
 ================================= */
 if (isset($_POST['login'])) {
     $email_id = $_POST['email_id'];
     $password = $_POST['password'];
-    $stmt = $conn->prepare("SELECT * FROM users_tbl WHERE email_id=? AND password=? AND status='active'");
-    $stmt->bind_param("ss", $email_id, $password);
+    
+    $stmt = $conn->prepare("SELECT * FROM users_tbl WHERE email_id = ?");
+    $stmt->bind_param("s", $email_id);
     $stmt->execute();
     $result = $stmt->get_result();
+    
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        $_SESSION['user_id'] = $user['emp_id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_email'] = $user['email_id'];
-        $_SESSION['user_role'] = $user['role'];
-        header("Location: controller/dashboard.php");
-        exit();
+        
+        // Check status (supports both 'active' string and 1 for active)
+        $is_active = ($user['status'] == 'active' || $user['status'] == 1);
+        
+        if (!$is_active) {
+            $alert = "Invalid email or password, or your account is not active!";
+            $alertType = "danger";
+        } else {
+            $db_password = $user['password'];
+            $login_success = false;
+            
+            // Try password_verify first (for hashed passwords)
+            if (password_verify($password, $db_password)) {
+                $login_success = true;
+            }
+            // Try direct comparison (for plain text passwords)
+            elseif ($password === $db_password) {
+                $login_success = true;
+                
+                // Optional: Convert plain password to hash
+                // $hashed = password_hash($password, PASSWORD_DEFAULT);
+                // $conn->query("UPDATE users_tbl SET password = '$hashed' WHERE id = {$user['id']}");
+            }
+            
+            if ($login_success) {
+                $_SESSION['user_id'] = $user['emp_id'];  // Using emp_id as user_id
+                $_SESSION['emp_id'] = $user['emp_id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_email'] = $user['email_id'];
+                $_SESSION['user_role'] = $user['role'];
+                
+                header("Location: controller/dashboard.php");
+                exit();
+            } else {
+                $alert = "Invalid email or password, or your account is not active!";
+                $alertType = "danger";
+            }
+        }
     } else {
         $alert = "Invalid email or password, or your account is not active!";
         $alertType = "danger";
     }
+    $stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +121,7 @@ if (isset($_POST['login'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>User Authentication</title>
+<title>Training Certificate Generation System</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -109,7 +146,7 @@ body { background: #f8f9fa; }
 <?php endif; ?>
 
 <!-- Login Form -->
-<div class="auth-container border border-primary" id="login-form">
+<div class="auth-container border border-primary shadow rounded" id="login-form">
     <div class="auth-header">
         <i class="bi bi-person-check auth-icon"></i>
         <h3>User Login</h3>
@@ -118,18 +155,18 @@ body { background: #f8f9fa; }
     <form method="POST">
         <div class="mb-3">
             <label class="form-label">Email Address <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" name="email_id" required>
+            <input type="email" class="form-control" name="email_id" required placeholder="Enter Email ID">
         </div>
         <div class="mb-3">
             <label class="form-label">Password <span class="text-danger">*</span></label>
             <div class="input-group">
-                <input type="password" class="form-control" id="login_password" name="password" required>
+                <input type="password" class="form-control" id="login_password" name="password" placeholder="Enter Password" required>
                 <span class="input-group-text password-toggle" onclick="togglePasswordVisibility('login_password')">
                     <i class="bi bi-eye"></i>
                 </span>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100" name="login">Login</button>
+        <button type="submit" class="btn btn-primary w-100" name="login"><i class="fa fa-sign-in"></i> Login</button>
         <div class="text-center mt-3">
             <p>Available Training
             <a href="#" onclick="event.preventDefault(); loadTrainingList(event)">Click Here</a></p>

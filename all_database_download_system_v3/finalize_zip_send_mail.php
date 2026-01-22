@@ -1,134 +1,75 @@
 <?php
-ob_start(); // 🔥 VERY IMPORTANT
-
-session_name('db_backup_session_v1');
+// finalize_zip_send_mail.php
+require_once 'config_send_mail.php';
 session_start();
-
-require_once __DIR__ . '/config_send_mail.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-require_once __DIR__ . '/PHPMailer/PHPMailer.php';
-require_once __DIR__ . '/PHPMailer/SMTP.php';
-require_once __DIR__ . '/PHPMailer/Exception.php';
-
-header('Content-Type: application/json; charset=utf-8');
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-
-/* ==========================
-   AUTH CHECK
-========================== */
 if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
-    ob_clean();
-    echo json_encode(['success' => false, 'message' => 'Not authenticated']);
+    echo json_encode(['success'=>false,'message'=>'Not authenticated']);
     exit;
 }
 
-/* ==========================
-   INPUT
-========================== */
-$input = json_decode(file_get_contents('php://input'), true);
-$stamp = $input['stamp'] ?? null;
-if (!$stamp) {
-    ob_clean();
-    echo json_encode(['success' => false, 'message' => 'Missing stamp']);
+$data = json_decode(file_get_contents('php://input'), true);
+if (!isset($data['stamp'])) {
+    echo json_encode(['success'=>false,'message'=>'Invalid request']);
     exit;
 }
 
-/* ==========================
-   COLLECT SQL FILES
-========================== */
-$files = glob(BACKUP_DIR . '*' . $stamp . '.sql');
-if (empty($files)) {
-    ob_clean();
-    echo json_encode(['success' => false, 'message' => 'No dump files found']);
+$stamp = $data['stamp'];
+$tempDir = sys_get_temp_dir() . '/backup_' . $stamp . '/';
+$zipFileName = 'backup_' . date('Y-m-d_H-i-s') . '.zip';
+$zipFilePath = BACKUP_DIR . $zipFileName;
+
+if (!is_dir($tempDir) || count(glob($tempDir . '*.sql')) === 0) {
+    echo json_encode(['success'=>false,'message'=>'No SQL files found']);
     exit;
 }
 
-/* ==========================
-   CREATE ZIP
-========================== */
-$zipName = 'database_backup_' . date('Ymd_His') . '.zip';
-$zipPath = BACKUP_DIR . $zipName;
+// Create backup directory if it doesn't exist
+if (!is_dir(BACKUP_DIR)) {
+    mkdir(BACKUP_DIR, 0777, true);
+}
 
+// Create ZIP file
 $zip = new ZipArchive();
-if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-    ob_clean();
-    echo json_encode(['success' => false, 'message' => 'Cannot create zip']);
+if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+    echo json_encode(['success'=>false,'message'=>'Cannot create ZIP']);
     exit;
 }
 
-foreach ($files as $f) {
-    $zip->addFile($f, basename($f));
+$files = glob($tempDir . '*.sql');
+foreach ($files as $file) {
+    if (is_file($file)) {
+        $zip->addFile($file, basename($file));
+    }
 }
 $zip->close();
 
-/* ==========================
-   DELETE SQL FILES
-========================== */
-foreach ($files as $f) {
-    @unlink($f);
+// Clean up temp directory
+array_map('unlink', glob($tempDir . '*.sql'));
+if (is_dir($tempDir)) {
+    rmdir($tempDir);
 }
 
-/* ==========================
-   SEND EMAIL
-========================== */
-if (EMAIL_NOTIFY && MAIL_TO !== '') {
-    try {
-        $mail = new PHPMailer(true);
+// Apply retention policy
+$allBackups = glob(BACKUP_DIR . '*.zip');
+usort($allBackups, function($a, $b) {
+    return filemtime($b) - filemtime($a);
+});
 
-        $mail->isSMTP();
-        $mail->Host       = MAIL_HOST;
-        $mail->SMTPAuth   = true;
-        $mail->Username   = MAIL_USERNAME;
-        $mail->Password   = MAIL_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = MAIL_PORT;
-
-        $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
-        $mail->addAddress(MAIL_TO);
-
-        $downloadUrl = 'http://' . $_SERVER['HTTP_HOST'] .
-            dirname($_SERVER['SCRIPT_NAME']) . '/backups/' . $zipName;
-
-        $mail->Subject = "Database Backup Completed: {$zipName}";
-        $mail->Body =
-            "Backup completed successfully.\n\n" .
-            "File: {$zipName}\n" .
-            "Size: " . round(filesize($zipPath) / 1024, 2) . " KB\n" .
-            "Download: {$downloadUrl}";
-
-        $mail->addAttachment($zipPath, $zipName);
-        $mail->send();
-
-    } catch (Exception $e) {
-        error_log('Backup email failed: ' . $mail->ErrorInfo);
+if (count($allBackups) > KEEP_LAST) {
+    for ($i = KEEP_LAST; $i < count($allBackups); $i++) {
+        if (is_file($allBackups[$i])) {
+            unlink($allBackups[$i]);
+        }
     }
 }
 
-/* ==========================
-   CLEAN OLD BACKUPS
-========================== */
-$all = glob(BACKUP_DIR . '*.zip');
-usort($all, fn($a, $b) => filemtime($b) - filemtime($a));
+$size = filesize($zipFilePath);
+$size_text = round($size / 1024, 2) . ' KB';
 
-if (count($all) > KEEP_LAST) {
-    foreach (array_slice($all, KEEP_LAST) as $d) {
-        @unlink($d);
-    }
-}
-
-/* ==========================
-   JSON RESPONSE
-========================== */
-ob_clean();
 echo json_encode([
-    'success'   => true,
-    'filename'  => $zipName,
-    'file'      => 'backups/' . $zipName,
-    'size'      => filesize($zipPath),
-    'size_text' => round(filesize($zipPath) / 1024, 2) . ' KB'
+    'success' => true,
+    'filename' => $zipFileName,
+    'file' => 'backups/' . $zipFileName,
+    'size' => $size,
+    'size_text' => $size_text
 ]);
-exit;

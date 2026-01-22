@@ -5,7 +5,7 @@ error_reporting(0);
 
 // Check if user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: dashboard.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -181,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="urea_form.php">
+                        <a class="nav-link" href="dashboard.php">
                             <i class="fas fa-home"></i> Home
                         </a>
                     </li>

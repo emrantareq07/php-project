@@ -2,7 +2,7 @@
 require_once 'config.php';
 session_start();
 if (!isset($_SESSION['logged']) || $_SESSION['logged'] !== true) {
-    header('Location: login.php'); exit;
+    header('Location: index.php'); exit;
 }
 
 // prepare backups list
@@ -48,7 +48,7 @@ body{background:var(--bg);color:var(--text);transition:.2s}
         <label class="form-check-label small-note ms-2" for="themeSwitch">Dark mode</label>
       </div>
       <a class="btn btn-primary" href="main_dashboard.php"><i class="fa fa-arrow-left"></i> Back</a>
-      <a class="btn btn-outline-secondary" href="login.php?logout=1"><i class="fa fa-sign-out"></i> Logout</a>
+      <a class="btn btn-outline-secondary" href="index.php?logout=1"><i class="fa fa-sign-out"></i> Logout</a>
     </div>
   </div>
 </nav>

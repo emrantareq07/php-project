@@ -6,7 +6,7 @@ $user_type = $_SESSION['user_type'];
 
 // Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: dashboard.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -185,7 +185,7 @@ $result_fetch = mysqli_query($conn, $sql_fetch);
                 <br>
                 <div class="form-group">
                     <button type="submit" name="insert" id="formSubmitBtn" class="btn btn-block btn-primary"><i class="fa fa-save"></i> Insert</button>
-                     <a class="btn btn-primary" id="login-btn" href="urea_form.php"><i class="fa fa-arrow-left"></i> Back </a> 
+                     <a class="btn btn-primary" id="login-btn" href="dashboard.php"><i class="fa fa-arrow-left"></i> Back </a> 
                 </div><br>
             </form>
         </div>

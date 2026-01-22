@@ -29,26 +29,19 @@ include('include/header.php');
 /* function showTable() {
    document.getElementById('welcomeDiv').style.display = "block";
 } */		
-</script>			
-
-
+</script>
 <!--<div id="welcomeDiv"  style="display:none;" class="answer_list" > WELCOME</div>
 <input type="button" name="answer" value="Show Div" onclick="showDiv()" />-->
 			
-<div class="container">
-  
- <div class="row">
-  
-    <div class="col-sm-2">
-      
+<div class="container">  
+ <div class="row">  
+    <div class="col-sm-2">   
       
     </div>
 	<div class="col-sm-6">
 	<h2 class="text-success text-center my-1">Urea Production Report --[All Factory]-- </h2>
-	</div>
-  
-   <div class="col-sm-4">
-     
+	</div>  
+   <div class="col-sm-4">     
       <span class="text-center float-end">
 	  <a href="report_search_by_date.php" class="btn btn-primary">Back to Previous Page</a>
 	  <a href="index.php" class="btn btn-primary">Back to Main Page</a></span>
@@ -60,8 +53,7 @@ include('include/header.php');
 <fieldset class="border p-2 my-2 rounded">
                 <legend class="float-none w-auto p-2">Select Date:</legend>
       <form action="view_report_search_by_date.php" id="search_form" method="post" class="needs-validation" >	
-			<div class="form-group">
-			 
+			<div class="form-group">		 
 			  <div class="form-group">
 			  <label for="date"></label>
 			  <input type="date" class="form-control" id="date" placeholder="Enter Date" name="date" required>
@@ -69,13 +61,9 @@ include('include/header.php');
 			  <div class="invalid-feedback">Please fill out this field.</div>
 			</div>		
 			<center><button type="submit" name="submit" id="submit" class="btn btn-primary pull-middle">Search</button></center>
-			
 			</div>
-
 	  </form>
-	  </fieldset>
-
-    
+	  </fieldset>    
   </div>-->
   
 <div class="row">
@@ -91,16 +79,13 @@ include('include/header.php');
             <th>Daily</th>
             <th>Monthly</th>
             <th>Yearly</th>
-			 <th>Production Target</th>
-			  <th>Due</th>
-			   <th>Plant Load(%)</th>
-			   <th>Causes of Shutdown</th>
+			<th>Production Target</th>
+			<th>Due</th>
+			<th>Plant Load(%)</th>
+			<th>Causes of Shutdown</th>
       </tr>
     </thead>
-    <tbody>
-	
-	
-	
+    <tbody>	
 	
   <?php
 	include('db/db.php');
@@ -180,9 +165,7 @@ include('include/header.php');
 				  $jfcl_yearly=$row['yearly'];
 				  $jfcl_prod_tar=$row['production_target'];
 				  $jfcl_due=$row['due'];
-			  }
-
-			  
+			  }			  
 			  
 			  $afccl_sql="SELECT * FROM afccl WHERE `date` LIKE '{$date}%'";
 			  	$result = mysqli_query($conn, $afccl_sql);
@@ -254,16 +237,12 @@ include('include/header.php');
  // }
  // echo "</table>";
  
-// ?>
-
-	
-	</div>
-	
+// ?>	
+	</div>	
     <div class="col-sm-0">
       <!--<h3><a href="report_view.php">View Report</a></h3>-->
     </div>
-  </div>
- 
+  </div> 
 </div>
 
 <?php

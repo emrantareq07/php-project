@@ -2,6 +2,11 @@
 session_name('dfms');
 session_start();
 ob_start(); // Start output buffering
+error_reporting(0);
+include('../db/db.php');
+
+// Set timezone to Dhaka, Bangladesh
+date_default_timezone_set('Asia/Dhaka');
 
 // Check if the user is already logged in, redirect to the dashboard
 if (!isset($_SESSION['username'])) {

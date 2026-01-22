@@ -92,7 +92,7 @@ td.date-nowrap, th.date-nowrap { white-space: nowrap !important; }
         <!-- Action Buttons -->
         <div class="col-12 col-md-6 text-md-end text-center mt-2 mt-md-0">     
             <div class="d-flex flex-wrap justify-content-center justify-content-md-end gap-2">
-                <a class="btn btn-primary" id="login-btn" href="urea_form.php">
+                <a class="btn btn-primary" id="login-btn" href="dashboard.php">
                     <i class="fa fa-arrow-left"></i> Previous Page
                 </a> 
                 <button onclick="window.print();return false;" class="btn btn-danger" id="print-btn">

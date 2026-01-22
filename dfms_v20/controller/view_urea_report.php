@@ -5,7 +5,7 @@ $table = $_SESSION['username'];
 $user_type = $_SESSION['user_type'];
 
 if (!isset($_SESSION['username'])) {
-  header("Location: dashboard.php");
+  header("Location: login.php");
   exit();
 }
 
@@ -36,7 +36,7 @@ include('../db/db.php');
       </h2>
     </div>
     <div class="col-lg-3 col-md-12 text-center text-lg-end mt-2 mt-lg-0">
-      <a href="urea_form.php?username=<?= $_SESSION['username'] ?>&user_type=<?= $_SESSION['user_type'] ?>" 
+      <a href="dashboard.php?username=<?= $_SESSION['username'] ?>&user_type=<?= $_SESSION['user_type'] ?>" 
          class="btn btn-primary me-2 mb-2 mb-lg-0">
         <i class="fa fa-arrow-left"></i> Previous Page
       </a>

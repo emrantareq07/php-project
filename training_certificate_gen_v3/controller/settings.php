@@ -1,4 +1,5 @@
 <?php
+session_name('training_certificate_gen_db');
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");

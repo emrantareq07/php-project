@@ -1,5 +1,7 @@
 <?php
+session_name('training_certificate_gen_db');
 session_start();
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../index.php"); // Redirect to login if not logged in
     exit();
@@ -7,7 +9,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_name = $_SESSION['user_name'];
 $user_role = $_SESSION['user_role'];
-
+$user_id = $_SESSION['user_id'];
+$emp_id = $_SESSION['emp_id'];
 $email_id = $_SESSION['user_email'];
 ?>
 
@@ -39,7 +42,7 @@ $email_id = $_SESSION['user_email'];
 <div class="container py-5">
     <div class="card shadow-lg p-4">
         <h3>Welcome, <?= htmlspecialchars($user_name) ?> 👋</h3>
-        <p>Your role: <strong class="text-primary"><?= ucfirst($user_role) ?></strong></p>
+        <p>Your role: <strong class="text-primary"><?= ucfirst($user_role) ?></strong> Emp ID: <?= ucfirst($user_id) ?> Email ID: <?= ucfirst($email_id) ?></p>
         
         <hr>
 
@@ -80,6 +83,7 @@ $email_id = $_SESSION['user_email'];
             <ul>
                 <li><a href="my_profile.php" style="text-decoration: none;">🙍 My Profile</a></li>
                 <li><a href="my_certificates.php?email=<?= urlencode($_SESSION['user_email']); ?>" style="text-decoration: none;">🎓 My Certificates</a>
+                    <li><a href="change_pwd.php" style="text-decoration: none;">🙍 Change Password</a></li>
                 </li>
             </ul>
         <?php else: ?>
@@ -87,7 +91,7 @@ $email_id = $_SESSION['user_email'];
         <?php endif; ?>
 
         <hr>
-        <a href="logout.php" class="btn btn-outline-danger fw-bold">Logout</a>
+        <a href="logout.php" class="btn btn-outline-danger fw-bold"><i class="fa fa-sign-out"></i> Logout</a>
         <?php
         require_once "includes/footer.php"; 
         ?>

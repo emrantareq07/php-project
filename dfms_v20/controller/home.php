@@ -4,7 +4,7 @@ error_reporting(0);
 session_start();
 
 if (!isset($_SESSION['username'])) {
-  header("Location: dashboard.php");
+  header("Location: login.php");
   exit();
 }
 
@@ -73,17 +73,17 @@ include('../include/header_index.php');
                     Factory Name
                 </a>
             <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="urea_form.php?val=sfcl&user_type=<?php echo $user_type; ?>">SFCL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=jfcl&user_type=<?php echo $user_type; ?>">JFCL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=afccl&user_type=<?php echo $user_type; ?>">AFCCL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=cufl&user_type=<?php echo $user_type; ?>">CUFL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=gpfplc&user_type=<?php echo $user_type; ?>">GPFPLC</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=tspcl&user_type=<?php echo $user_type; ?>">TSPCL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=dapfcl&user_type=<?php echo $user_type; ?>">DAPFCL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=bisf&user_type=<?php echo $user_type; ?>">BISF</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=cccl&user_type=<?php echo $user_type; ?>">CCCL</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=ugsf&user_type=<?php echo $user_type; ?>">UGSF</a></li>
-            <li><a class="dropdown-item" href="urea_form.php?val=kpml&user_type=<?php echo $user_type; ?>">KPML</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=sfcl&user_type=<?php echo $user_type; ?>">SFCL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=jfcl&user_type=<?php echo $user_type; ?>">JFCL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=afccl&user_type=<?php echo $user_type; ?>">AFCCL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=cufl&user_type=<?php echo $user_type; ?>">CUFL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=gpfplc&user_type=<?php echo $user_type; ?>">GPFPLC</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=tspcl&user_type=<?php echo $user_type; ?>">TSPCL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=dapfcl&user_type=<?php echo $user_type; ?>">DAPFCL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=bisf&user_type=<?php echo $user_type; ?>">BISF</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=cccl&user_type=<?php echo $user_type; ?>">CCCL</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=ugsf&user_type=<?php echo $user_type; ?>">UGSF</a></li>
+            <li><a class="dropdown-item" href="dashboard.php?val=kpml&user_type=<?php echo $user_type; ?>">KPML</a></li>
             </ul>
           </div> 
           <!-- <button onclick="window.print();return false;" class="btn btn-danger" id="print-btn"><i class="fa fa-print"></i> Print</button>      -->

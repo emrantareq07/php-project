@@ -8,7 +8,7 @@ if (isset($_GET['logout'])) {
 }
 
 if (isset($_SESSION['logged']) && $_SESSION['logged'] === true) {
-    header('Location: dashboard.php'); exit;
+    header('Location: main_dashboard.php'); exit;
 }
 
 $err = '';
@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($u === ADMIN_USER && $p === ADMIN_PASS) {
         $_SESSION['logged'] = true;
         $_SESSION['user'] = $u;
-        header('Location: dashboard.php'); exit;
+        header('Location: main_dashboard.php'); exit;
     } else $err = 'Invalid username or password';
 }
 ?>
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head><body>
 <div class="container vh-100 d-flex align-items-center justify-content-center">
   <div class="card p-4 shadow" style="max-width:420px;width:100%;">
-    <h4 class="mb-3">Backup Admin Login</h4>
+    <h4 class="mb-3 text-muted text-center">All Database Backup Admin Login</h4>
     <?php if($err): ?><div class="alert alert-danger"><?php echo htmlspecialchars($err); ?></div><?php endif; ?>
     <form method="post" novalidate>
       <input name="username" class="form-control mb-2" placeholder="Username" required>

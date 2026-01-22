@@ -1,48 +1,77 @@
 <?php
+session_name('training_certificate_gen_db');
 session_start();
-include 'db.php'; // $conn should be your mysqli connection
 
-// Get user ID
-if (!isset($_GET['id'])) die("Invalid request.");
-$user_id = intval($_GET['id']);
+require_once 'db.php';
+require_once 'flash.php';
 
-// Fetch user data
+// ❌ Invalid request
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    setFlash('error', 'Invalid request.');
+    header("Location: my_certificates.php?email=" . urlencode($_SESSION['user_email']));
+    exit;
+}
+
+
+$user_id = (int) $_GET['id'];
+
+// Fetch user
 $stmt = $conn->prepare("SELECT * FROM users_tbl WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
-if (!$user) die("User not found.");
 
-// Fetch authority data by batch
-$stmt2 = $conn->prepare("SELECT * FROM authority_tbl WHERE batch = ? AND active_status='active'");
+// ❌ User not found
+if (!$user) {
+    setFlash('error', 'User not found.');
+    header("Location: my_certificates.php");
+    exit;
+}
+
+// Fetch authority by batch
+$stmt2 = $conn->prepare("
+    SELECT * FROM authority_tbl 
+    WHERE batch = ? AND active_status = 'active'
+");
 $stmt2->bind_param("s", $user['batch']);
 $stmt2->execute();
 $result2 = $stmt2->get_result();
 $authority = $result2->fetch_assoc();
-if (!$authority) die("Traning not completed Yet.Batch : " . htmlspecialchars($user['batch']));
 
-// Build certificate data
+// ❌ Training not completed
+if (!$authority) {
+    setFlash(
+        'warning',
+        'Training not completed yet. Batch: ' . $user['batch']
+    );
+    header("Location: my_certificates.php");
+    exit;
+}
+
+// ✅ Certificate data
 $certificate_data = [
     'participant_name' => $user['name'],
     'training_title'   => $authority['training_title'],
     'start_date'       => $authority['start_date'],
     'end_date'         => $authority['end_date'],
-    'organized_by'         => $authority['organized_by'],
-
+    'organized_by'     => $authority['organized_by'],
     'batch'            => $user['batch'],
-    'name1'            => $authority['name1'],
-    'designation1'     => $authority['designation1'],
-    'office1'          => $authority['office1'],
-    'ministry1'        => $authority['ministry1'],
-    'signature1'       => $authority['signature1'],
-    'name2'            => $authority['name2'],
-    'designation2'     => $authority['designation2'],
-    'office2'          => $authority['office2'],
-    'ministry2'        => $authority['ministry2'],
-    'signature2'       => $authority['signature2']
+
+    'name1' => $authority['name1'],
+    'designation1' => $authority['designation1'],
+    'office1' => $authority['office1'],
+    'ministry1' => $authority['ministry1'],
+    'signature1' => $authority['signature1'],
+
+    'name2' => $authority['name2'],
+    'designation2' => $authority['designation2'],
+    'office2' => $authority['office2'],
+    'ministry2' => $authority['ministry2'],
+    'signature2' => $authority['signature2'],
 ];
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
