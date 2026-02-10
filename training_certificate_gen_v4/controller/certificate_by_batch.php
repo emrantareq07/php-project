@@ -56,14 +56,14 @@ require_once "includes/header.php";
 <div class="container">
     <!-- Download Button Top -->
     <?php if ($certificates): ?>
-    <div class="mb-3 text-end">
+    <div class="mb-0 text-end">
         <button onclick="downloadCertificates()" class="btn btn-success">
                 Download All Certificates (<?= count($certificates); ?>)
             </button>
     </div>
     <?php endif; ?>
     <!-- Batch Select Form -->
-    <form method="get" class="row g-3 mb-2">
+    <form method="get" class="row g-3 mb-0">
         <div class="col-auto">
             <label for="batch" class="col-form-label fw-bold">Select Batch:</label>
         </div>
@@ -99,18 +99,18 @@ require_once "includes/header.php";
                             <div class="header-text">
                                 <h3 class="righteous-regular">Bangladesh Chemical Industries Corporation (BCIC)</h3>
                                 <h4 class="text-primary fw-bold my-2 rowdies-regular ">Ministry of Industries</h4>
-                                <h4 class="text-primary fw-bold rowdies-regular ">People Republic of Bangladesh</h4>
+                                <h4 class="text-primary fw-bold rowdies-regular ">People's Republic of Bangladesh</h4>
                             </div>
                             <img src="../logo/bcic_logo.png" alt="Right Logo" class="logo">
                         </div>
                         <div style="position: relative;">
                         <h2 class=" text-center" style="font-family: 'Certificate', sans-serif; font-size: 56px; font-weight: bold; color: #333;">Certificate of Achievement</h2>
                         <h6 style="position: absolute; top: 5px; right: -10px; color: #6c757d; margin: 0;">
-    Serial No: 
-    <span>
-        BCIC-ICT-DIVISION-B<?= htmlspecialchars($certificate_data['batch']) . '-' . htmlspecialchars($certificate_data['user_id']); ?>
-    </span>
-</h6>
+                        Serial No: 
+                        <span>
+                            BCIC-ICT-DIVISION-B<?= htmlspecialchars($certificate_data['batch']) . '-' . htmlspecialchars($certificate_data['user_id']); ?>
+                        </span>
+                    </h6>
                     </div>                        
                         <div class="participant-name "><h4 class="righteous-regular text-center ">This is to certify that</h4><?= htmlspecialchars($certificate_data['participant_name']); ?> 
                         <p class="certificate-text lobster-two-regular ">

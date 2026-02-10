@@ -65,8 +65,8 @@ include('../db/db.php');
           </thead>
           <tbody>
             <?php
-            if (isset($_SESSION['username'])!='bisf') {
-              $query = "SELECT * FROM $table ORDER BY date DESC";
+   if ($table!='bisf') {
+	   $query = "SELECT * FROM $table ORDER BY date DESC";
             }
             else{
               $query = "SELECT * FROM bisf ORDER BY date DESC, FIELD(product_produce, 'sanitary', 'insulator', 'refractories')";

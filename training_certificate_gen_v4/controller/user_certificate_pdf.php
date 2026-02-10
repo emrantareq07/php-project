@@ -226,7 +226,7 @@ span{ font-size: 10px; color:#4a6491;}
         <div class="header-text">
             <h3 class="righteous-regular">Bangladesh Chemical Industries Corporation (BCIC)</h3>
             <h4 class="text-primary fw-bold mt-2">Ministry of Industries</h4>
-            <h4 class="text-primary fw-bold mt-2" >People Republic of Bangladesh</h4>
+            <h4 class="text-primary fw-bold mt-2" >People's Republic of Bangladesh</h4>
         </div>
         <img src="../logo/bcic_logo.png" alt="Right Logo" class="logo">
     </div>

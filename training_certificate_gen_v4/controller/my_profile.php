@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($update_stmt->execute()) {
             $success = 'Profile updated successfully!';
             // Refresh user data
-            $result = $conn->query("SELECT * FROM users_tbl WHERE emp_id = $user_id");
+            $result = $conn->query("SELECT * FROM users_tbl WHERE emp_id = '$user_id'");
             $user = $result->fetch_assoc();
         } else {
             $error = 'Failed to update profile. Please try again.';
@@ -365,7 +365,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <span class="badge badge-custom badge-designation"><?php echo htmlspecialchars($user['designation']); ?></span>
         </div>
         
-        <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+        <button class="btn btn-edit" data-bs-toggle="modal" data-bs-target="#editProfileModal" readonly>
             <i class="bi bi-pencil-square me-2"></i> Edit Profile
         </button>
     </div>

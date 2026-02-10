@@ -4,6 +4,32 @@ session_start();
 include 'controller/db.php'; // Adjust if needed
 
 /* ===============================
+   GET AVAILABLE TRAININGS
+================================= */
+function getAvailableTrainings($conn) {
+    $current_date = date('Y-m-d');
+    $trainings = [];
+    
+    $sql = "SELECT * FROM authority_tbl 
+            WHERE end_date >= ? 
+            ORDER BY start_date ASC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $current_date);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    while ($row = $result->fetch_assoc()) {
+        $trainings[] = $row;
+    }
+    
+    return $trainings;
+}
+
+// Get training count for badge
+$available_trainings = getAvailableTrainings($conn);
+$training_count = count($available_trainings);
+
+/* ===============================
    USER REGISTRATION
 ================================= */
 if (isset($_POST['register'])) {
@@ -29,6 +55,7 @@ if (isset($_POST['register'])) {
     $maxid = $maxid + 1;
 
     $serial_no = "BCIC-ICT-DIVISION-B{$batch}-{$maxid}";
+    //$serial_no = "BCIC-ICT-DIVISION-B{$batch-1}-{$maxid}";
 
     // Check duplicate for same batch (email or mobile)
     $check = $conn->prepare("
@@ -289,7 +316,7 @@ if (isset($_GET['check_certificate']) && isset($_GET['serial_no'])) {
         
         .login-card {
             max-width: 450px;
-            margin: 40px auto;
+            margin: 10px auto;
         }
         
         .register-card {
@@ -464,6 +491,112 @@ if (isset($_GET['check_certificate']) && isset($_GET['serial_no'])) {
             border-radius: 10px;
             border: none;
         }
+        
+        /* Training Button Badge */
+        .training-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        /* Training Card Styles */
+        .training-card {
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .training-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .training-card.current {
+            border-left: 5px solid #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        .training-card.upcoming {
+            border-left: 5px solid #17a2b8;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .status-current {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+        
+        .status-upcoming {
+            background: rgba(23, 162, 184, 0.15);
+            color: #17a2b8;
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+            color: white;
+        }
+        
+    /* Add this to your existing CSS */
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+
+        .modal {
+            z-index: 1050 !important;
+        }
+
+        /* Fix for modal stacking issue */
+        .modal-backdrop.show {
+            opacity: 0.5;
+        }
+
+        /* Ensure body doesn't get stuck with scrollbar */
+        body.modal-open {
+            overflow: hidden;
+            padding-right: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -519,21 +652,20 @@ if (isset($_GET['check_certificate']) && isset($_GET['serial_no'])) {
                         <i class="bi bi-box-arrow-in-right me-2"></i> Login
                     </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">
-                        <i class="bi bi-person-plus me-2"></i> Register
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="training-tab" data-bs-toggle="tab" data-bs-target="#training" type="button" role="tab">
-                        <i class="bi bi-calendar-check me-2"></i> Trainings
+                <!-- Removed Register Tab -->
+                <li class="nav-item" role="presentation" style="position: relative;">
+                    <button class="nav-link" id="training-tab" data-bs-toggle="tab" data-bs-target="#training" type="button" role="tab" onclick="openTrainingModal()">
+                        <i class="bi bi-calendar-check me-2"></i> Available Trainings
+                        <?php if ($training_count > 0): ?>
+                        <span class="training-badge"><?= $training_count ?></span>
+                        <?php endif; ?>
                     </button>
                 </li>
             </ul>
             
             <div class="tab-content" id="authTabsContent">
                 
-                <!-- Login Tab -->
+                <!-- Login Tab (Always Active) -->
                 <div class="tab-pane fade show active" id="login" role="tabpanel">
                     <div class="card login-card">
                         <div class="card-header">
@@ -564,92 +696,14 @@ if (isset($_GET['check_certificate']) && isset($_GET['serial_no'])) {
                     </div>
                 </div>
                 
-                <!-- Registration Tab -->
-                <div class="tab-pane fade" id="register" role="tabpanel">
-                    <div class="card register-card">
-                        <div class="card-header">
-                            <h4 class="mb-0"><i class="bi bi-person-plus me-2"></i>New Registration</h4>
-                            <p class="mb-0 opacity-75" id="reg_training_info">Select training first from Trainings tab</p>
-                        </div>
-                        <div class="card-body">
-                            <form method="POST" id="registrationForm">
-                                <div class="row mb-3">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Batch Number</label>
-                                        <input type="text" class="form-control" name="batch" id="reg_batch" readonly>
-                                        <div class="form-text small">Auto-filled from selected training</div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Employee ID</label>
-                                        <div class="input-group">
-                                            <input type="text" class="form-control" name="emp_id" id="emp_id" placeholder="Enter Employee ID">
-                                            <button type="button" class="btn btn-outline-primary" onclick="checkExistingEmployee()" id="searchBtn">
-                                                <i class="bi bi-search"></i> Check
-                                            </button>
-                                        </div>
-                                        <div class="form-text small">Enter existing ID to auto-fill</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="name" id="name" required placeholder="Enter full name">
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Designation <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="designation" id="designation" required placeholder="Enter designation">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Office/Organization <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="place_of_posting" id="place_of_posting" required placeholder="Enter office/organization">
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                        <input type="tel" class="form-control" name="mobile_no" id="mobile_no" required placeholder="Enter mobile number">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" name="email_id" id="email_id" required placeholder="Enter email address">
-                                        <div class="form-text small" id="emailStatus"></div>
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Password</label>
-                                    <input type="text" class="form-control" value="1234" readonly>
-                                    <div class="form-text small">Default password is 1234</div>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary w-100 py-2" name="register">
-                                    <i class="bi bi-person-plus me-2"></i> Complete Registration
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                <!-- Registration Tab (Hidden - Only accessible via modal) -->
+                <div class="tab-pane fade" id="register" role="tabpanel" style="display: none;">
+                    <!-- Will be shown only via modal -->
                 </div>
                 
-                <!-- Training Tab -->
+                <!-- Training Tab (Hidden - Only shows modal) -->
                 <div class="tab-pane fade" id="training" role="tabpanel">
-                    <div class="text-center mb-4">
-                        <h4 class="text-primary"><i class="bi bi-calendar-check me-2"></i>Available Training Programs</h4>
-                        <p class="text-muted">Select a training to register</p>
-                    </div>
-                    
-                    <div id="trainingList" class="text-center p-4">
-                        <div class="spinner-border text-primary" role="status"></div>
-                        <p class="mt-2">Loading trainings...</p>
-                    </div>
-                    
-                    <div class="text-center mt-3">
-                        <button class="btn btn-primary" onclick="loadTrainingList()">
-                            <i class="bi bi-arrow-clockwise me-2"></i> Refresh List
-                        </button>
-                    </div>
+                    <!-- Empty - Modal will handle content -->
                 </div>
             </div>
         </div>
@@ -657,41 +711,213 @@ if (isset($_GET['check_certificate']) && isset($_GET['serial_no'])) {
 </div>
 
 <!-- Modals -->
-<!-- Training List Modal -->
-<div class="modal fade" id="trainingModal" tabindex="-1">
+<!-- Available Trainings Modal -->
+<div class="modal fade" id="trainingModal" tabindex="-1" data-bs-backdrop="static">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-calendar-check me-2"></i>Available Trainings</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title"><i class="bi bi-calendar-check me-2"></i>Available Training Programs</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="resetToLoginTab()"></button>
       </div>
-      <div class="modal-body" id="trainingModalBody"></div>
+      <div class="modal-body">
+        <?php if ($training_count > 0): ?>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 text-primary">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Total <?= $training_count ?> training program<?= $training_count > 1 ? 's' : '' ?> available
+                    </h6>
+                    <span class="badge bg-primary"><?= date('d M Y') ?></span>
+                </div>
+                
+                <div class="row" id="trainingCards">
+                    <?php 
+                    $current_date = date('Y-m-d');
+                    foreach ($available_trainings as $training): 
+                        $start_date = $training['start_date'];
+                        $end_date = $training['end_date'];
+                        $is_current = ($current_date >= $start_date && $current_date <= $end_date);
+                        $status_class = $is_current ? 'current' : 'upcoming';
+                        $status_text = $is_current ? 'Ongoing' : 'Upcoming';
+                        $status_badge_class = $is_current ? 'status-current' : 'status-upcoming';
+                    ?>
+                    <div class="col-md-6 mb-3">
+                        <div class="card training-card <?= $status_class ?>">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="badge <?= $status_badge_class ?> status-badge">
+                                            <i class="bi <?= $is_current ? 'bi-play-circle' : 'bi-clock' ?> me-1"></i>
+                                            <?= $status_text ?>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">Batch: <?= $training['batch'] ?></small>
+                                </div>
+                                
+                                <h6 class="card-title text-primary"><?= htmlspecialchars($training['training_title']) ?></h6>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        <?= date('d M Y', strtotime($start_date)) ?> - <?= date('d M Y', strtotime($end_date)) ?>
+                                    </small>
+                                    <small class="text-muted">
+                                        <i class="bi bi-building me-1"></i>
+                                        <?= htmlspecialchars($training['organized_by']) ?>
+                                    </small>
+                                </div>
+                                
+                                <?php if ($is_current): ?>
+                                <div class="alert alert-success py-1 px-3 mb-2" style="font-size: 0.85rem;">
+                                    <i class="bi bi-lightning-charge me-1"></i>
+                                    <strong>Registration Open!</strong> This training is currently running.
+                                </div>
+                                <?php endif; ?>
+                                
+                                <button type="button" class="btn btn-register w-100" 
+                                        onclick="openRegistrationModal('<?= $training['batch'] ?>', '<?= htmlspecialchars($training['training_title']) ?>', '<?= $start_date ?>', '<?= $end_date ?>')">
+                                    <i class="bi bi-person-plus me-2"></i> Register Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                <h5 class="text-muted mt-3">No Training Programs Available</h5>
+                <p class="text-muted">Check back later for upcoming training programs.</p>
+                <button class="btn btn-outline-primary" onclick="loadTrainingList()">
+                    <i class="bi bi-arrow-clockwise me-2"></i> Refresh
+                </button>
+            </div>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Registration Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" data-bs-backdrop="static">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i>Registration Form</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeRegistrationAndBackToTraining()"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" id="registrationForm">
+            <div class="alert alert-info" id="regTrainingInfo">
+                <i class="bi bi-info-circle me-2"></i>
+                <span id="selectedTrainingText">Please select a training first</span>
+            </div>
+            
+            <div class="row mb-0">
+                <div class="col-md-6 mb-0">
+                    <label class="form-label">Batch Number</label>
+                    <input type="text" class="form-control" name="batch" id="reg_batch" readonly>
+                    <div class="form-text small">Auto-filled from selected training</div>
+                </div>
+                <div class="col-md-6 mb-0">
+                    <label class="form-label">Employee ID</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="emp_id" id="emp_id" placeholder="Enter Employee ID">
+                        <button type="button" class="btn btn-outline-primary" onclick="checkExistingEmployee()" id="searchBtn">
+                            <i class="bi bi-search"></i> Check
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="resetEmployee()" id="searchBtn">
+                            <i class="bi bi-close"></i> Reset
+                        </button>
+                    </div>
+                    <div class="form-text small">Enter existing ID to auto-fill</div>
+                </div>
+            </div>
+            
+            <div class="mb-0">
+                <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="name" id="name" required placeholder="Enter full name">
+            
+                <div class="form-text small" id="nameStatus"></div>
+            </div>
+            
+            <div class="row mb-0">
+                <div class="col-md-6 mb-0">
+                    <label class="form-label">Designation <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="designation" id="designation" required placeholder="Enter designation">
+                </div>
+                <div class="col-md-6 mb-0">
+                    <label class="form-label">Office/Organization <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="place_of_posting" id="place_of_posting" required placeholder="Enter office/organization">
+                </div>
+            </div>
+            
+            <div class="row mb-0">
+                <div class="col-md-6 mb-0">
+                    <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" name="mobile_no" id="mobile_no" required placeholder="Enter mobile number">
+
+<div class="form-text small" id="mobileStatus"></div>
+
+
+
+                </div>
+                <div class="col-md-6 mb-0">
+                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email_id" id="email_id" required placeholder="Enter email address">
+                    <div class="form-text small" id="emailStatus"></div>
+                </div>
+            </div>
+            
+            <div class="mb-0">
+                <label class="form-label">Password</label>
+                <input type="text" class="form-control" value="1234" readonly>
+                <div class="form-text small">Default password is 1234</div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2" name="register">
+                <i class="bi bi-person-plus me-2"></i> Complete Registration
+            </button>
+        </form>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Certificate Check Modal -->
-<div class="modal fade" id="certificateModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-award me-2"></i>Verify Certificate</h5>
+        <h5 class="modal-title text-uppercase text-light" id="certificateModalLabel">Certificate Verification</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
-        <div class="mb-3">
-            <label class="form-label">Serial Number</label>
-            <div class="input-group">
-                <span class="input-group-text">BCIC-ICT-DIVISION-B</span>
-                <input type="text" class="form-control" id="certificateSerial" placeholder="2-2">
-                <button class="btn btn-primary" type="button" onclick="checkCertificate()">
-                    <i class="bi bi-search"></i> Verify
-                </button>
-            </div>
-            <div class="form-text small">Enter like: 2-2 (Batch-UserID)</div>
+      <div class="modal-body" id="certificateCheckBody">
+        <div class="text-center mb-1">
+          <i class="bi bi-award-fill text-warning" style="font-size: 3rem;"></i>
+          <h4 class="mt-1">Verify Certificate Authenticity</h4>
+          <p class="text-muted">Enter the certificate serial number (Format: batch-userid)</p>
         </div>
         
-        <div id="certificateResult"></div>
+        <div class="mb-2">
+          <label for="certificateSerial" class="form-label fw-bold">Certificate Serial Number</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light">BCIC-ICT-DIVISION-B</span>
+            <input type="text" class="form-control form-control-lg" id="certificateSerial" placeholder="Enter like: 2-2">
+            <button class="btn btn-primary btn-lg" type="button" onclick="checkCertificate()">
+              <i class="bi bi-search"></i> Verify
+            </button>
+          </div>
+          <div class="form-text">Example: <code>2-2</code> means Batch 2, User ID 2 (Full: BCIC-ICT-DIVISION-B2-2)</div>
+        </div>
+        
+        <div id="certificateResult" class="mt-2">
+          <!-- Results will be shown here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -712,80 +938,494 @@ function togglePasswordVisibility(id) {
     }
 }
 
+// Replace the resetToLoginTab function with this:
+function resetToLoginTab() {
+    document.getElementById('login-tab').click();
+    
+    // Manually remove modal backdrop if it exists
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+    
+    // Remove modal-open class from body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+}
+
+// Also update the closeRegistrationAndBackToTraining function:
+function closeRegistrationAndBackToTraining() {
+    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+    if (registerModal) registerModal.hide();
+    
+    // Manually remove modal backdrop if it exists
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+    
+    // Remove modal-open class from body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    // Reopen training modal
+    setTimeout(() => {
+        openTrainingModal();
+    }, 300);
+}
+
+// Add this function to handle modal hidden event
+function setupModalCleanup() {
+    const trainingModal = document.getElementById('trainingModal');
+    const registerModal = document.getElementById('registerModal');
+    
+    if (trainingModal) {
+        trainingModal.addEventListener('hidden.bs.modal', function () {
+            // Remove backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            // Clean up body classes
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+    
+    if (registerModal) {
+        registerModal.addEventListener('hidden.bs.modal', function () {
+            // Remove backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            // Clean up body classes
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+    }
+}
+
+// Also update the openTrainingModal function:
+function openTrainingModal() {
+    // Always show login tab first
+    document.getElementById('login-tab').click();
+    
+    // Clean any existing backdrop first
+    const existingBackdrop = document.querySelector('.modal-backdrop');
+    if (existingBackdrop) {
+        existingBackdrop.remove();
+    }
+    
+    // Open training modal
+    const trainingModal = new bootstrap.Modal(document.getElementById('trainingModal'));
+    trainingModal.show();
+    
+    // Load training list if needed
+    loadTrainingList();
+}
+
+// Update the openRegistrationModal function:
+function openRegistrationModal(batch, title, start, end) {
+    // Close training modal
+    const trainingModal = bootstrap.Modal.getInstance(document.getElementById('trainingModal'));
+    if (trainingModal) {
+        trainingModal.hide();
+        
+        // Clean up backdrop immediately
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+    
+    // Small delay to ensure modal is closed
+    setTimeout(() => {
+        // Open registration modal
+        const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+        registerModal.show();
+        
+        // Set training info
+        const startDate = new Date(start).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+        const endDate = new Date(end).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+        
+        document.getElementById('selectedTrainingText').innerHTML = 
+            `<strong>${title}</strong><br>${startDate} to ${endDate}`;
+        document.getElementById('reg_batch').value = batch;
+        
+        // Clear form
+        document.getElementById('emp_id').value = '';
+        document.getElementById('name').value = '';
+        document.getElementById('designation').value = '';
+        document.getElementById('place_of_posting').value = '';
+        document.getElementById('mobile_no').value = '';
+        document.getElementById('email_id').value = '';
+        document.getElementById('email_id').readOnly = false;
+        document.getElementById('emailStatus').textContent = '';
+        
+        // Reset search button
+        const searchBtn = document.getElementById('searchBtn');
+        searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+        searchBtn.classList.remove('btn-success', 'btn-danger');
+        searchBtn.classList.add('btn-outline-primary');
+    }, 300);
+}
+
+// Add this to your DOMContentLoaded event listener:
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('login-tab').click();
+    setupModalCleanup(); // Initialize modal cleanup
+});
+
+// Close registration and go back to training modal
+function closeRegistrationAndBackToTraining() {
+    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+    if (registerModal) registerModal.hide();
+    
+    // Reopen training modal
+    setTimeout(() => {
+        openTrainingModal();
+    }, 300);
+}
+
+// Reset to login tab when training modal is closed
+function resetToLoginTab() {
+    document.getElementById('login-tab').click();
+}
+
 // Load training list
 function loadTrainingList() {
-    const target = document.getElementById('trainingList');
-    target.innerHTML = `
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2">Loading trainings...</p>
-    `;
-    
-    fetch("controller/training_list.php", { cache: "no-store" })
-        .then(r => r.text())
-        .then(html => {
-            document.getElementById('trainingModalBody').innerHTML = html;
-            // Switch to registration tab
-            new bootstrap.Tab(document.getElementById('register-tab')).show();
-            new bootstrap.Modal(document.getElementById('trainingModal')).show();
-        })
-        .catch(err => {
-            console.error(err);
-            document.getElementById('trainingModalBody').innerHTML = `<div class="alert alert-danger">Failed to load trainings.</div>`;
-            new bootstrap.Modal(document.getElementById('trainingModal')).show();
-        });
+    // This function is now handled by PHP directly
+    // You can add AJAX refresh if needed
 }
 
-// Open certificate check
+// Open certificate check modal
 function openCertificateCheck() {
+    // Clear previous results
     document.getElementById('certificateResult').innerHTML = '';
     document.getElementById('certificateSerial').value = '';
-    new bootstrap.Modal(document.getElementById('certificateModal')).show();
-    setTimeout(() => document.getElementById('certificateSerial').focus(), 500);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('certificateModal'));
+    modal.show();
+    
+    // Focus on input field
+    setTimeout(() => {
+        document.getElementById('certificateSerial').focus();
+    }, 500);
 }
 
-// Check certificate
+// Check certificate validity
 function checkCertificate() {
     const serialNo = document.getElementById('certificateSerial').value.trim();
     const resultDiv = document.getElementById('certificateResult');
     
     if (!serialNo) {
-        resultDiv.innerHTML = `<div class="alert alert-warning">Please enter serial number.</div>`;
+        resultDiv.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> Please enter a certificate serial number (Format: batch-userid).
+            </div>
+        `;
         return;
     }
     
+    // Validate format: should be like "2-2"
     if (!/^\d+-\d+$/.test(serialNo)) {
-        resultDiv.innerHTML = `<div class="alert alert-warning">Enter like: 2-2</div>`;
+        resultDiv.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> Invalid format. Please enter like: <code>2-2</code>
+            </div>
+        `;
         return;
     }
     
-    resultDiv.innerHTML = `<div class="text-center"><div class="spinner-border text-primary"></div><p>Verifying...</p></div>`;
+    // Show loading
+    resultDiv.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <div class="mt-2">Verifying certificate BCIC-ICT-DIVISION-B${serialNo}...</div>
+        </div>
+    `;
     
-    fetch(`?check_certificate=1&serial_no=${encodeURIComponent(serialNo)}`)
-        .then(r => r.json())
-        .then(data => {
-            if (data.valid) {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-success">
-                        <h6><i class="bi bi-check-circle me-2"></i>Valid Certificate</h6>
-                        <p class="mb-1"><strong>Name:</strong> ${data.participant_name}</p>
-                        <p class="mb-1"><strong>Training:</strong> ${data.training_title}</p>
-                        <p class="mb-1"><strong>Period:</strong> ${data.start_date} to ${data.end_date}</p>
+    // Make AJAX request
+    fetch(`?check_certificate=1&serial_no=${encodeURIComponent(serialNo)}`, {
+        cache: 'no-store'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.valid) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-3" style="font-size: 2rem;"></i>
+                        <div>
+                            <h5 class="mb-1"><i class="bi bi-shield-check"></i> Certificate Verified!</h5>
+                            <p class="mb-0">This certificate is valid and authentic.</p>
+                        </div>
                     </div>
-                `;
-            } else {
-                resultDiv.innerHTML = `
-                    <div class="alert alert-danger">
-                        <h6><i class="bi bi-x-circle me-2"></i>Invalid Certificate</h6>
-                        <p>${data.message}</p>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="bi bi-info-circle"></i> Certificate Details</h6>
                     </div>
-                `;
-            }
-        })
-        .catch(error => {
-            console.error(error);
-            resultDiv.innerHTML = `<div class="alert alert-danger">Verification failed.</div>`;
-        });
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Serial Number:</strong><br>${data.serial_no}</p>
+                                <p><strong>Short Code:</strong><br>${data.short_serial}</p>
+                                <p><strong>Participant Name:</strong><br>${data.participant_name}</p>
+                                <p><strong>Designation:</strong><br>${data.designation}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Office/Organization:</strong><br>${data.place_of_posting}</p>
+                                <p><strong>Batch:</strong><br>${data.batch}</p>
+                                <p><strong>Training Title:</strong><br>${data.training_title}</p>
+                                <p><strong>Training Period:</strong><br>${data.start_date} to ${data.end_date}</p>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-12">
+                                <p><strong>Issued By:</strong><br>${data.organized_by}</p>
+                                <p><strong>Issue Date:</strong><br>${data.issue_date}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="text-center text-muted small">
+                            <i class="bi bi-clock"></i> Verified on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-x-circle-fill me-3" style="font-size: 2rem;"></i>
+                        <div>
+                            <h5 class="mb-1"><i class="bi bi-shield-exclamation"></i> Certificate Not Found</h5>
+                            <p class="mb-0">${data.message}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Warning</h6>
+                    </div>
+                    <div class="card-body">
+                        <p>The serial number <strong>"${serialNo}"</strong> does not exist in our database.</p>
+                        <p class="mb-0">Full serial checked: <code>BCIC-ICT-DIVISION-B${serialNo}</code></p>
+                        <p class="text-danger mt-2 mb-0"><i class="bi bi-info-circle"></i> This certificate may be forged or invalid.</p>
+                    </div>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Certificate check error:', error);
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle"></i> Error verifying certificate. Please try again.
+            </div>
+        `;
+    });
 }
+
+// Allow Enter key to trigger certificate check
+document.getElementById('certificateSerial')?.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkCertificate();
+    }
+});
+
+// // Check existing employee
+// function checkExistingEmployee() {
+//     const empId = document.getElementById('emp_id').value.trim();
+//     const searchBtn = document.getElementById('searchBtn');
+    
+//     if (!empId) {
+//         alert('Please enter Employee ID');
+//         document.getElementById('emp_id').focus();
+//         return;
+//     }
+    
+//     searchBtn.innerHTML = '<i class="bi bi-hourglass"></i>';
+//     searchBtn.disabled = true;
+    
+//     fetch(`?check_emp=1&emp_id=${encodeURIComponent(empId)}`)
+//         .then(r => r.json())
+//         .then(data => {
+//             if (data.exists) {
+//                 document.getElementById('name').value = data.name || '';
+//                 document.getElementById('designation').value = data.designation || '';
+//                 document.getElementById('place_of_posting').value = data.place_of_posting || '';
+//                 document.getElementById('mobile_no').value = data.mobile_no || '';
+//                 document.getElementById('email_id').value = data.email_id || '';
+//                 document.getElementById('email_id').readOnly = true;
+//                 document.getElementById('emailStatus').innerHTML = '<span class="text-success"><i class="bi bi-lock me-1"></i>Locked</span>';
+//                 searchBtn.innerHTML = '<i class="bi bi-check-circle"></i>';
+//                 searchBtn.classList.replace('btn-outline-primary', 'btn-success');
+//                 document.getElementById('name').focus();
+//             } else {
+//                 searchBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
+//                 searchBtn.classList.replace('btn-outline-primary', 'btn-danger');
+//                 setTimeout(() => {
+//                     searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+//                     searchBtn.classList.replace('btn-danger', 'btn-outline-primary');
+//                 }, 2000);
+//             }
+//         })
+//         .catch(error => {
+//             console.error(error);
+//             searchBtn.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+//             searchBtn.classList.replace('btn-outline-primary', 'btn-danger');
+//             setTimeout(() => {
+//                 searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+//                 searchBtn.classList.replace('btn-danger', 'btn-outline-primary');
+//             }, 2000);
+//         })
+//         .finally(() => {
+//             searchBtn.disabled = false;
+//         });
+// }
+
+// // Reset employee form
+// function resetEmployee() {
+//     // Clear all input fields
+//     document.getElementById('emp_id').value = '';
+//     document.getElementById('name').value = '';
+//     document.getElementById('designation').value = '';
+//     document.getElementById('place_of_posting').value = '';
+//     document.getElementById('mobile_no').value = '';
+//     document.getElementById('email_id').value = '';
+
+//     // Unlock email field
+//     document.getElementById('email_id').readOnly = false;
+//     document.getElementById('emailStatus').innerHTML = '';
+
+//     // Reset search button state
+//     const searchBtn = document.getElementById('searchBtn');
+//     searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+//     searchBtn.classList.remove('btn-success', 'btn-danger');
+//     searchBtn.classList.add('btn-outline-primary');
+//     searchBtn.disabled = false;
+
+//     // Focus back on Employee ID field
+//     document.getElementById('emp_id').focus();
+// }
+
+// // Handle form submission
+// document.getElementById('registrationForm').addEventListener('submit', function(e) {
+//     // Optional: Add validation here
+//     const batch = document.getElementById('reg_batch').value;
+//     if (!batch) {
+//         e.preventDefault();
+//         alert('Please select a training first');
+//         return;
+//     }
+// });
+
+// Check existing employee
+// function checkExistingEmployee() {
+//     const empId = document.getElementById('emp_id').value.trim();
+//     const searchBtn = document.getElementById('searchBtn');
+    
+//     if (!empId) {
+//         alert('Please enter Employee ID');
+//         document.getElementById('emp_id').focus();
+//         return;
+//     }
+    
+//     searchBtn.innerHTML = '<i class="bi bi-hourglass"></i>';
+//     searchBtn.disabled = true;
+    
+//     fetch(`?check_emp=1&emp_id=${encodeURIComponent(empId)}`)
+//         .then(r => r.json())
+//         .then(data => {
+//             if (data.exists) {
+//                 document.getElementById('name').value = data.name || '';
+//                 document.getElementById('designation').value = data.designation || '';
+//                 document.getElementById('place_of_posting').value = data.place_of_posting || '';
+//                 document.getElementById('mobile_no').value = data.mobile_no || '';
+//                 document.getElementById('email_id').value = data.email_id || '';
+
+//                 // Make fields readonly like email_id
+//                 document.getElementById('email_id').readOnly = true;
+//                 document.getElementById('name').readOnly = true;
+//                 document.getElementById('mobile_no').readOnly = true;
+
+//                 document.getElementById('emailStatus').innerHTML = '<span class="text-success"><i class="bi bi-lock me-1"></i>Locked</span>';
+//                 searchBtn.innerHTML = '<i class="bi bi-check-circle"></i>';
+//                 searchBtn.classList.replace('btn-outline-primary', 'btn-success');
+//                 document.getElementById('name').focus();
+//             } else {
+//                 searchBtn.innerHTML = '<i class="bi bi-x-circle"></i>';
+//                 searchBtn.classList.replace('btn-outline-primary', 'btn-danger');
+//                 setTimeout(() => {
+//                     searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+//                     searchBtn.classList.replace('btn-danger', 'btn-outline-primary');
+
+//                     // Unlock fields like email_id
+//                     document.getElementById('email_id').readOnly = false;
+//                     document.getElementById('name').readOnly = false;
+//                     document.getElementById('mobile_no').readOnly = false;
+//                 }, 2000);
+//             }
+//         })
+//         .catch(error => {
+//             console.error(error);
+//             searchBtn.innerHTML = '<i class="bi bi-exclamation-triangle"></i>';
+//             searchBtn.classList.replace('btn-outline-primary', 'btn-danger');
+//             setTimeout(() => {
+//                 searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+//                 searchBtn.classList.replace('btn-danger', 'btn-outline-primary');
+
+//                 // Unlock fields like email_id
+//                 document.getElementById('email_id').readOnly = false;
+//                 document.getElementById('name').readOnly = false;
+//                 document.getElementById('mobile_no').readOnly = false;
+//             }, 2000);
+//         })
+//         .finally(() => {
+//             searchBtn.disabled = false;
+//         });
+// }
+
+// // Reset employee form
+// function resetEmployee() {
+//     document.getElementById('emp_id').value = '';
+//     document.getElementById('name').value = '';
+//     document.getElementById('designation').value = '';
+//     document.getElementById('place_of_posting').value = '';
+//     document.getElementById('mobile_no').value = '';
+//     document.getElementById('email_id').value = '';
+
+//     // Unlock fields like email_id
+//     document.getElementById('email_id').readOnly = false;
+//     document.getElementById('name').readOnly = false;
+//     document.getElementById('mobile_no').readOnly = false;
+
+//     document.getElementById('emailStatus').innerHTML = '';
+
+//     const searchBtn = document.getElementById('searchBtn');
+//     searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+//     searchBtn.classList.remove('btn-success', 'btn-danger');
+//     searchBtn.classList.add('btn-outline-primary');
+//     searchBtn.disabled = false;
+
+//     document.getElementById('emp_id').focus();
+// }
 
 // Check existing employee
 function checkExistingEmployee() {
@@ -810,8 +1450,17 @@ function checkExistingEmployee() {
                 document.getElementById('place_of_posting').value = data.place_of_posting || '';
                 document.getElementById('mobile_no').value = data.mobile_no || '';
                 document.getElementById('email_id').value = data.email_id || '';
+
+                // Make fields readonly
                 document.getElementById('email_id').readOnly = true;
+                document.getElementById('name').readOnly = true;
+                document.getElementById('mobile_no').readOnly = true;
+
+                // Show lock icon/status for each
                 document.getElementById('emailStatus').innerHTML = '<span class="text-success"><i class="bi bi-lock me-1"></i>Locked</span>';
+                document.getElementById('nameStatus').innerHTML = '<span class="text-success"><i class="bi bi-lock me-1"></i>Locked</span>';
+                document.getElementById('mobileStatus').innerHTML = '<span class="text-success"><i class="bi bi-lock me-1"></i>Locked</span>';
+
                 searchBtn.innerHTML = '<i class="bi bi-check-circle"></i>';
                 searchBtn.classList.replace('btn-outline-primary', 'btn-success');
                 document.getElementById('name').focus();
@@ -821,6 +1470,16 @@ function checkExistingEmployee() {
                 setTimeout(() => {
                     searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
                     searchBtn.classList.replace('btn-danger', 'btn-outline-primary');
+
+                    // Unlock fields
+                    document.getElementById('email_id').readOnly = false;
+                    document.getElementById('name').readOnly = false;
+                    document.getElementById('mobile_no').readOnly = false;
+
+                    // Clear lock icons/status
+                    document.getElementById('emailStatus').innerHTML = '';
+                    document.getElementById('nameStatus').innerHTML = '';
+                    document.getElementById('mobileStatus').innerHTML = '';
                 }, 2000);
             }
         })
@@ -831,6 +1490,16 @@ function checkExistingEmployee() {
             setTimeout(() => {
                 searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
                 searchBtn.classList.replace('btn-danger', 'btn-outline-primary');
+
+                // Unlock fields
+                document.getElementById('email_id').readOnly = false;
+                document.getElementById('name').readOnly = false;
+                document.getElementById('mobile_no').readOnly = false;
+
+                // Clear lock icons/status
+                document.getElementById('emailStatus').innerHTML = '';
+                document.getElementById('nameStatus').innerHTML = '';
+                document.getElementById('mobileStatus').innerHTML = '';
             }, 2000);
         })
         .finally(() => {
@@ -838,41 +1507,51 @@ function checkExistingEmployee() {
         });
 }
 
-// Called from training_list.php
-function closeModalAndShowRegister(batch = '', title = '', start = '', end = '', organized = '') {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('trainingModal'));
-    if (modal) modal.hide();
-    
-    new bootstrap.Tab(document.getElementById('register-tab')).show();
-    
-    const infoEl = document.getElementById('reg_training_info');
-    if (infoEl) {
-        infoEl.innerHTML = `<strong>${title}</strong><br>${start} to ${end}`;
-    }
-    
-    document.getElementById('reg_batch').value = batch;
-    
-    // Clear form
+// Reset employee form
+function resetEmployee() {
     document.getElementById('emp_id').value = '';
     document.getElementById('name').value = '';
     document.getElementById('designation').value = '';
     document.getElementById('place_of_posting').value = '';
     document.getElementById('mobile_no').value = '';
     document.getElementById('email_id').value = '';
+
+    // Unlock fields
     document.getElementById('email_id').readOnly = false;
-    document.getElementById('emailStatus').textContent = '';
+    document.getElementById('name').readOnly = false;
+    document.getElementById('mobile_no').readOnly = false;
+
+    // Clear lock icons/status
+    document.getElementById('emailStatus').innerHTML = '';
+    document.getElementById('nameStatus').innerHTML = '';
+    document.getElementById('mobileStatus').innerHTML = '';
+
+    const searchBtn = document.getElementById('searchBtn');
+    searchBtn.innerHTML = '<i class="bi bi-search"></i> Check';
+    searchBtn.classList.remove('btn-success', 'btn-danger');
+    searchBtn.classList.add('btn-outline-primary');
+    searchBtn.disabled = false;
+
+    document.getElementById('emp_id').focus();
 }
 
-// Auto-load training list
-document.getElementById('training-tab').addEventListener('shown.bs.tab', loadTrainingList);
+
+
+// Prevent training tab from showing content
+document.getElementById('training-tab').addEventListener('click', function(e) {
+    e.preventDefault();
+    openTrainingModal();
+});
 
 // Enter key for certificate
 document.getElementById('certificateSerial')?.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') checkCertificate();
 });
 
-// Load on page load
-document.addEventListener('DOMContentLoaded', loadTrainingList);
+// On page load, ensure login tab is active
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('login-tab').click();
+});
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 08, 2025 at 12:06 PM
+-- Generation Time: Jan 26, 2026 at 04:21 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -44,21 +44,24 @@ CREATE TABLE `authority_tbl` (
   `office2` varchar(100) NOT NULL,
   `ministry2` varchar(100) NOT NULL,
   `signature2` varchar(255) DEFAULT NULL,
+  `active_status` varchar(10) NOT NULL,
+  `tr_link_status` varchar(50) NOT NULL,
+  `name3` varchar(255) DEFAULT NULL,
+  `designation3` varchar(100) DEFAULT NULL,
+  `office3` varchar(100) DEFAULT NULL,
+  `ministry3` varchar(100) DEFAULT NULL,
+  `signature3` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` date DEFAULT NULL,
-  `active_status` varchar(10) NOT NULL
+  `updated_at` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `authority_tbl`
 --
 
-INSERT INTO `authority_tbl` (`id`, `batch`, `training_title`, `organized_by`, `start_date`, `end_date`, `name1`, `designation1`, `office1`, `ministry1`, `signature1`, `name2`, `designation2`, `office2`, `ministry2`, `signature2`, `created_at`, `updated_at`, `active_status`) VALUES
-(1, '2', 'Digital Transformation and E-Governance Digital Transformation and E-Governance Digital Transformation and E-Governance', '', '2025-08-26', '2025-09-10', 'Designation: Additional Secretary (Training)', 'Designation: Additional Secretary (Training)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'uploads/68b678f221253_signature 300_80.jpg', 'Name: Engr. Md. Anwar Hossain', 'Designation: Director (ICT)', 'Office: Bangladesh Computer Council (BCC)', 'Ministry: Ministry of Posts, Telecommunications and Information Technology', 'uploads/68b678f22131b_signature 300_80.jpg', '2025-09-02 04:56:18', '2025-09-07', 'active'),
-(2, '3', 'Digital Transformation and E-Governance Digital Transformation & E-Governance Digital Transformation and E-Governance\"', 'bcic ict division', '2025-09-01', '2025-09-10', 'test1', 'PD1', 'MOI', 'MOI', 'uploads/68b682abec2eb_signature 300_80.jpg', 'test2', 'PD2', 'MOI', 'MOI', 'uploads/68b682abec3d5_signature 300_80.jpg', '2025-09-02 05:37:47', '2025-09-08', 'active'),
-(3, '1', 'PPR1', '', '2025-09-07', '2025-09-22', 'Designation: Additional Secretary (Training)', 'Designation: Additional Secretary (Training)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'uploads/68bd4b78a19aa_signature1_1756627932.jpg', 'Name: Engr. Md. Anwar Hossain', 'Designation: Director (ICT)', 'Office: Bangladesh Computer Council (BCC)', 'Ministry: Ministry of Posts, Telecommunications and Information Technology', 'uploads/68bd4b78a1acd_signature1_1756627961.jpg', '2025-09-07 09:08:08', NULL, 'Inactive'),
-(4, '4', 'তথ্য অধিকার আইন-২০০৯ বিষয়ক প্রশিক্ষণ।', '', '2025-09-07', '2025-09-23', 'Designation: Additional Secretary (Training)', 'Designation: Additional Secretary (Training)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'uploads/68bd4c457ccb8_signature2_1756634975.jpg', 'Name: Engr. Md. Anwar Hossain', 'Designation: Director (ICT)', 'Office: Bangladesh Computer Council (BCC)', 'Ministry: Ministry of Posts, Telecommunications and Information Technology', 'uploads/68bd4c457cdd8_signature1_1756627932.jpg', '2025-09-07 09:11:33', '2025-09-07', 'Inactive'),
-(5, '5', 'তথ্য অধিকার আইন-২০০৯ বিষয়ক প্রশিক্ষণ।', 'bcic ict division', '2025-09-08', '2025-09-30', 'Designation: Additional Secretary (Training)', 'Designation: Additional Secretary (Training)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'Office: Bangladesh Public Administration Training Centre (BPATC)', 'uploads/68be7eda6e1cf_68b678ba583e0_signature 300_80.jpg', 'Name: Engr. Md. Anwar Hossain', 'Designation: Director (ICT)', 'Office: Bangladesh Computer Council (BCC)', 'Ministry: Ministry of Posts, Telecommunications and Information Technology', 'uploads/68be7eda6e2e5_68b678f22131b_signature 300_80.jpg', '2025-09-08 06:59:38', '2025-09-08', 'Inactive');
+INSERT INTO `authority_tbl` (`id`, `batch`, `training_title`, `organized_by`, `start_date`, `end_date`, `name1`, `designation1`, `office1`, `ministry1`, `signature1`, `name2`, `designation2`, `office2`, `ministry2`, `signature2`, `active_status`, `tr_link_status`, `name3`, `designation3`, `office3`, `ministry3`, `signature3`, `created_at`, `updated_at`) VALUES
+(2, '1', 'Departmental Litigation, Disciplinary & Appeal Rules', 'conducted by Personnel Division, BCIC.', '2026-01-10', '2026-01-30', 'Mr. A.N.M. Shariful Alam', 'Chief of Personnel', 'Bangladesh Chemical Industries Corporation', 'Under Ministry of Industries', 'uploads/68c7939cbdccf_signature.png', 'Mr. Md. Fazlur Rahman', 'Chairman', 'Bangladesh Chemical Industries Corporation', 'Under Ministry of Industries', 'uploads/68c7939cbdde4_signature.png', 'active', 'active', NULL, NULL, NULL, NULL, NULL, '2025-09-15 04:18:36', '2026-01-21'),
+(3, '2', 'web portal', 'bcic ict division', '2026-01-26', '2026-01-27', 'Mr. Md. Solaiman', 'PD1', 'MOI', 'MOI', 'uploads/696da2fef1a87_signature.png', 'Fazlur Rahman', 'PD2', 'MOI', 'MOI', 'uploads/696da2fef1dd9_signature.png', 'Inactive', 'active', NULL, NULL, NULL, NULL, NULL, '2026-01-19 03:20:30', '2026-01-25');
 
 -- --------------------------------------------------------
 
@@ -77,24 +80,26 @@ CREATE TABLE `users_tbl` (
   `office` varchar(100) DEFAULT NULL,
   `mobile_no` varchar(15) DEFAULT NULL,
   `email_id` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL DEFAULT '1234',
+  `password` varchar(255) NOT NULL,
   `role` varchar(50) NOT NULL DEFAULT 'user',
   `status` varchar(20) NOT NULL DEFAULT 'active',
   `batch` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `serial_no` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users_tbl`
 --
 
-INSERT INTO `users_tbl` (`id`, `emp_id`, `name`, `designation`, `division`, `section`, `place_of_posting`, `office`, `mobile_no`, `email_id`, `password`, `role`, `status`, `batch`, `created_at`, `updated_at`) VALUES
-(1, '6594-6', 'Engr. Md. Anwar Hossain', 'Sub Assistant Engr.', 'test', 'test', 'BCIC H.O.', 'ICT', '01718834655', 'test3@yahoo.com', '1234', 'user', 'active', '3', '2025-09-01 09:23:53', '2025-09-08 09:29:20'),
-(2, 'admin', 'test', 'Sub Assistant Engr.', 'test', 'sdf', 'BCIC H.O.', 'ICT', '01718834655', 'test@yahoo.com', '1234', 'sadmin', 'active', '1', '2025-09-01 09:29:36', '2025-09-07 09:12:46'),
-(3, 'admin1', 'PD1', 'PD1', 'test', 'sdf', 'BCIC H.O.', '', '01718834655', 'pd1@yahoo.com', '1234', 'admin', 'active', '2', '2025-09-02 03:36:55', '2025-09-07 09:12:49'),
-(4, 'admin2', 'PD2', 'PD2', 'test', 'A', 'BCIC H.O.', '', '01718834655', 'pd2@yahoo.com', '1234', 'user', 'active', '2', '2025-09-02 03:37:41', '2025-09-07 09:12:53'),
-(5, '11111', 'Mr. S. M. Sohel Ahmed', 'Assistant Manager', 'Civil test', 'sdf', 'BCIC H.O.', 'ICT  Division', '11111111', 'test4@yahoo.com', '1234', 'user', 'active', '2', '2025-09-02 08:22:03', '2025-09-08 07:52:32');
+INSERT INTO `users_tbl` (`id`, `emp_id`, `name`, `designation`, `division`, `section`, `place_of_posting`, `office`, `mobile_no`, `email_id`, `password`, `role`, `status`, `batch`, `created_at`, `updated_at`, `serial_no`) VALUES
+(1, '5620-0', 'sadmin', NULL, NULL, NULL, 'BCIC', 'BCIC', '01718834655', 'test@yahoo.com', '1234', 'sadmin', 'active', '', '2026-01-22 08:28:08', '2026-01-22 08:28:08', ''),
+(2, '11111444', 'MR. A.N.M. SHARIFUL ALAM1', 'Sub Assistant Engr.', '', '', 'BCIC H.O.', '', '335435343', 'shane@gmail.com', '$2y$10$0/PSksgznRfAEDogufvNDeOHpucTKMmIHSCOvvbcCHictmIgcqo8C', 'user', 'active', '2', '2026-01-22 08:28:33', '2026-01-25 09:53:03', 'BCIC-ICT-DIVISION-B2-2'),
+(3, '11111444', 'MR. A.N.M. SHARIFUL ALAM1', 'Chief of Personnel', '', '', 'BCIC H.O', '', '335435343', 'shane@gmail.com', '1234', 'user', 'active', '2', '2026-01-25 03:43:05', '2026-01-25 09:53:03', 'BCIC-ICT-DIVISION-B2-3'),
+(4, '1111122', 'test', 'Sub Assistant Engr.', NULL, NULL, 'BCIC H.O.', NULL, '01718834655', 'cop@bcic.gov.bd', '1234', 'user', 'active', '2', '2026-01-25 09:42:22', '2026-01-25 09:42:22', 'BCIC-ICT-DIVISION-B2-4'),
+(5, '6594-6', 'test', 'Sub Assistant Engr.', NULL, NULL, 'BCIC H.O.', NULL, '01716791307', 'shane@gmail.com', '1234', 'user', 'active', '2', '2026-01-25 09:51:21', '2026-01-25 09:51:21', 'BCIC-ICT-DIVISION-B2-5'),
+(6, '6851-0', 't2', 'test', NULL, NULL, 'tesat', NULL, '23453453242', 'shane4@gmail.com', '1234', 'user', 'active', '2', '2026-01-26 03:20:33', '2026-01-26 03:20:33', 'BCIC-ICT-DIVISION-B2-6');
 
 --
 -- Indexes for dumped tables
@@ -110,9 +115,7 @@ ALTER TABLE `authority_tbl`
 -- Indexes for table `users_tbl`
 --
 ALTER TABLE `users_tbl`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `emp_id` (`emp_id`),
-  ADD UNIQUE KEY `email_id` (`email_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -122,13 +125,13 @@ ALTER TABLE `users_tbl`
 -- AUTO_INCREMENT for table `authority_tbl`
 --
 ALTER TABLE `authority_tbl`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users_tbl`
 --
 ALTER TABLE `users_tbl`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -67,57 +67,176 @@ if ($selected_batch) {
     <title>Attendance Sheet - Training Certificate System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .container { background-color: white; padding: 10px; border-radius: 10px; margin-top: 0px; }
-        .attendance-table { font-size: 0.9rem; }
-        .attendance-table th { background-color: #e9ecef; position: sticky; top: 0; z-index: 10; }
-        .table-wrapper { max-height: 600px; overflow-y: auto; border: 1px solid #dee2e6; }
-        .date-header { white-space: nowrap; }
-        .print-hide { display: none; }
-        @media print {
-            .print-hide { display: none !important; }
-            .container { padding: 0; margin: 0; }
-            .table-wrapper { max-height: none; overflow: visible; }
-            .no-print { display: none !important; }
-            .attendance-table th { position: static; }
-            #header_title { display: none !important; }
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .container {
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+        margin-top: 0px;
+    }
+
+    .attendance-table {
+        font-size: 0.9rem;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .attendance-table th {
+        background-color: #e9ecef;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .table-wrapper {
+        max-height: 600px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+    }
+
+    .date-header {
+        white-space: nowrap;
+    }
+
+    .print-hide {
+        display: none;
+    }
+
+    .attendance-cell { 
+        width: 40px; 
+        text-align: center;
+        border-left: 1px solid #dee2e6 !important;
+        border-right: 1px solid #dee2e6 !important;
+    }
+
+    .combined-info
+    {
+        white-space: pre-line;
+        line-height: 1.2;
+        font-size: 0.85rem;
+    }
+
+    .combined-contact {
+        white-space: pre-line;
+        line-height: 1.2;
+        font-size: 0.85rem;
+    }
+
+    .print-title {
+        display: none;
+    }
+
+    /* ================= PRINT SETTINGS ================= */
+    @media print {
+
+        body {
+            background: #fff;
         }
-        .attendance-cell { 
-            width: 40px; 
+
+        .print-hide,
+        .no-print {
+            display: none !important;
+        }
+
+        .container {
+            padding: 0;
+            margin: 0;
+        }
+
+        .table-wrapper {
+            max-height: none;
+            overflow: visible;
+            border: none;
+        }
+
+        .attendance-table th {
+            position: static;
+        }
+
+
+
+
+
+
+
+
+        #header_title {
+            display: none !important;
+        }
+
+        /* Print title */
+        .print-title { 
+            display: block; 
             text-align: center;
-            border-left: 1px solid #dee2e6 !important;
-            border-right: 1px solid #dee2e6 !important;
+            margin-bottom: 15px;
         }
-        .combined-info {
-            white-space: pre-line;
-            line-height: 1.2;
-            font-size: 0.85rem;
+
+        .print-title h4 {
+            margin-bottom: 5px;
+            text-transform: uppercase;
         }
-        .combined-contact {
-            white-space: pre-line;
-            line-height: 1.2;
-            font-size: 0.85rem;
+
+        .print-title p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
         }
-        .print-title {
-            display: none;
+
+        /* Prevent table breaking & page split lines */
+        table {
+            page-break-inside: auto;
         }
-        @media print {
-            .print-title { 
-                display: block; 
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            .print-title h4 { 
-                margin-bottom: 5px; 
-                text-transform: uppercase;
-            }
-            .print-title p {
-                margin-bottom: 5px;
-                font-size: 0.9rem;
-            }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
         }
-    </style>
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        /* Manual page break if needed */
+        .page-break {
+            page-break-before: always;
+        }
+
+
+.combined-info {
+    white-space: nowrap;
+    overflow: visible;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    
+}
+
+
+
+
+
+
+
+    }
+
+    /* ================= PAGE NUMBER (CHROME SAFE) ================= */
+    @page {
+        margin: 7mm;
+
+        @bottom-right {
+            content: "Page " counter(page);
+            font-size: 12px;
+        }
+    }
+</style>
+
+
 </head>
 <body>
     <?php require_once "includes/header.php"; ?>
@@ -180,21 +299,27 @@ if ($selected_batch) {
 
             <!-- Print-only title (only shows when printing) -->
             <div class="print-title">
-                 <h4 class="text-muted text-uppercase fw-bold">Bangladesh Chemical Industries Corporation</h4>
-                    <h4 class="text-uppercase fw-bold">Attendance Sheet</h4>
+                 <h4 class=" text-uppercase fw-bold">Bangladesh Chemical Industries Corporation</h4>
+                    
                     <!-- <h5>Batch: <?= htmlspecialchars($selected_batch) ?></h5> -->
-                    <h5><strong>Training Title:</strong> <?= htmlspecialchars($authority_data['training_title']) ?></h5>
-                    <p>
+                    <h5>Training On "<?= htmlspecialchars($authority_data['training_title']) ?>"</h5>
+                    <p class="text-center">
                         <!-- <strong>Training Title:</strong> <?= htmlspecialchars($authority_data['training_title']) ?> |  -->
-                        <strong>Period:</strong> <?= date('d/m/Y', strtotime($authority_data['start_date'])) ?> to <?= date('d/m/Y', strtotime($authority_data['end_date'])) ?>
+                        <strong>Duration:</strong> <?= date('d/m/Y', strtotime($authority_data['start_date'])) ?> to <?= date('d/m/Y', strtotime($authority_data['end_date'])) ?>
+                        
                     </p>
+
+                    
+                    <h5 class="text-uppercase fw-bold text-center">Attendance Sheet Of Participants</h5>
+                    <p> <strong>Venue:</strong> ICT Division(4th floor), BCIC Bhaban, 30‑31 Dilkusha C/A, Dhaka‑1000</p>
+
             </div>
 
             <!-- Attendance Sheet (Printable Version) -->
             <div class="mb-3">
                 <div class="text-center mb-3 no-print">
                     <h4 class="text-muted text-uppercase fw-bold">Bangladesh Chemical Industries Corporation</h4>
-                    <h4 class="text-uppercase fw-bold">Attendance Sheet</h4>
+                    <h4 class="text-uppercase fw-bold">Attendance Sheet Of Participants</h4>
                     <!-- <h5>Batch: <?= htmlspecialchars($selected_batch) ?></h5> -->
                     <h5><strong>Training Title:</strong> <?= htmlspecialchars($authority_data['training_title']) ?></h5>
                     <p>
@@ -208,8 +333,8 @@ if ($selected_batch) {
         <thead>
             <tr>
                 <th rowspan="2" width="10" class="text-center align-middle">SL No</th>
-                <th rowspan="2" width="100" class="text-center align-middle">Participants</th>
-                <th rowspan="2" width="100" class="text-center align-middle">Email / Mobile</th>  
+                <th rowspan="2" width="100" class="text-center align-middle">Participants List</th>
+                <th rowspan="2" width="80" class="text-center align-middle">Contact Info</th>  
                 <th colspan="<?= count($date_range) ?>" class="text-center align-middle">Signature</th>
             </tr>
             <tr>
@@ -235,7 +360,7 @@ if ($selected_batch) {
                             <br><?= htmlspecialchars($participant['designation']) ?>
                             <br><?= htmlspecialchars($participant['place_of_posting']) ?>
                         </td>
-                        <td class="combined-contact">
+                        <td class="combined-info">
                             <?= htmlspecialchars($participant['email_id']) ?>
                             <br><?= htmlspecialchars($participant['mobile_no']) ?>
                         </td>

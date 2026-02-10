@@ -1,41 +1,43 @@
 <?php
-// edit_user.php
 session_name('training_certificate_gen_db');
 session_start();
 require_once "db.php";
 
-// Check if admin is logged in
+/* ================= AUTH CHECK ================= */
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'sadmin') {
     header("Location: ../index.php");
     exit;
 }
 
-// Get user ID
+/* ================= GET USER ================= */
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header("Location: manage_users.php");
     exit;
 }
 
-$id = intval($_GET['id']);
+$id = (int)$_GET['id'];
 
-// Fetch user details
 $stmt = $conn->prepare("SELECT * FROM users_tbl WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+$user = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Redirect if user not found
 if (!$user) {
     header("Location: manage_users.php");
     exit;
 }
 
-// Handle form submission
-$success = '';
-$error = '';
+/* ================= OLD IDENTITY ================= */
+$old_email  = $user['email_id'];
+$old_emp_id = $user['emp_id'];
+$old_name   = $user['name'];
+$old_mobile = $user['mobile_no'];
 
+$success = '';
+$error   = '';
+
+/* ================= UPDATE ================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $emp_id           = $_POST['emp_id'];
@@ -52,75 +54,130 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $batch            = $_POST['batch'];
     $password         = trim($_POST['password']);
 
-    /* ================= EMAIL DUPLICATE CHECK ================= */
-    $check_email = $conn->prepare(
-        "SELECT id FROM users_tbl WHERE email_id = ? AND id != ?"
+    /* ========== CHECK IDENTITY CHANGE ========== */
+    $identity_changed = (
+        $email_id  !== $old_email ||
+        $emp_id    !== $old_emp_id ||
+        $name      !== $old_name ||
+        $mobile_no !== $old_mobile
     );
-    $check_email->bind_param("si", $email_id, $id);
-    $check_email->execute();
-    $email_result = $check_email->get_result();
 
-    if ($email_result->num_rows > 0) {
-        $error = "Email ID already exists for another user!";
-    } else {
+    /* ========== FETCH RELATED RECORDS ========== */
+    $related_records = [];
 
-        /* ================= UPDATE LOGIC ================= */
-        if ($password !== '') {
-            // 🔐 Always hash new password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    if ($identity_changed) {
+        $stmt = $conn->prepare("
+            SELECT id, emp_id, name, mobile_no, email_id
+            FROM users_tbl
+            WHERE email_id = ?
+               OR emp_id = ?
+               OR mobile_no = ?
+               OR name = ?
+        ");
+        $stmt->bind_param("ssss", $old_email, $old_emp_id, $old_mobile, $old_name);
+        $stmt->execute();
+        $res = $stmt->get_result();
 
-            $stmt = $conn->prepare("
-                UPDATE users_tbl SET
-                    emp_id=?, name=?, designation=?, division=?, section=?,
-                    place_of_posting=?, office=?, mobile_no=?, email_id=?,
-                    role=?, status=?, batch=?, password=?, updated_at=NOW()
-                WHERE id=?
-            ");
-            $stmt->bind_param(
-                "sssssssssssssi",
-                $emp_id, $name, $designation, $division, $section,
-                $place_of_posting, $office, $mobile_no, $email_id,
-                $role, $status, $batch, $hashed_password, $id
-            );
-
-        } else {
-            // ❌ Do NOT touch password
-            $stmt = $conn->prepare("
-                UPDATE users_tbl SET
-                    emp_id=?, name=?, designation=?, division=?, section=?,
-                    place_of_posting=?, office=?, mobile_no=?, email_id=?,
-                    role=?, status=?, batch=?, updated_at=NOW()
-                WHERE id=?
-            ");
-            $stmt->bind_param(
-                "ssssssssssssi",
-                $emp_id, $name, $designation, $division, $section,
-                $place_of_posting, $office, $mobile_no, $email_id,
-                $role, $status, $batch, $id
-            );
+        while ($row = $res->fetch_assoc()) {
+            $related_records[] = $row;
         }
-
-        if ($stmt->execute()) {
-            $success = "User updated successfully!";
-
-            // Reload user data
-            $stmt->close();
-            $stmt = $conn->prepare("SELECT * FROM users_tbl WHERE id = ?");
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-        } else {
-            $error = "Failed to update user. Please try again.";
-        }
-
         $stmt->close();
     }
 
-    $check_email->close();
+    /* ========== POPUP + MASS UPDATE ========== */
+if ($identity_changed && count($related_records) > 1) {
+
+    // Prepare the text-based table
+    $popup = "The following records will be updated:\\n\\n";
+
+    foreach ($related_records as $r) {
+        $popup .= "ID: {$r['id']}\tEMP: {$r['emp_id']}\tName: {$r['name']}\tMobile: {$r['mobile_no']}\tEmail: {$r['email_id']}\\n";
+    }
+
+    // Escape for JavaScript
+    $js_popup = addslashes($popup);
+
+    // Show alert with table and ask confirmation
+    echo "<script>
+        var proceed = confirm('{$js_popup}');
+        if (!proceed) {
+            window.location.href='manage_users.php';
+        }
+    </script>";
+
+    // Mass update if confirmed
+    $stmt = $conn->prepare("
+        UPDATE users_tbl
+        SET emp_id = ?, name = ?, mobile_no = ?, email_id = ?
+        WHERE email_id = ? OR emp_id = ? OR mobile_no = ? OR name = ?
+    ");
+    $stmt->bind_param(
+        "ssssssss",
+        $emp_id, $name, $mobile_no, $email_id,
+        $old_email, $old_emp_id, $old_mobile, $old_name
+    );
+    $stmt->execute();
+    $stmt->close();
 }
 
+    /* ========== UPDATE CURRENT RECORD ========== */
+    if ($password !== '') {
+
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("
+            UPDATE users_tbl SET
+                emp_id=?, name=?, designation=?, division=?, section=?,
+                place_of_posting=?, office=?, mobile_no=?, email_id=?,
+                role=?, status=?, batch=?, password=?, updated_at=NOW()
+            WHERE id=?
+        ");
+        $stmt->bind_param(
+            "sssssssssssssi",
+            $emp_id, $name, $designation, $division, $section,
+            $place_of_posting, $office, $mobile_no, $email_id,
+            $role, $status, $batch, $hashed_password, $id
+        );
+
+    } else {
+
+        $stmt = $conn->prepare("
+            UPDATE users_tbl SET
+                emp_id=?, name=?, designation=?, division=?, section=?,
+                place_of_posting=?, office=?, mobile_no=?, email_id=?,
+                role=?, status=?, batch=?, updated_at=NOW()
+            WHERE id=?
+        ");
+        $stmt->bind_param(
+            "ssssssssssssi",
+            $emp_id, $name, $designation, $division, $section,
+            $place_of_posting, $office, $mobile_no, $email_id,
+            $role, $status, $batch, $id
+        );
+    }
+
+    /* ========== EXECUTE + RELOAD USER ========== */
+    if ($stmt->execute()) {
+
+        $success = "User updated successfully!";
+
+        /* 🔁 RELOAD USER DATA */
+        $reload = $conn->prepare("SELECT * FROM users_tbl WHERE id = ?");
+        $reload->bind_param("i", $id);
+        $reload->execute();
+        $user = $reload->get_result()->fetch_assoc();
+        $reload->close();
+
+    } else {
+        $error = "Failed to update user.";
+    }
+
+    $stmt->close();
+}
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
