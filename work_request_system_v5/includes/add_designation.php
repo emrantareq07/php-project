@@ -28,7 +28,7 @@ $isAdmin = in_array($role, ['admin','sadmin']);
 <?php if ($isAdmin): ?>
 <div class="row mb-3">
     <div class="col-md-8">
-        <input type="text" id="designation" class="form-control" placeholder="Enter Designation">
+        <input type="text" id="designation" class="form-control"  placeholder="Enter Designation">
     </div>
     <div class="col-md-4 d-grid">
         <button id="saveDesignation" class="btn btn-primary">Save</button>

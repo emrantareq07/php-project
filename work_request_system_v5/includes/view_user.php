@@ -342,7 +342,7 @@ $conn->close();
                     <p><?php echo htmlspecialchars($user['full_name']); ?></p>
                 </div>
                 <div class="user-id">
-                    ID: <?php echo $user['id']; ?> | Emp ID: <?php echo htmlspecialchars($user['emp_id']); ?>
+                    ID: <?php echo $user['id']; ?> | Emp ID: <?php echo htmlspecialchars($user['emp_id']); ?> | Emp Type: <?php echo htmlspecialchars($user['emp_type']); ?>
                 </div>
             </div>
         </div>

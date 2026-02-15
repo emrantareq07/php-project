@@ -19,22 +19,31 @@ require_once 'header_reg.php';
             <form id="registrationForm" method="POST" action="register_process.php">
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="emp_type">EMP Type *</label>
+                        <select id="emp_type" name="emp_type" required>
+                            <option value="">--Select--</option>
+                            <option value="Officer">Officer</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Worker">Worker</option>
+                            <option value="Technician">Technician</option>
+                        </select>
+                        <div class="error" id="designation_error"></div>
+                    </div>
+                     <div class="form-group">
                         <label for="emp_id">Employee ID *</label>
                         <input type="text" id="emp_id" name="emp_id" required 
                                placeholder="Enter your employee ID">
                         <div class="error" id="emp_id_error"></div>
                     </div>
-                    
+                </div>
+                <div class="form-row">  
                     <div class="form-group">
                         <label for="full_name">Full Name *</label>
                         <input type="text" id="full_name" name="full_name" required 
                                placeholder="Enter your full name">
                         <div class="error" id="full_name_error"></div>
                     </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
+                     <div class="form-group">
                         <label for="designation">Designation *</label>
                         <select id="designation" name="designation" required>
                             <option value="">Select Designation</option>
@@ -53,7 +62,9 @@ require_once 'header_reg.php';
                         </select>
                         <div class="error" id="designation_error"></div>
                     </div>
-
+                </div>
+                
+                <div class="form-row">
                     <div class="form-group">
                         <label for="division">Division *</label>
                         <select id="division" name="division" required>
@@ -73,10 +84,7 @@ require_once 'header_reg.php';
                         </select>
                         <div class="error" id="division_error"></div>
                     </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
+                     <div class="form-group">
                         <label for="section">Section *</label>
                         <select id="section" name="section" required>
                             <option value="">Select Section</option>
@@ -95,23 +103,22 @@ require_once 'header_reg.php';
                         </select>
                         <div class="error" id="section_error"></div>
                     </div>
+                </div>
 
-                    
+                <div class="form-row">
                     <div class="form-group">
                         <label for="password">Password *</label>
                         <input type="password" id="password" name="password" required 
                                placeholder="Create a password">
                         <div class="error" id="password_error"></div>
                     </div>
-                </div>
-                
-                <div class="form-group">
+                    <div class="form-group">
                     <label for="confirm_password">Confirm Password *</label>
                     <input type="password" id="confirm_password" name="confirm_password" required 
                            placeholder="Confirm your password">
                     <div class="error" id="confirm_password_error"></div>
-                </div>
-                
+                </div>                
+                </div>  
                 <button type="submit" class="btn-submit">Register</button>
             </form>
             
@@ -129,6 +136,7 @@ require_once 'header_reg.php';
             let isValid = true;
             
             // Get form values
+            const emp_type = document.getElementById('emp_type').value.trim();
             const empId = document.getElementById('emp_id').value.trim();
             const fullName = document.getElementById('full_name').value.trim();
             const designation = document.getElementById('designation').value.trim();

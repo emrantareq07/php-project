@@ -60,7 +60,8 @@ body { font-family: 'Roboto', sans-serif; background: #ffff; padding: 20px; }
     padding-right: 15px;  /* right border width */
     padding-bottom: 20px; /* bottom border width */
     padding-left: 10px;   /* left border width */
-    background: linear-gradient(45deg, #2c3e50, #27ae60, #4a6491);
+     background: linear-gradient(45deg, #2c3e50, #27ae60, #4a6491);
+/*    background: linear-gradient(45deg, #2c3e50, #27ae60, #4a6491);*/ for border color
     border-radius: 20px;
     box-sizing: border-box;
 }

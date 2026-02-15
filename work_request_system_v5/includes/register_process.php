@@ -47,6 +47,7 @@ try {
 }
 
 // Get form data
+$emp_type = trim($_POST['emp_type'] ?? '');
 $emp_id = trim($_POST['emp_id'] ?? '');
 $full_name = trim($_POST['full_name'] ?? '');
 $designation = trim($_POST['designation'] ?? '');
@@ -85,6 +86,11 @@ if (empty($emp_id)) {
 }
 
 // Validate full name
+// Validate emp_type
+if (empty($emp_type)) {
+    $errors[] = 'Employee type is required';
+}
+
 if (empty($full_name)) {
     $errors[] = 'Full name is required';
 } elseif (strlen($full_name) < 2) {
@@ -152,6 +158,7 @@ if ($table_check->num_rows == 0) {
     // Table doesn't exist, create it
     $create_table_sql = "CREATE TABLE users (
         id INT PRIMARY KEY AUTO_INCREMENT,
+        emp_type VARCHAR(100) NOT NULL,
         emp_id VARCHAR(50) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
         full_name VARCHAR(100) NOT NULL,
@@ -174,8 +181,8 @@ if ($table_check->num_rows == 0) {
 }
 
 // Prepare SQL statement
-$sql = "INSERT INTO users (emp_id, password, full_name, designation, division, section, status, role, routine_role, created_at, updated_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+$sql = "INSERT INTO users (emp_type,emp_id, password, full_name, designation, division, section, status, role, routine_role, created_at, updated_at) 
+        VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
 
 $stmt = $conn->prepare($sql);
 
@@ -187,8 +194,9 @@ if ($stmt === false) {
 }
 
 // Bind parameters
-$bind_result = $stmt->bind_param("sssssssss", 
-    $emp_id, 
+$bind_result = $stmt->bind_param("ssssssssss", 
+    $emp_type,
+    $emp_id,     
     $hashed_password, 
     $full_name, 
     $designation, 

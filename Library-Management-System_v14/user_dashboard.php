@@ -301,7 +301,7 @@ $sql = "SELECT
         <div class="col-md-12 d-flex justify-content-between align-items-center">
             <h4 class="fw-bold text-uppercase">USER DASHBOARD</h4>
             <h6 class="fw-bold text-uppercase text-primary text-end">
-                [ Student ID: <?php echo htmlentities($_SESSION['stdid']); ?> ]
+                [ EMP ID: <?php echo htmlentities($_SESSION['stdid']); ?> ]
             </h6>
         </div>
     </div>

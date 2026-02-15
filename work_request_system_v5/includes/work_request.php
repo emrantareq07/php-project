@@ -337,7 +337,7 @@ include "header_test.php"
                             <div class="col-md-4 text-md-end">
                                 <div class="user-badge d-inline-block px-4 py-3 rounded-pill">
                                     <div class="text-white fw-semibold"><?php echo htmlspecialchars($full_name); ?></div>
-                                    <small class="text-white-75 d-block">
+                                    <small class="text-white-50 d-block">
                                         <?php echo htmlspecialchars($designation); ?> | 
                                         <?php echo htmlspecialchars($user_division); ?> - 
                                         <?php echo htmlspecialchars($user_section); ?>
@@ -370,7 +370,7 @@ include "header_test.php"
                         <?php endif; ?>
                         
                         <!-- Quick Tips -->
-                        <div class="quick-tips mb-5">
+                        <div class="quick-tips mb-3">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
                                     <h6 class="text-primary mb-1">

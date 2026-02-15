@@ -2,6 +2,9 @@
 session_name('factory_work_request_db');
 require_once '../db/config.php';
 
+// Set timezone to Dhaka, Bangladesh
+date_default_timezone_set('Asia/Dhaka');
+
 // Check if user is logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: ../index.php");
@@ -803,32 +806,36 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                 </div>
             <?php endif; ?>
             
-                <?php
-                if (
-                    ($user['division'] === "Administration Division" || $user['section'] === "Transport") &&
-                    ($user['routine_role'] === 'section_head' || $user['routine_role'] === 'division_head')
-                ) {
-                    // Transport-specific page
-                    ?>
-                    <div class="nav-item">
-                        <a href="incoming_w_req_transport.php" class="nav-link">
-                            <i class="fas fa-inbox"></i>
-                            <span>Incoming Requests</span>
-                        </a>
-                    </div>
-                    <?php
-                } else {
-                    // General page
-                    ?>
-                    <div class="nav-item">
-                        <a href="incoming_work_request.php" class="nav-link">
-                            <i class="fas fa-inbox"></i>
-                            <span>Incoming Requests</span>
-                        </a>
-                    </div>
-                    <?php
-                }
-                ?>
+               <?php
+// Only show the link if user has a routine_role (not empty)
+if (!empty($user['routine_role'])) {
+    if (
+        ($user['division'] === "Administration Division" || $user['section'] === "Transport") &&
+        ($user['routine_role'] === 'section_head' || $user['routine_role'] === 'division_head')
+    ) {
+        // Transport-specific page
+        ?>
+        <div class="nav-item">
+            <a href="incoming_w_req_transport.php" class="nav-link">
+                <i class="fas fa-inbox"></i>
+                <span>Incoming Requests</span>
+            </a>
+        </div>
+        <?php
+    } else if($user['routine_role'] === 'section_head' || $user['routine_role'] === 'division_head') {
+        // General page
+        ?>
+        <div class="nav-item">
+            <a href="incoming_work_request.php" class="nav-link">
+                <i class="fas fa-inbox"></i>
+                <span>Incoming Requests</span>
+            </a>
+        </div>
+        <?php
+    }
+}
+// If routine_role is empty, nothing will be displayed
+?>
             
             <div class="nav-item">
                 <a href="change_password.php" class="nav-link">
@@ -1202,7 +1209,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                             <div class="action-title">Incoming Requests</div>
                         </a>
                          <?php
-                    } else {
+                    } else if($user['routine_role'] === 'section_head' || $user['routine_role'] === 'division_head'){
                         // General page
                         ?>
                         <a href="incoming_work_request.php" class="action-card">

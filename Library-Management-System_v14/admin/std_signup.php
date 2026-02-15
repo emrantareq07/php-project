@@ -91,7 +91,7 @@ include('includes/header.php');
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>EMP ID<span style="color:red;">*</span></label>
-                                <input class="form-control" type="text" id="StudentId" name="StudentId" onblur="checkAvailability('StudentId', 'user-availability-status2')" required />
+                                <input class="form-control" type="text" id="StudentId" name="StudentId" onblur="checkAvailability('StudentId', 'user-availability-status2')" required placeholder="Enter EMP ID"/>
                                 <span id="user-availability-status2"></span>
                                 <span id="loaderIcon2" class="loader-icon" style="display:none">Checking...</span>
                             </div>
@@ -99,7 +99,7 @@ include('includes/header.php');
                         <div class="col-md-8">
                             <div class="form-group">
                                 <label>Full Name<span style="color:red;">*</span></label>
-                                <input class="form-control" type="text" name="fullanme" required />
+                                <input class="form-control" type="text" name="fullanme" required placeholder="Enter Full Name" />
                             </div>
                         </div>
                     </div>
@@ -158,7 +158,7 @@ include('includes/header.php');
                         <div class="col">
                             <div class="form-group">
                                 <label>PABX/Intercom</label>
-                               <input class="form-control" type="text" name="pabx" id="pabx"  />
+                               <input class="form-control" type="text" name="pabx" id="pabx" placeholder="Enter PABX" />
                             </div>
                         </div>
                     </div>
@@ -166,12 +166,12 @@ include('includes/header.php');
                         <div class="col-md-6">
                     <div class="form-group">
                         <label>Mobile Number<span style="color:red;">*</span></label>
-                        <input class="form-control" type="text" name="mobileno" maxlength="11"  required />
+                        <input class="form-control" type="text" name="mobileno" maxlength="11"  required placeholder="Enter Mobile No."/>
                     </div></div>
                     <div class="col-md-6">
                     <div class="form-group">
                         <label>Email</label>
-                        <input class="form-control" type="email" name="email" id="emailid" onblur="checkAvailability('emailid', 'user-availability-status1')" />
+                        <input class="form-control" type="email" name="email" id="emailid" onblur="checkAvailability('emailid', 'user-availability-status1')" placeholder="Enter Email"/>
                         <span id="user-availability-status1"></span>
                         <span id="loaderIcon1" class="loader-icon" style="display:none">Checking...</span>
                     </div></div></div>
@@ -179,13 +179,13 @@ include('includes/header.php');
                         <div class="col">
                             <div class="form-group">
                                 <label>Password<span style="color:red;">*</span></label>
-                                <input class="form-control" type="password" name="password" id="password" required />
+                                <input class="form-control" type="password" name="password" id="password" required placeholder="Enter Password"/>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group">
                                 <label>Confirm Password<span style="color:red;">*</span></label>
-                                <input class="form-control" type="password" name="confirmpassword" id="confirmpassword" required />
+                                <input class="form-control" type="password" name="confirmpassword" id="confirmpassword" required placeholder="Enter Password"/>
                                 <small id="passwordHelp" class="text-danger" style="display:none">Passwords don't match!</small>
                             </div>
                         </div>
@@ -215,7 +215,7 @@ include('includes/header.php');
                             <div class="form-group">
                                 <label>Blood Group</label>
                                 <select class="form-control" name="std_group" >
-                                    <option value="">Select Group</option>
+                                    <option value="">--Select--</option>
                                     <option>A+</option>
                                     <option>B+</option>
                                     <option>AB+</option>

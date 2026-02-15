@@ -199,6 +199,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit User - <?php echo htmlspecialchars($user['full_name']); ?></title>
+    
     <style>
         /* Similar styles to registration form */
         * {
@@ -269,11 +270,11 @@ $conn->close();
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         label {
@@ -390,21 +391,29 @@ $conn->close();
             <?php endif; ?>
             
             <form method="POST">
-                <div class="form-grid">
+                <div class="form-grid"> 
+                    <div class="form-group">
+                        <label for="emp_type" class="required">Employee Type</label>
+                        <input type="text" id="emp_type" name="emp_type" 
+                               value="<?php echo htmlspecialchars($user['emp_type']); ?>" 
+                               readonly>
+                    </div>                   
                     <div class="form-group">
                         <label for="emp_id" class="required">Employee ID</label>
                         <input type="text" id="emp_id" name="emp_id" 
                                value="<?php echo htmlspecialchars($user['emp_id']); ?>" 
-                               required>
+                               readonly>
                     </div>
-                    
+
+                </div>
+                <div class="form-grid"> 
+
                     <div class="form-group">
                         <label for="full_name" class="required">Full Name</label>
                         <input type="text" id="full_name" name="full_name" 
                                value="<?php echo htmlspecialchars($user['full_name']); ?>" 
                                required>
-                    </div>
-                </div>
+                    </div></div>
                 
                 <div class="form-grid">
                     <div class="form-group">

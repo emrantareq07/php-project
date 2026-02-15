@@ -49,10 +49,10 @@ if ($selected_batch) {
         echo "<div class='alert alert-warning'>Training for batch $selected_batch is not completed. Please set the training status to active.</div>";
     }
 }
-?>
-<?php
+
 require_once "includes/header.php"; 
 ?>
+
 <div class="container">
     <!-- Download Button Top -->
     <?php if ($certificates): ?>
@@ -99,7 +99,7 @@ require_once "includes/header.php";
                             <div class="header-text">
                                 <h3 class="righteous-regular">Bangladesh Chemical Industries Corporation (BCIC)</h3>
                                 <h4 class="text-primary fw-bold my-2 rowdies-regular ">Ministry of Industries</h4>
-                                <h4 class="text-primary fw-bold rowdies-regular ">People's Republic of Bangladesh</h4>
+                                <h4 class="text-primary fw-bold rowdies-regular ">ThePeople's Republic of Bangladesh</h4>
                             </div>
                             <img src="../logo/bcic_logo.png" alt="Right Logo" class="logo">
                         </div>
@@ -178,4 +178,6 @@ function downloadCertificates() {
 }
 </script>
 </body>
+
 </html>
+

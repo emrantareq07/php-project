@@ -721,6 +721,7 @@ $conn->close();
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Emp Type</th>
                             <th>Emp ID</th>
                             <th>Full Name</th>
                             <th>Designation</th>
@@ -746,6 +747,7 @@ $conn->close();
                             <?php foreach ($users as $user): ?>
                                 <tr>
                                     <td><?php echo $user['id']; ?></td>
+                                    <td><?php echo htmlspecialchars($user['emp_type']); ?></td>
                                     <td>
                                         <strong><?php echo htmlspecialchars($user['emp_id']); ?></strong>
                                     </td>

@@ -114,6 +114,14 @@ $conn->close();
 <html>
 <head>
     <title>Update Profile</title>
+     <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Add similar styles as registration page */
         body { 
@@ -210,8 +218,8 @@ $conn->close();
 </head>
 <body>
     <div class="container">
-        <h2>Update Profile</h2>
-        
+        <h2 class="text-muted text-uppercase">Update Profile</h2>
+        <h5  class="text-muted text-center" >Emp ID: <?php echo $user['emp_id']?></h5>
         <?php if ($message): ?>
             <div class="message success"><?php echo $message; ?></div>
         <?php endif; ?>

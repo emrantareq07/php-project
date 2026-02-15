@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 22, 2026 at 05:42 AM
+-- Generation Time: Feb 15, 2026 at 11:16 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -111,7 +111,7 @@ INSERT INTO `designation` (`id`, `designation`) VALUES
 (54, 'Head Master'),
 (55, 'Senior Technical Officer'),
 (56, 'Assistant Chief Accountant'),
-(57, 'A.C.F.O'),
+(57, 'Additional Chief Finance Officer'),
 (58, 'Assistant Chief Auditor'),
 (59, 'Computer Operator'),
 (60, 'Data Entry Operator'),
@@ -188,7 +188,7 @@ INSERT INTO `designation` (`id`, `designation`) VALUES
 (134, 'Assistant Cashier'),
 (135, 'Accounts Assistant'),
 (136, 'Supervisor'),
-(137, 'A.C.I.O'),
+(137, 'Additional Chief Insurance Officer'),
 (138, 'Additional Chief Auditor'),
 (139, 'Junior Programmer'),
 (140, 'Security Guard'),
@@ -909,7 +909,9 @@ INSERT INTO `users` (`id`, `emp_type`, `emp_id`, `password`, `full_name`, `desig
 (8, '', '5620-4', '$2y$12$KypWb93MnifYY9wgmr/yL.WB39RQf7HHn8mShefT2xwF3ChYeJ4Fu', 'Kamal', 'Additional Chief Engineer', 'MTS (Electrical)', 'Electrical Maintenance (EM)', 'active', 'user', 'division_head', '', '2025-12-28 09:33:53', '2025-12-29 08:19:39'),
 (9, '', '4569-8', '$2y$12$a7tsBKVcXYVxKXyixOWKsOecV8GQySrcTPpro/FlkBrWW82Hwuxou', 'Gias', 'Deputy Chief Engineer', 'MTS (Mechanical)', 'Civil', 'active', 'user', 'section_head', '', '2026-01-01 03:35:29', '2026-01-01 05:15:21'),
 (10, '', '4956-9', '$2y$12$LeJXRgRhjFemFhqawz8RfuhY9O45N7Wj97O3NVa7lFllvigD0/HEG', 'Mr. Md. Mahmudul Hasan Chowdhury', 'Deputy Chief Engineer', 'ICT Division', 'ICT', 'active', 'admin', NULL, '', '2026-01-01 05:45:17', '2026-01-01 10:08:23'),
-(11, '', '7079-8', '$2y$12$P/jEkmIVW5epJH1oh6XX1u0Me070HnS01CNKHKR57.3IG5addRsQS', 'Transport', 'Executive Engineer', 'Administration Division', 'Transport', 'active', 'user', 'section_head', 'fc_officer', '2026-01-13 06:27:47', '2026-01-13 06:28:19');
+(11, '', '7079-8', '$2y$12$P/jEkmIVW5epJH1oh6XX1u0Me070HnS01CNKHKR57.3IG5addRsQS', 'Transport', 'Executive Engineer', 'Administration Division', 'Transport', 'active', 'user', 'section_head', 'fc_officer', '2026-01-13 06:27:47', '2026-01-13 06:28:19'),
+(12, '', '2136-9', '$2y$12$wML4MNPMuDVLqwEtZrU2Qu4azhrvBDRVnhX2kZoNAgB/N8ODJkaqW', 'Tipu', 'ST. CUM COMPUTER OPERATOR', 'MTS Division', 'Plant Maintenance (PM)', 'active', 'user', NULL, 'fc_officer', '2026-02-15 04:55:44', '2026-02-15 04:55:44'),
+(13, 'Staff', '4563-5', '$2y$12$fgEckmuPQrW2Q.N0JggJIe9L37b9gsZNKZ9LPCrwIKfM4145qqGpe', 'hasan rahman b', 'ST. CUM COMPUTER OPERATOR', 'Technical Division', 'Technical', 'active', 'user', NULL, 'fc_officer', '2026-02-15 05:16:36', '2026-02-15 09:57:48');
 
 -- --------------------------------------------------------
 
@@ -965,7 +967,11 @@ INSERT INTO `user_edit_logs` (`id`, `admin_id`, `user_id`, `changes`, `edited_at
 (2, 5, 10, '{\"admin\":\"sadmin\",\"user\":\"4956-9\",\"changes\":{\"emp_id\":\"4956-9\",\"full_name\":\"Mr. Md. Mahmudul Hasan Chowdhury\",\"designation\":\"Deputy Chief Engineer\",\"division\":\"ICT Division\",\"section\":\"ICT\",\"status\":\"active\",\"role\":\"admin\",\"routine_role\":\"\"}}', '2026-01-01 05:45:43'),
 (3, 5, 10, '{\"admin\":\"sadmin\",\"user\":\"4956-9\",\"changes\":{\"emp_id\":\"4956-9\",\"full_name\":\"Mr. Md. Mahmudul Hasan Chowdhury\",\"designation\":\"Deputy Chief Engineer\",\"division\":\"ICT Division\",\"section\":\"ICT\",\"status\":\"inactive\",\"role\":\"admin\",\"routine_role\":\"\"}}', '2026-01-01 10:02:17'),
 (4, 5, 4, '{\"admin\":\"sadmin\",\"user\":\"6851-0\",\"changes\":{\"emp_id\":\"6851-0\",\"full_name\":\"JFCL\",\"designation\":\"Deputy Chief Engineer\",\"division\":\"MTS (Mechanical)\",\"section\":\"Machinery Maintenance (MM)\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"section_head\"}}', '2026-01-06 06:56:59'),
-(5, 5, 11, '{\"admin\":\"sadmin\",\"user\":\"7079-8\",\"changes\":{\"emp_id\":\"7079-8\",\"full_name\":\"Transport\",\"designation\":\"Executive Engineer\",\"division\":\"Administration Division\",\"section\":\"Transport\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"section_head\"}}', '2026-01-13 06:28:19');
+(5, 5, 11, '{\"admin\":\"sadmin\",\"user\":\"7079-8\",\"changes\":{\"emp_id\":\"7079-8\",\"full_name\":\"Transport\",\"designation\":\"Executive Engineer\",\"division\":\"Administration Division\",\"section\":\"Transport\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"section_head\"}}', '2026-01-13 06:28:19'),
+(6, 5, 13, '{\"admin\":\"sadmin\",\"user\":\"4563-5\",\"changes\":{\"emp_type\":\"Staff\",\"emp_id\":\"4563-5\",\"full_name\":\"hasan rahman b\",\"designation\":\"ST. CUM COMPUTER OPERATOR\",\"division\":\"Technical Division\",\"section\":\"Technical\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"\"}}', '2026-02-15 09:55:27'),
+(7, 5, 13, '{\"admin\":\"sadmin\",\"user\":\"4563-5\",\"changes\":{\"emp_type\":\"Staff\",\"emp_id\":\"4563-5\",\"full_name\":\"hasan rahman b\",\"designation\":\"ST. CUM COMPUTER OPERATOR\",\"division\":\"Technical Division\",\"section\":\"Technical\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"\"}}', '2026-02-15 09:56:41'),
+(8, 5, 13, '{\"admin\":\"sadmin\",\"user\":\"4563-5\",\"changes\":{\"emp_type\":\"Staff\",\"emp_id\":\"4563-5\",\"full_name\":\"hasan rahman b\",\"designation\":\"ST. CUM COMPUTER OPERATOR\",\"division\":\"Technical Division\",\"section\":\"Technical\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"\"}}', '2026-02-15 09:57:08'),
+(9, 5, 13, '{\"admin\":\"sadmin\",\"user\":\"4563-5\",\"changes\":{\"emp_type\":\"Staff\",\"emp_id\":\"4563-5\",\"full_name\":\"hasan rahman b\",\"designation\":\"ST. CUM COMPUTER OPERATOR\",\"division\":\"Technical Division\",\"section\":\"Technical\",\"status\":\"active\",\"role\":\"user\",\"routine_role\":\"\"}}', '2026-02-15 09:57:48');
 
 -- --------------------------------------------------------
 
@@ -1026,7 +1032,8 @@ INSERT INTO `work_request_tbl` (`id`, `emp_id`, `date`, `w_req_type`, `w_locatio
 (15, '', '2026-01-12', 'Civil', 'Technical Building', 'fdgdfg dsfgfsdfs sdfsdfs', 'MTS (Mechanical)', 'Civil', 'incomplete', 'normal', '', '', 1, 'test', 'Assistant Manager', 'ICT Division', 'ICT', '2026-01-12 06:13:49', '2026-01-12 06:13:49'),
 (19, '6594-6', '2026-01-12', 'Transport', 'Transport Request - sylhet', 'Transport request for Cost estimate commitee', 'Transport Division', 'Transport', 'incomplete', 'normal', 'Transport Type: Official', '', 1, 'test', 'Assistant Manager', 'ICT Division', 'ICT', '2026-01-12 06:35:00', '2026-01-12 06:35:00'),
 (20, '6594-6', '2026-01-12', 'Electrical', 'Power station dfff', 'fdsf dfsfsdf sdfsdfsd', 'MTS (Electrical)', 'Electrical Maintenance (EM)', 'incomplete', 'normal', '', '', 1, 'test', 'Assistant Manager', 'ICT Division', 'ICT', '2026-01-12 10:27:23', '2026-01-12 10:27:23'),
-(21, '6594-6', '2026-01-12', 'Transport', 'Transport Request - sylhet', 'Transport request for gfgf', 'Transport Division', 'Transport', 'incomplete', 'normal', 'Transport Type: Official', '', 1, 'test', 'Assistant Manager', 'ICT Division', 'ICT', '2026-01-12 10:31:34', '2026-01-12 10:31:34');
+(21, '6594-6', '2026-01-12', 'Transport', 'Transport Request - sylhet', 'Transport request for gfgf', 'Transport Division', 'Transport', 'incomplete', 'normal', 'Transport Type: Official', '', 1, 'test', 'Assistant Manager', 'ICT Division', 'ICT', '2026-01-12 10:31:34', '2026-01-12 10:31:34'),
+(22, '4563-5', '2026-02-15', 'Electrical', 'NO2 Plant', 'Need Necessary Electric bulb', 'MTS (Electrical)', 'Electrical Maintenance (EM)', 'incomplete', 'normal', '', '', 13, 'hasan rahman', 'ST. CUM COMPUTER OPERATOR', 'Technical Division', 'Technical', '2026-02-15 08:48:20', '2026-02-15 08:50:44');
 
 --
 -- Indexes for dumped tables
@@ -1238,7 +1245,7 @@ ALTER TABLE `transport_w_req_tbl`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `users_tbl`
@@ -1250,7 +1257,7 @@ ALTER TABLE `users_tbl`
 -- AUTO_INCREMENT for table `user_edit_logs`
 --
 ALTER TABLE `user_edit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `work_request_history`
@@ -1262,7 +1269,7 @@ ALTER TABLE `work_request_history`
 -- AUTO_INCREMENT for table `work_request_tbl`
 --
 ALTER TABLE `work_request_tbl`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Constraints for dumped tables
