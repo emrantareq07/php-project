@@ -78,7 +78,13 @@ $total_days += count($d);
 <body class="container mt-4">
 
 <h3 class="mb-4">Monthly FC Dashboard</h3>
-
+  <a href="my_fc_sheet.php" class=""><i class="fas fa-key"></i> My FC
+                            
+                        </a>
+                        <br>
+ <a href="fc_monthly_report.php" class=""><i class="fas fa-key"></i>  FC Monthly Report
+                            
+                        </a>                       
 <div class="row">
 
 <div class="col-md-3">
