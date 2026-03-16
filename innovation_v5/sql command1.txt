@@ -1,0 +1,13 @@
+SELECT e.fullname, e.address, e.contact_no, e.email, d.dept_name FROM employee e JOIN department d  ON e.dept_id=d.dept_id;
+
+SELECT e.fullname, e.address, e.contact_no, e.email, d.dept_name, des.des_name FROM employee e JOIN department d ON e.dept_id=d.dept_id JOIN designation des ON e.des_id=des.des_id;
+
+SELECT e.fullname, e.address, e.contact_no, e.email, d.dept_name, des.des_name FROM employee e JOIN department d ON e.dept_id=d.dept_id JOIN designation des ON e.des_id=des.des_id ORDER BY e.fullname;
+
+ALTER TABLE employee ADD FOREIGN KEY (dept_id) REFERENCES department(dept_id);
+
+SELECT fiscal_year, count(fiscal_year) no_of_award, COUNT(inventors_emp_id) no_of_officer FROM innovation WHERE fiscal_year="২০১৮-১৯"
+
+SELECT fiscal_year, count(fiscal_year) no_of_award, COUNT(inventors_emp_id) no_of_officer FROM innovation WHERE fiscal_year="২০১৮-১৯"
+UNION
+SELECT fiscal_year, count(fiscal_year) no_of_award, COUNT(inventors_emp_id) no_of_officer FROM innovation WHERE fiscal_year="২০১৯-২০"
