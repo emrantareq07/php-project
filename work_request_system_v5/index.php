@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     
     // Validate credentials
-    $stmt = $conn->prepare("SELECT id, emp_id, password, full_name, role, status FROM users WHERE emp_id = ?");
+    $stmt = $conn->prepare("SELECT id, emp_id, password, full_name, role,emp_type, status FROM users WHERE emp_id = ?");
     $stmt->bind_param("s", $emp_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['emp_id'] = $user['emp_id'];
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['emp_type'] = $user['emp_type'];
             $_SESSION['logged_in'] = true;
             
             // Redirect to dashboard

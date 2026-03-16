@@ -16,7 +16,7 @@ $user_id = $_SESSION['user_id'];
 $emp_id = $_SESSION['emp_id'];
 $full_name = $_SESSION['full_name'];
 $role = $_SESSION['role'];
-
+$emp_type = $_SESSION['emp_type'];
 // Define work request types
 $work_types = ['ICT', 'Civil', 'Transport', 'Electrical', 'Mechanical'];
 
@@ -31,6 +31,7 @@ $_SESSION['designation'] = $user['designation'];
 $_SESSION['division']  = $user['division'];
 $_SESSION['section']  = $user['section'];
 $_SESSION['emp_id']  = $user['emp_id'];
+$_SESSION['emp_type']  = $user['emp_type'];
 $routine_role = $user['routine_role'];
 
 $stmt->close();
@@ -783,6 +784,12 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                         <span>My Requests</span>
                     </a>
                 </div>
+                   <div class="nav-item">
+                    <a href="my_fc_sheet.php" class="nav-link">
+                        <i class="fas fa-list-check"></i>
+                        <span>My FC</span>
+                    </a>
+                </div>
             <?php endif; ?>
             
             <?php if($role === 'admin' || $role === 'sadmin'): ?>
@@ -802,6 +809,13 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                     <a href="reports.php" class="nav-link">
                         <i class="fas fa-chart-bar"></i>
                         <span>Reports</span>
+                    </a>
+                </div>
+
+                  <div class="nav-item">
+                    <a href="fc_dashboard.php" class="nav-link">
+                        <i class="fas fa-list-check"></i>
+                        <span>FC Dashboard</span>
                     </a>
                 </div>
             <?php endif; ?>
@@ -905,6 +919,9 @@ if (!empty($user['routine_role'])) {
                     ?>
                     <span class="<?php echo $roleClass; ?>">
                         <?php echo ucfirst($role); ?>
+                    </span>
+                    <span class="text-white badge bg-info">
+                        <?php echo ucfirst($_SESSION['emp_type'] ); ?>
                     </span>
                     <span class="text-white badge bg-primary">
                         <?php 

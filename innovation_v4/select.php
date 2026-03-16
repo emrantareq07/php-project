@@ -17,7 +17,7 @@
                 </tr>  
                 <tr>  
                      <td width="30%"><label>সেবা/আইডিয়া/উদ্ভাবনের সংক্ষিপ্ত বর্নণা</label></td>  
-                     <td width="70%">'.$row["des_of_invention"].'</td>  
+                     <td width="70%" style="text-align: justify;">'.$row["des_of_invention"].'</td>  
                 </tr>  
                 
                 ';  

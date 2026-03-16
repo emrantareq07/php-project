@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 15, 2026 at 11:16 AM
+-- Generation Time: Mar 15, 2026 at 09:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -282,6 +282,38 @@ INSERT INTO `division` (`id`, `division`) VALUES
 (85, 'MTS (Electrical)'),
 (86, 'test'),
 (87, 'test f');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fc_tbl`
+--
+
+CREATE TABLE `fc_tbl` (
+  `id` int(11) NOT NULL,
+  `emp_id` varchar(50) DEFAULT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `designation` varchar(100) DEFAULT NULL,
+  `division` varchar(100) DEFAULT NULL,
+  `section` varchar(100) DEFAULT NULL,
+  `current_date` date DEFAULT NULL,
+  `month` varchar(50) NOT NULL,
+  `date` text DEFAULT NULL,
+  `time_from` text DEFAULT NULL,
+  `time_to` text DEFAULT NULL,
+  `total_hours` text DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fc_tbl`
+--
+
+INSERT INTO `fc_tbl` (`id`, `emp_id`, `name`, `designation`, `division`, `section`, `current_date`, `month`, `date`, `time_from`, `time_to`, `total_hours`, `remarks`, `created_at`, `updated_at`) VALUES
+(1, '4665-5', 'fared', 'Sub Assistant Engr.', 'Administration Division', 'pm', '2026-03-15', '01', '01-01-2026,02-01-2026,03-01-2026,04-01-2026,05-01-2026,06-01-2026,07-01-2026,08-01-2026,09-01-2026,10-01-2026,11-01-2026,12-01-2026,13-01-2026,14-01-2026,15-01-2026,16-01-2026,17-01-2026,18-01-2026,19-01-2026,20-01-2026,21-01-2026,22-01-2026,23-01-2026,24-01-2026,25-01-2026,26-01-2026,27-01-2026,28-01-2026,29-01-2026,30-01-2026,31-01-2026', '02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM', '05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM', '3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3', ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,', '2026-03-15 08:41:09', '2026-03-15 08:41:09'),
+(2, '4665-5', 'fared', 'Sub Assistant Engr.', 'Administration Division', 'pm', '2026-03-15', '02', '01-02-2026,02-02-2026,03-02-2026,04-02-2026,05-02-2026,06-02-2026,07-02-2026,08-02-2026,09-02-2026,10-02-2026,11-02-2026,26-02-2026,27-02-2026,28-02-2026', '02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM,02:00 PM', '05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM,05:00 PM', '3,3,3,3,3,3,3,3,3,3,3,3,3,3', ',,,,,,,,,,,,,', '2026-03-15 08:42:56', '2026-03-15 08:42:56');
 
 -- --------------------------------------------------------
 
@@ -879,7 +911,7 @@ INSERT INTO `transport_w_req_tbl` (`id`, `work_request_id`, `requester_id`, `emp
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `emp_type` varchar(100) NOT NULL,
+  `emp_type` enum('officer','staff','','') NOT NULL,
   `emp_id` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL COMMENT 'Stores hashed password using bcrypt/scrypt/argon2',
   `full_name` varchar(100) NOT NULL,
@@ -905,13 +937,13 @@ INSERT INTO `users` (`id`, `emp_type`, `emp_id`, `password`, `full_name`, `desig
 (4, '', '6851-0', '$2y$12$uq2nMdp2EkK8z9cCMRWqUejfRt3DIy0G3YHne9q/FS2pKmPPb6gW2', 'JFCL', 'Deputy Chief Engineer', 'MTS (Mechanical)', 'Machinery Maintenance (MM)', 'active', 'user', 'section_head', '', '2025-12-07 07:55:57', '2026-01-06 07:43:23'),
 (5, '', 'sadmin', '$2y$10$BWyOp9JLrXXzrRUp.2Jreu38rDdVfY.OcBozlvEW8BAY61yOW/3di', 'sadmin', NULL, NULL, NULL, 'active', 'sadmin', NULL, '', '2025-12-07 09:57:34', '2025-12-07 09:57:34'),
 (6, '', '5620-0', '$2y$12$CsvVGcIgYWDXI7OvGXSEDeBHfc/c/hzofTFfiMafuNZ53ySTXl/82', 'emran', 'Assistant Programmer', 'MTS (Electrical)', 'Electrical Maintenance (EM)', 'active', 'user', 'section_head', '', '2025-12-18 03:37:49', '2025-12-29 08:21:32'),
-(7, '', '4665-5', '$2y$12$vQjPNckNm//I3jtQqKQhZeClZQhJJO8OKHVYFwzfqA4oy/xgSWZW.', 'fared', 'Sub Assistant Engr.', 'HR', 'pm', 'active', 'user', NULL, '', '2025-12-18 03:39:45', '2025-12-18 03:39:45'),
+(7, 'officer', '4665-5', '$2y$12$vQjPNckNm//I3jtQqKQhZeClZQhJJO8OKHVYFwzfqA4oy/xgSWZW.', 'fared', 'Sub Assistant Engr.', 'Administration Division', 'pm', 'active', 'user', NULL, '', '2025-12-18 03:39:45', '2026-03-12 06:18:34'),
 (8, '', '5620-4', '$2y$12$KypWb93MnifYY9wgmr/yL.WB39RQf7HHn8mShefT2xwF3ChYeJ4Fu', 'Kamal', 'Additional Chief Engineer', 'MTS (Electrical)', 'Electrical Maintenance (EM)', 'active', 'user', 'division_head', '', '2025-12-28 09:33:53', '2025-12-29 08:19:39'),
 (9, '', '4569-8', '$2y$12$a7tsBKVcXYVxKXyixOWKsOecV8GQySrcTPpro/FlkBrWW82Hwuxou', 'Gias', 'Deputy Chief Engineer', 'MTS (Mechanical)', 'Civil', 'active', 'user', 'section_head', '', '2026-01-01 03:35:29', '2026-01-01 05:15:21'),
 (10, '', '4956-9', '$2y$12$LeJXRgRhjFemFhqawz8RfuhY9O45N7Wj97O3NVa7lFllvigD0/HEG', 'Mr. Md. Mahmudul Hasan Chowdhury', 'Deputy Chief Engineer', 'ICT Division', 'ICT', 'active', 'admin', NULL, '', '2026-01-01 05:45:17', '2026-01-01 10:08:23'),
 (11, '', '7079-8', '$2y$12$P/jEkmIVW5epJH1oh6XX1u0Me070HnS01CNKHKR57.3IG5addRsQS', 'Transport', 'Executive Engineer', 'Administration Division', 'Transport', 'active', 'user', 'section_head', 'fc_officer', '2026-01-13 06:27:47', '2026-01-13 06:28:19'),
-(12, '', '2136-9', '$2y$12$wML4MNPMuDVLqwEtZrU2Qu4azhrvBDRVnhX2kZoNAgB/N8ODJkaqW', 'Tipu', 'ST. CUM COMPUTER OPERATOR', 'MTS Division', 'Plant Maintenance (PM)', 'active', 'user', NULL, 'fc_officer', '2026-02-15 04:55:44', '2026-02-15 04:55:44'),
-(13, 'Staff', '4563-5', '$2y$12$fgEckmuPQrW2Q.N0JggJIe9L37b9gsZNKZ9LPCrwIKfM4145qqGpe', 'hasan rahman b', 'ST. CUM COMPUTER OPERATOR', 'Technical Division', 'Technical', 'active', 'user', NULL, 'fc_officer', '2026-02-15 05:16:36', '2026-02-15 09:57:48');
+(12, 'officer', '2136-9', '$2y$12$wML4MNPMuDVLqwEtZrU2Qu4azhrvBDRVnhX2kZoNAgB/N8ODJkaqW', 'Tipu', 'Executive Engineer', 'MTS (Mechanical)', 'Plant Maintenance (PM)', 'active', 'user', NULL, '', '2026-02-15 04:55:44', '2026-03-12 06:18:54'),
+(13, 'staff', '4563-5', '$2y$12$fgEckmuPQrW2Q.N0JggJIe9L37b9gsZNKZ9LPCrwIKfM4145qqGpe', 'hasan rahman b', 'ST. CUM COMPUTER OPERATOR', 'Technical Division', 'Technical', 'active', 'user', NULL, '', '2026-02-15 05:16:36', '2026-03-12 06:18:59');
 
 -- --------------------------------------------------------
 
@@ -1062,6 +1094,12 @@ ALTER TABLE `division`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `fc_tbl`
+--
+ALTER TABLE `fc_tbl`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `log_table`
 --
 ALTER TABLE `log_table`
@@ -1192,6 +1230,12 @@ ALTER TABLE `designation`
 --
 ALTER TABLE `division`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
+
+--
+-- AUTO_INCREMENT for table `fc_tbl`
+--
+ALTER TABLE `fc_tbl`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `log_table`
