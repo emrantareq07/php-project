@@ -20,6 +20,7 @@ $division = $_POST['division'] ?? '';
 $fax = $_POST['fax'] ?? '';
 $status = $_POST['status'] ?? 'active';
 $blood_group = $_POST['blood_group'] ?? '';
+$address= $_POST['address'] ?? '';
 
 // Validate required fields
 if (empty($emp_id) || empty($name) || empty($designation) || empty($mobile)) {
@@ -67,14 +68,14 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 // Insert into database
 $sql = "INSERT INTO emp_tbl (
     emp_id, name, designation, office, phone_office, intercom, 
-    mobile, email, department, division,blood_group, image, fax, status,system_status
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?,'approved')";
+    mobile, email, department, division,blood_group, image, fax, address,status,system_status
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?,?, ?,'approved')";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-    "ssssssssssssss", 
+    "sssssssssssssss", 
     $emp_id, $name, $designation, $office, $phone_office, $intercom,
-    $mobile, $email, $department, $division,$blood_group, $image_path, $fax, $status
+    $mobile, $email, $department, $division,$blood_group, $image_path, $fax, $address, $status
 );
 
 if ($stmt->execute()) {

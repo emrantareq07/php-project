@@ -11,7 +11,7 @@ $id = $_POST['id'] ?? '';
 $emp_id = $_POST['emp_id'] ?? '';
 $name = $_POST['name'] ?? '';
 $designation = $_POST['designation'] ?? '';
-// $office = $_POST['office'] ?? '';
+$blood_group = $_POST['blood_group'] ?? '';
 $phone_office = $_POST['phone_office'] ?? '';
 $intercom = $_POST['intercom'] ?? '';
 $mobile = $_POST['mobile'] ?? '';
@@ -21,7 +21,7 @@ $division = $_POST['division'] ?? '';
 $fax = $_POST['fax'] ?? '';
 $status = $_POST['status'] ?? 'active';
 $system_status = $_POST['system_status'] ?? 'approved';
-
+$address= $_POST['address'] ?? '';
 // Validate required fields
 if (empty($id) || empty($emp_id) || empty($name) || empty($designation) || empty($mobile)) {
     die('Required fields are missing');
@@ -84,29 +84,29 @@ if (!empty($image_path)) {
     // Update with new image
     $sql = "UPDATE emp_tbl SET 
         emp_id = ?, name = ?, designation = ?, phone_office = ?, 
-        intercom = ?, mobile = ?, email = ?, department = ?, division = ?, 
-        image = ?, fax = ?, status = ?, system_status = ?, updated_at = NOW() 
+        intercom = ?, mobile = ?, email = ?, department = ?, division = ?, blood_group = ?, 
+        image = ?, fax = ?, address= ?,status = ?, system_status = ?, updated_at = NOW() 
         WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "sssssssssssssi", // Fixed: Added missing comma and corrected parameter count
+        "sssssssssssssssi", // Fixed: Added missing comma and corrected parameter count
         $emp_id, $name, $designation, $phone_office, $intercom,
-        $mobile, $email, $department, $division, $image_path, $fax, $status, $system_status, $id
+        $mobile, $email, $department, $division,$blood_group, $image_path, $fax, $address,$status, $system_status, $id
     );
 } else {
     // Update without changing image
     $sql = "UPDATE emp_tbl SET 
         emp_id = ?, name = ?, designation = ?, phone_office = ?, 
-        intercom = ?, mobile = ?, email = ?, department = ?, division = ?, 
-        fax = ?, status = ?, system_status = ?, updated_at = NOW() 
+        intercom = ?, mobile = ?, email = ?, department = ?, division = ?, blood_group = ?,
+        fax = ?,address= ?, status = ?, system_status = ?, updated_at = NOW() 
         WHERE id = ?";
     
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        "ssssssssssssi", // Fixed: Corrected parameter count
+        "ssssssssssssssi", // Fixed: Corrected parameter count
         $emp_id, $name, $designation, $phone_office, $intercom,
-        $mobile, $email, $department, $division, $fax, $status, $system_status, $id
+        $mobile, $email, $department, $division, $blood_group,$fax, $address,$status, $system_status, $id
     );
 }
 

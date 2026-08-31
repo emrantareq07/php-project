@@ -1,0 +1,392 @@
+<?php
+session_name('man_power_db');
+session_start();
+include('../db/db.php');
+
+if (!isset($_SESSION['username'])) {
+    echo "<div class='alert alert-danger'>Unauthorized access</div>";
+    exit;
+}
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if ($id <= 0) {
+    echo "<div class='alert alert-danger'>Invalid record ID</div>";
+    exit;
+}
+
+$month_key = isset($_GET['month_key']) ? $_GET['month_key'] : '';
+$month_name = isset($_GET['month_name']) ? $_GET['month_name'] : '';
+$month_name_en = date('F', strtotime($month_key . '-01'));
+$month_name_bn = convertToBanglaMonth($month_name_en);
+
+// Year বের করা
+$year_en = date('Y', strtotime($month_key . '-01'));
+$year_bn = enToBn($year_en);
+
+// মাস বাংলায় রূপান্তরের ফাংশন
+function convertToBanglaMonth($englishMonth) {
+    $months = [
+        'January'   => 'জানুয়ারি',
+        'February'  => 'ফেব্রুয়ারি',
+        'March'     => 'মার্চ',
+        'April'     => 'এপ্রিল',
+        'May'       => 'মে',
+        'June'      => 'জুন',
+        'July'      => 'জুলাই',
+        'August'    => 'আগস্ট',
+        'September' => 'সেপ্টেম্বর',
+        'October'   => 'অক্টোবর',
+        'November'  => 'নভেম্বর',
+        'December'  => 'ডিসেম্বর'
+    ];
+
+    return $months[$englishMonth] ?? $englishMonth;
+}
+
+function enToBn($number) {
+    $en = ['0','1','2','3','4','5','6','7','8','9'];
+    $bn = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+    return str_replace($en, $bn, (string)$number);
+}
+
+function formatBanglaDate($date) {
+    $timestamp = strtotime($date);
+
+    $day = enToBn(date('d', $timestamp));
+    $month_en = date('F', $timestamp);
+    $month_bn = convertToBanglaMonth($month_en);
+    $year = enToBn(date('Y', $timestamp));
+
+    return $day . ' ' . $month_bn . ' ' . $year;
+}
+function formatBanglaDateTime($date) {
+    $timestamp = strtotime($date);
+
+    $day = enToBn(date('d', $timestamp));
+    $month_bn = convertToBanglaMonth(date('F', $timestamp));
+    $year = enToBn(date('Y', $timestamp));
+
+    $time = enToBn(date('h:i:s A', $timestamp));
+
+    return $day . ' ' . $month_bn . ' ' . $year . ' ' . $time;
+}
+
+// Helper function to convert CSV to array
+function csvToArray($csv) {
+    if (empty($csv)) return [];
+    return array_map('intval', explode(',', $csv));
+}
+
+
+// Structure definition
+$structure = [
+    'প্রথম শ্রেণী' => ['grades' => range(1, 9), 'grade_range' => '১-৯'],
+    'দ্বিতীয় শ্রেণী' => ['grades' => [10], 'grade_range' => '১০'],
+    'তৃতীয় শ্রেণী' => ['grades' => range(11, 16), 'grade_range' => '১১-১৬'],
+    'চতুর্থ শ্রেণী' => ['grades' => range(17, 20), 'grade_range' => '১৭-২০'],
+    'শ্রমিক' => ['grades' => range(1, 20), 'grade_range' => '১-২০']
+];
+
+// Calculate total grades count
+$total_grades = 0;
+foreach ($structure as $classData) {
+    $total_grades += count($classData['grades']);
+}
+
+// Fetch record
+$sql = "SELECT * FROM vacant_statistics_tbl WHERE id = $id LIMIT 1";
+$result = $conn->query($sql);
+
+if (!$result || $result->num_rows == 0) {
+    echo "<div class='alert alert-danger'>Record not found</div>";
+    exit;
+}
+
+$record = $result->fetch_assoc();
+
+// Parse CSV data
+$granted_array = csvToArray($record['granted_post']);
+$service_array = csvToArray($record['in_service']);
+$promo_array = csvToArray($record['eligible_promotion']);
+$recruit_array = csvToArray($record['direct_recruit']);
+
+// Pad arrays
+while (count($granted_array) < $total_grades) $granted_array[] = 0;
+while (count($service_array) < $total_grades) $service_array[] = 0;
+while (count($promo_array) < $total_grades) $promo_array[] = 0;
+while (count($recruit_array) < $total_grades) $recruit_array[] = 0;
+
+// Calculate totals
+$total_granted = array_sum($granted_array);
+$total_service = array_sum($service_array);
+$total_promo = array_sum($promo_array);
+$total_recruit = array_sum($recruit_array);
+$total_vacant = $total_promo + $total_recruit;
+
+$entry_date = !empty($record['entry_date']) ? $record['entry_date'] : $record['created_at'];
+?>
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>শূন্য পদ পরিসংখ্যান - বিস্তারিত</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans Bengali', sans-serif; padding: 20px; background: #f8f9fa; }
+        .summary-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .info-table { background: white; border-radius: 10px; }
+        .print-header { text-align: center; margin-bottom: 0px; padding-bottom: 0px; border-bottom: 0px solid #333; display: none; }
+        .stat-box { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 15px; text-align: center; margin: 5px; }
+        .stat-number { font-size: 24px; font-weight: bold; }
+        @media print {
+            body { padding: 0; margin: 0; background: white; }
+            .no-print { display: none !important; }
+            .print-header { display: block !important; }
+            .table { font-size: 12px; }
+            .summary-card { background: #f8f9fa; color: #333; border: 1px solid #ddd; }
+            .stat-box { background: #f0f0f0; color: #333; }
+            .modal-content { border: none; }
+            .modal-header, .modal-footer { display: none; }
+            @page {
+                    size: Letter portrait; /* Portrait মোডে বাধ্য করবে */
+                    margin: 10mm;      /* চাইলে মার্জিন সেট করতে পারো */
+                }
+        }
+        /*@page { size: landscape; margin: 1cm; }*/
+           .print-footer {
+                    text-align: center;
+                    margin-top: 2px;
+                    padding-top: 9px;
+                    border-top: 1px solid #dee2e6;
+                    font-size: 10px;
+                    color: #6c757d;
+                }
+    </style>
+</head>
+<body>
+
+<div class="print-header">
+    <h3>বাংলাদেশ কেমিক্যাল ইন্ডাস্ট্রিজ কর্পোরেশন</h3>
+    <h6>বিসিআইসি ভবন, ৩০-৩১, দিলকুশা বা/এ, ঢাকা-১০০০</h6>
+    <h5>শূন্য পদ পরিসংখ্যান প্রতিবেদন</h5>
+    <p>প্রতিবেদন তৈরির তারিখ: <?php echo formatBanglaDate(date('Y-m-d')); ?></p>
+</div>
+
+<div class="container-fluid">
+    <!-- Basic Information -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card info-table">
+                <div class="card-header bg-primary text-white no-print">
+                    <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>মৌলিক তথ্য</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <th style="width: 40%">কারখানার নাম:</th>
+                            <td class="text-uppercase"><strong><?php echo htmlspecialchars($record['factory_name']); ?></strong></td>
+                        </tr>
+                        <tr>
+                            <th>এন্ট্রির তারিখ:</th>
+                            <td><?php echo formatBanglaDate($entry_date); ?></td>
+                        </tr>
+                        <tr>
+                            <th>মাস/বছর:</th>
+                            <td>
+                        <?php 
+                        echo convertToBanglaMonth(date('F', strtotime($entry_date))) . ' ' . enToBn(date('Y', strtotime($entry_date))); 
+                        ?>
+                        </td>
+                        </tr>
+                        <tr>
+                            <th>তৈরির তারিখ:</th>
+                            <td><?php echo formatBanglaDateTime($record['created_at']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>সর্বশেষ আপডেট:</th>
+                            <td><?php echo formatBanglaDateTime($record['updated_at']); ?></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Statistics -->
+        <div class="col-md-6">
+            <div class="card summary-card no-print">
+                <div class="card-body">
+                    <h6 class="mb-3"><i class="fas fa-chart-bar me-2"></i>সারসংক্ষেপ</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <small>মোট অনুমোদিত পদ</small>
+                                <div class="stat-number"><?php echo enToBn($total_granted); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <small>মোট কর্মরত</small>
+                                <div class="stat-number"><?php echo enToBn($total_service); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <small>পদোন্নতিযোগ্য</small>
+                                <div class="stat-number"><?php echo enToBn($total_promo); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <small>সরাসরি নিয়োগযোগ্য</small>
+                                <div class="stat-number"><?php echo enToBn($total_recruit); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <div class="stat-box bg-danger text-white">
+                                <small>মোট শূন্য পদ</small>
+                                <div class="stat-number"><?php echo enToBn($total_vacant); ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grade-wise Detailed Table -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h6 class="mb-0"><i class="fas fa-table me-2"></i>গ্রেড ভিত্তিক বিস্তারিত তথ্য</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm mb-0">
+                    <thead class="table-primary">
+                        <tr>
+                            <th style="width: 12%">শ্রেণী</th>
+                            <th style="width: 10%">গ্রেড</th>
+                            <th style="width: 15%">অনুমোদিত পদ</th>
+                            <th style="width: 15%">কর্মরত</th>
+                            <th style="width: 18%">পদোন্নতিযোগ্য</th>
+                            <th style="width: 18%">সরাসরি নিয়োগ</th>
+                            <th style="width: 12%">মোট শূন্য</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $global_idx = 0;
+                        foreach ($structure as $className => $classData): 
+                            $grades = $classData['grades'];
+                            $span = count($grades);
+                            foreach ($grades as $i => $gNum): 
+                                $granted_val = $granted_array[$global_idx] ?? 0;
+                                $service_val = $service_array[$global_idx] ?? 0;
+                                $promo_val = $promo_array[$global_idx] ?? 0;
+                                $recruit_val = $recruit_array[$global_idx] ?? 0;
+                                $vacant_val = $promo_val + $recruit_val;
+                        ?>
+                        <tr>
+                            <?php if($i === 0): ?>
+                                <td rowspan="<?php echo $span; ?>" style="background-color: #f0f5fb; vertical-align: middle;">
+                                    <strong><?php echo $className; ?></strong>
+                                    <br><small>(গ্রেড <?php echo $classData['grade_range']; ?>)</small>
+                                 </td>
+                            <?php endif; ?>
+                            <td class="text-center">গ্রেড <?php echo enToBn($gNum); ?></td>
+                            <td class="text-center"><?php echo enToBn($granted_val); ?></td>
+                            <td class="text-center"><?php echo enToBn($service_val); ?></td>
+                            <td class="text-center"><?php echo enToBn($promo_val); ?></td>
+                            <td class="text-center"><?php echo enToBn($recruit_val); ?></td>
+                            <td class="text-center text-danger fw-bold"><?php echo enToBn($vacant_val); ?></td>
+                        </tr>
+                        <?php 
+                            $global_idx++;
+                            endforeach; 
+                        endforeach; 
+                        ?>
+                    </tbody>
+                    <tfoot class="table-secondary">
+                        <tr>
+                            <td colspan="2" class="text-end fw-bold">সর্বমোট:</td>
+                            <td class="text-center fw-bold"><?php echo enToBn($total_granted); ?></td>
+                            <td class="text-center fw-bold"><?php echo enToBn($total_service); ?></td>
+                            <td class="text-center fw-bold"><?php echo enToBn($total_promo); ?></td>
+                            <td class="text-center fw-bold"><?php echo enToBn($total_recruit); ?></td>
+                            <td class="text-center text-danger fw-bold"><?php echo enToBn($total_vacant); ?></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <!-- Signature Section -->
+        <div class="row mt-2">
+           <div class="col-md-12 text-center">
+                <div style="border-top: 0px solid #000; width: auto; margin: 0 auto; padding-top: 0px;">
+                    <strong><small>সিস্টেম জেনারেটেড ডকুমেন্ট। স্বাক্ষরের প্রয়োজন নাই।</small></strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="print-footer">
+            Design & Developed by ICT Division, BCIC.
+        </div>
+    <div class="mt-4 text-center no-print">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeModal()">
+            <i class="fas fa-times"></i> বন্ধ করুন
+        </button>
+        <button type="button" class="btn btn-primary" onclick="printRecord()">
+            <i class="fas fa-print"></i> প্রিন্ট করুন
+        </button>
+    </div>
+    <div class="text-center mt-2">
+  <small class="text-muted bangla-number ">
+প্রতিবেদন তৈরির তারিখ: <?php echo enToBn(date('d-m-Y')); ?>
+</small></div>
+</div>
+
+<script>
+function printRecord() {
+    // Store original title
+    var originalTitle = document.title;
+    document.title = 'Vacant_Statistics_Report_' + '<?php echo $record['factory_name']; ?>';
+    
+    // Trigger print
+    window.print();
+    
+    // Restore title after print dialog closes
+    setTimeout(function() {
+        document.title = originalTitle;
+    }, 100);
+}
+
+function closeModal() {
+    // Find and close the modal
+    var modal = document.querySelector('#viewModal');
+    if (modal) {
+        var bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+            bootstrapModal.hide();
+        }
+    }
+}
+
+// Auto trigger print when page loads (if print parameter is present)
+<?php if(isset($_GET['print']) && $_GET['print'] == '1'): ?>
+window.onload = function() {
+    setTimeout(function() {
+        window.print();
+    }, 500);
+}
+<?php endif; ?>
+</script>
+
+</body>
+</html>

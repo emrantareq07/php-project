@@ -522,3 +522,13 @@
 2025-12-10 13:13:29 - Preparing INSERT for new record
 2025-12-10 13:13:29 - Load mode detected - skipping duplicate check for Load ID: 4
 2025-12-10 13:13:29 - Inserted new record ID 10 from Load ID: 4
+2026-04-06 13:38:01 - === SAVE_DATA STARTED ===
+2026-04-06 13:38:01 - ID: null, Load ID: null
+2026-04-06 13:38:01 - Processing 14 section entries
+2026-04-06 13:38:01 - Preparing INSERT for new record
+2026-04-06 13:38:01 - Inserted new record ID 11
+2026-04-06 15:13:21 - === SAVE_DATA STARTED ===
+2026-04-06 15:13:21 - ID: 11, Load ID: null
+2026-04-06 15:13:21 - Processing 14 section entries
+2026-04-06 15:13:21 - Preparing UPDATE for ID 11
+2026-04-06 15:13:21 - Updated ID 11 successfully

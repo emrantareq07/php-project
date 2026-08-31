@@ -72,7 +72,7 @@ $edit_record = null;
 $monthly_entry_exists = false;
 $monthly_entry_message = '';
 
-// Check if we're loading an existing record
+// Check if we're loading an existing record (CLONE)
 if (isset($_GET['load_id'])) {
     $editing_record_id = $_GET['load_id'];
     $is_loading = true;
@@ -157,41 +157,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['date'])) {
 }
 
 // Departments and Grades
-// $sections1 = [
-//     'General Admin', 'Security', 'Medical', 'College', 'School', 'Library',
-//     'Accounts', 'ICT','Commercial', 'Production (Chemical)', 'Production (Chemist)', 
-//     'Engineering (Mechanical)', 'Engineering (Electrical + Instrument + Others)',
-//     'Engineering (Civil)', 'Forest/FRM'
-// ];
-
-// $sections = [
-//     'সাধারণ প্রশাসন', 'নিরাপত্তা', 'চিকিৎসা', 'কলেজ', 'স্কুল', 'লাইব্রেরি',
-//     'হিসাব/অর্থ', 'আইসিটি','বাণিজ্যিক', 'প্রোডাকশন (কেমিক্যাল ইঞ্জিনিয়ারিং', 'প্রোডাকশন (কেমিস্ট)', 
-//     'ইঞ্জিনিয়ারিং (মেকানিক্যাল)', 'ইঞ্জিনিয়ারিং (ইলেকট্রিক্যাল + ইন্সট্রুমেন্ট + অন্যান্য)',
-//     'ইঞ্জিনিয়ারিং (সিভিল)', 'বন/এফআরএম'
-// ];
-
-
-
-
-// $sections1 = [
-//     'Administration1',
-//     'Security',
-//     'Technical (Production, Safety & Environment)',
-//     'Technical (Forest/FRM)',
-//     'Technical (Engineering-Mechanical)',
-//     'Technical (Engineering-Electrical/Instrument/Others)',
-//     'Technical (Engineering-Civil)',
-//     'Medical',
-//     'Commercial',
-//     'Accounts & Finance',
-//     'ICT',
-//     'Educational Institution-College',
-//     'Educational Institution-School',
-//     'Library'
-// ];
-
-
 $sections1 = [
       'প্রশাসন',
     'নিরাপত্তা',
@@ -245,7 +210,9 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
+  <style type="text/css">
+    body { font-family: 'Noto Sans Bengali', sans-serif; background: #f8f9fa; }
     .male-col { background-color: #e3f2fd !important; }
     .female-col { background-color: #fce4ec !important; }
     .total-col { background-color: #f5f5f5 !important; font-weight: bold; }
@@ -327,6 +294,39 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
         border-radius: 5px;
         margin-bottom: 15px;
         border-left: 4px solid #856404;
+    }
+    /* Toast message animation */
+    .toast-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        min-width: 320px;
+        animation: slideInRight 0.3s ease-out;
+    }
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    .toast-message.fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+    }
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+            display: none;
+        }
     }
   </style>
 </head>
@@ -506,7 +506,7 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
             <tr class="section-row">
               <td class="section-name department-column">
                 <strong><?php echo $section; ?></strong>
-              </td>
+               </span>
               
               <?php foreach($grades as $grade): ?>
               <td class="male-col">
@@ -517,7 +517,7 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
                        data-section="<?php echo $index; ?>"
                        placeholder="0" 
                        style="font-size: 1.1rem;">
-              </td>
+               </span>
               <td class="female-col">
                 <input type="number" class="form-control input-comfort input-highlight <?php echo $grade; ?>_f" 
                        name="data[<?php echo $index; ?>][<?php echo $grade; ?>_f]" 
@@ -526,21 +526,21 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
                        data-section="<?php echo $index; ?>"
                        placeholder="0" 
                        style="font-size: 1.1rem;">
-              </td>
+               </span>
               <td class="total-col text-center border-end">
                 <span class="total-display <?php echo $grade; ?>_total">0</span>
-              </td>
+               </span>
               <?php endforeach; ?>
               
               <td class="male-col text-center">
                 <span class="total-display section_male">0</span>
-              </td>
+               </span>
               <td class="female-col text-center">
                 <span class="total-display section_female">0</span>
-              </td>
+               </span>
               <td class="total-col text-center">
                 <span class="total-display section_total" style="color: #2c5aa0;">0</span>
-              </td>
+               </span>
             </tr>
             <?php endforeach; ?>
             
@@ -548,29 +548,29 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
             <tr class="table-active">
               <td class="department-column bg-dark text-dark">
                 <strong class="h6">GRAND TOTALS</strong>
-              </td>
+               </span>
               
               <?php foreach($grades as $grade): ?>
               <td class="male-col text-center">
                 <strong class="total-display total_<?php echo $grade; ?>_m">0</strong>
-              </td>
+               </span>
               <td class="female-col text-center">
                 <strong class="total-display total_<?php echo $grade; ?>_f">0</strong>
-              </td>
+               </span>
               <td class="total-col text-center border-end">
                 <strong class="total-display total_<?php echo $grade; ?>" style="color: #2c5aa0;">0</strong>
-              </td>
+               </span>
               <?php endforeach; ?>
               
               <td class="male-col text-center bg-primary text-white">
                 <strong class="total-display" id="finalMaleTotal">0</strong>
-              </td>
+               </span>
               <td class="female-col text-center bg-danger text-white">
                 <strong class="total-display" id="finalFemaleTotal">0</strong>
-              </td>
+               </span>
               <td class="total-col text-center bg-success text-white">
                 <strong class="total-display" id="finalGrandTotal">0</strong>
-              </td>
+               </span>
             </tr>
           </tbody>
         </table>
@@ -685,7 +685,7 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
                       <i class="fas fa-hourglass-half me-1"></i>Clone
                   </button>
               <?php } ?>
-          </td>
+           </span>
             </tr>
             <?php endforeach; ?>
           </tbody>
@@ -698,6 +698,35 @@ $grades = ['g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8', 'g9', 'g10'];
 
 <script>
 $(document).ready(function() {
+  // Function to show auto-dismiss toast message (disappears after 5 seconds)
+  function showToast(message, type = 'success') {
+    // Remove existing toasts
+    $('.toast-message').remove();
+    
+    const icon = type === 'success' ? 'fa-check-circle' : (type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle');
+    const bgClass = type === 'success' ? 'bg-success' : (type === 'warning' ? 'bg-warning' : 'bg-info');
+    
+    const toastHtml = `
+      <div class="toast-message ${bgClass} text-white p-3 rounded shadow-lg d-flex align-items-center">
+        <i class="fas ${icon} me-3 fs-4"></i>
+        <div class="flex-grow-1">
+          <strong>${type === 'success' ? 'Success!' : (type === 'warning' ? 'Warning!' : 'Info!')}</strong><br>
+          <small>${message}</small>
+        </div>
+        <button type="button" class="btn-close btn-close-white ms-3" onclick="$(this).closest('.toast-message').remove()"></button>
+      </div>
+    `;
+    
+    $('body').append(toastHtml);
+    
+    // Auto remove after 5 seconds
+    setTimeout(function() {
+      $('.toast-message').fadeOut(500, function() {
+        $(this).remove();
+      });
+    }, 5000);
+  }
+
   // Function to convert English numbers to Bangla (for print only)
   function englishToBanglaNumber(number) {
     if (number === null || number === undefined || number === '') return '০';
@@ -734,53 +763,19 @@ $(document).ready(function() {
   });
 
   // Function to show alerts with auto-dismiss
-  // function showAlert(message, type = 'info') {
-  //   const alertClass = {
-  //     'success': 'alert-success',
-  //     'error': 'alert-danger',
-  //     'warning': 'alert-warning',
-  //     'info': 'alert-info'
-  //   }[type] || 'alert-info';
-
-  //   // Remove existing alerts
-  //   $('.auto-dismiss-alert').remove();
-
-  //   const alertHtml = `
-  //     <div class="alert ${alertClass} alert-dismissible fade show auto-dismiss-alert" role="alert"
-  //       style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-  //       <div class="d-flex justify-content-between align-items-center">
-  //         <div>
-  //           <strong>${type.charAt(0).toUpperCase() + type.slice(1)}!</strong> ${message}
-  //         </div>
-  //         <button type="button" class="btn-close ms-3" data-bs-dismiss="alert"></button>
-  //       </div>
-  //     </div>
-  //   `;
-  //   $('body').append(alertHtml);
-
-  //   // Auto-dismiss after 20 seconds
-  //   setTimeout(() => {
-  //     $('.auto-dismiss-alert').alert('close');
-  //   }, 2000);
-  // }
-
-  // Function to show alerts with configurable auto-dismiss
-function showAlert(message, type = 'info') {
+  function showAlert(message, type = 'info') {
     const alertClass = {
-        'success': 'alert-success',
-        'error': 'alert-danger',
-        'warning': 'alert-warning',
-        'info': 'alert-info'
+      'success': 'alert-success',
+      'error': 'alert-danger',
+      'warning': 'alert-warning',
+      'info': 'alert-info'
     }[type] || 'alert-info';
 
     // Remove existing alerts
-    $('.auto-dismiss-alert, .persistent-alert').remove();
+    $('.auto-dismiss-alert').remove();
 
-    // Use persistent alerts for errors, auto-dismiss for others
-    const alertClassname = type === 'error' ? 'persistent-alert' : 'auto-dismiss-alert';
-    
     const alertHtml = `
-      <div class="alert ${alertClass} alert-dismissible fade show ${alertClassname}" role="alert"
+      <div class="alert ${alertClass} alert-dismissible fade show auto-dismiss-alert" role="alert"
         style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -792,14 +787,11 @@ function showAlert(message, type = 'info') {
     `;
     $('body').append(alertHtml);
 
-    // Auto-dismiss only for non-error messages (after 20 seconds)
-    if (type !== 'error') {
-        setTimeout(() => {
-            $(`.${alertClassname}`).alert('close');
-        }, 20000); // 20 seconds
-    }
-    // Error messages will persist until manually closed
-}
+    // Auto-dismiss after 20 seconds
+    setTimeout(() => {
+      $('.auto-dismiss-alert').alert('close');
+    }, 20000);
+  }
 
   // Function to calculate progress
   function calculateProgress() {
@@ -920,9 +912,7 @@ function showAlert(message, type = 'info') {
   // Initialize totals on page load
   calculateAllTotals();
 
-  
-
-  // Load button behavior
+  // Load button behavior (CLONE)
   $(document).on('click', '.load-btn', function() {
     const id = $(this).data('id');
     window.location.href = 'officers_info.php?load_id=' + id;
@@ -943,14 +933,14 @@ function showAlert(message, type = 'info') {
     if (confirm('Are you sure you want to clear all data?')) {
       $('#employeeForm input[type="number"]').val('').removeClass('has-data');
       calculateAllTotals();
-      showAlert('All fields cleared successfully!', 'success');
+      showToast('All fields cleared successfully!', 'success');
     }
   });
 
   $('#fillZeros').on('click', function() {
     $('#employeeForm input[type="number"]').val('0').addClass('has-data');
     calculateAllTotals();
-    showAlert('All fields filled with zeros!', 'success');
+    showToast('All fields filled with zeros!', 'success');
   });
 
   $('#savePartial').on('click', function() {
@@ -971,7 +961,7 @@ function showAlert(message, type = 'info') {
   // Cancel edit
   $('#cancelBtn').on('click', resetForm);
 
-  // Edit button click
+  // Edit button click - with toast message that auto-disappears after 5 seconds
   $(document).on('click', '.edit-btn', function() {
     const id = $(this).data('id');
     const $editBtn = $(this);
@@ -1018,7 +1008,8 @@ function showAlert(message, type = 'info') {
                     $('#cancelBtn').show();
                     $('html, body').animate({ scrollTop: 0 }, 'slow');
 
-                    showAlert('Record loaded for editing! Date field is locked.', 'success');
+                    // Show toast message that auto-disappears after 5 seconds
+                    showToast('Record loaded for editing! Date field is locked.', 'success');
                 } else {
                     showAlert('Error loading record: ' + (response.message || 'Unknown error'), 'error');
                 }
@@ -1058,7 +1049,7 @@ function showAlert(message, type = 'info') {
         try {
           const result = JSON.parse(response);
           if (result.success) {
-            showAlert('Record deleted successfully!', 'success');
+            showToast('Record deleted successfully!', 'success');
             setTimeout(() => location.reload(), 1000);
           } else {
             showAlert('Error deleting record: ' + result.message, 'error');
@@ -1285,8 +1276,8 @@ function generatePrintView(data) {
         // Add row with serial number in Bangla
         printContent += `
                 <tr>
-                    <td class="division-cell bangla-number">${englishToBanglaNumber(serialNumber)}</td>
-                    <td class="department-cell">${section}</td>
+                    <td class="division-cell bangla-number">${englishToBanglaNumber(serialNumber)}</span>
+                    <td class="department-cell">${section}</span>
         `;
 
         // Add grade data
@@ -1298,16 +1289,16 @@ function generatePrintView(data) {
             const grade_total = parseInt(grade_m) + parseInt(grade_f);
             
             printContent += `
-                    <td class="male-col bangla-number">${englishToBanglaNumber(grade_m)}</td>
-                    <td class="female-col bangla-number">${englishToBanglaNumber(grade_f)}</td>
-                    <td class="grade-total bangla-number">${englishToBanglaNumber(grade_total)}</td>
+                    <td class="male-col bangla-number">${englishToBanglaNumber(grade_m)}</span>
+                    <td class="female-col bangla-number">${englishToBanglaNumber(grade_f)}</span>
+                    <td class="grade-total bangla-number">${englishToBanglaNumber(grade_total)}</span>
             `;
         });
         
         printContent += `
-                    <td class="male-col section-total bangla-number">${englishToBanglaNumber(sectionMaleTotal)}</td>
-                    <td class="female-col section-total bangla-number">${englishToBanglaNumber(sectionFemaleTotal)}</td>
-                    <td class="grade-total section-total bangla-number">${englishToBanglaNumber(sectionTotal)}</td>
+                    <td class="male-col section-total bangla-number">${englishToBanglaNumber(sectionMaleTotal)}</span>
+                    <td class="female-col section-total bangla-number">${englishToBanglaNumber(sectionFemaleTotal)}</span>
+                    <td class="grade-total section-total bangla-number">${englishToBanglaNumber(sectionTotal)}</span>
                 </tr>
         `;
 
@@ -1317,8 +1308,8 @@ function generatePrintView(data) {
     // Add grand totals row with Bangla numbers
     printContent += `
         <tr class="total-row">
-            <td class="division-cell grand-total"></td>
-            <td class="department-cell grand-total"><strong>সর্বমোট</strong></td>
+            <td class="division-cell grand-total"></span>
+            <td class="department-cell grand-total"><strong>সর্বমোট</strong></span>
     `;
 
     // Calculate and display grade-wise grand totals with Bangla numbers
@@ -1336,16 +1327,16 @@ function generatePrintView(data) {
         gradeTotal = gradeMaleTotal + gradeFemaleTotal;
 
         printContent += `
-            <td class="male-col grand-total bangla-number"><strong>${englishToBanglaNumber(gradeMaleTotal)}</strong></td>
-            <td class="female-col grand-total bangla-number"><strong>${englishToBanglaNumber(gradeFemaleTotal)}</strong></td>
-            <td class="grade-total grand-total bangla-number"><strong>${englishToBanglaNumber(gradeTotal)}</strong></td>
+            <td class="male-col grand-total bangla-number"><strong>${englishToBanglaNumber(gradeMaleTotal)}</strong></span>
+            <td class="female-col grand-total bangla-number"><strong>${englishToBanglaNumber(gradeFemaleTotal)}</strong></span>
+            <td class="grade-total grand-total bangla-number"><strong>${englishToBanglaNumber(gradeTotal)}</strong></span>
         `;
     });
 
     printContent += `
-        <td class="male-col grand-total bangla-number"><strong>${englishToBanglaNumber(grandMaleTotal)}</strong></td>
-        <td class="female-col grand-total bangla-number"><strong>${englishToBanglaNumber(grandFemaleTotal)}</strong></td>
-        <td class="grade-total grand-total bangla-number"><strong>${englishToBanglaNumber(grandTotal)}</strong></td>
+        <td class="male-col grand-total bangla-number"><strong>${englishToBanglaNumber(grandMaleTotal)}</strong></span>
+        <td class="female-col grand-total bangla-number"><strong>${englishToBanglaNumber(grandFemaleTotal)}</strong></span>
+        <td class="grade-total grand-total bangla-number"><strong>${englishToBanglaNumber(grandTotal)}</strong></span>
         </tr>
     `;
 
@@ -1525,17 +1516,17 @@ function proceedWithSave(formData, isEdit, isLoad, $submitBtn, originalText) {
             
             if (result.success) {
                 if (isLoad) {
-                    showAlert('Data saved as new record successfully!', 'success');
+                    showToast('Data saved as new record successfully!', 'success');
                     setTimeout(() => {
                         window.location.href = 'officers_info.php';
                     }, 1500);
                 } else if (isEdit) {
-                    showAlert('Record updated successfully!', 'success');
+                    showToast('Record updated successfully!', 'success');
                     setTimeout(() => {
                         window.location.href = 'officers_info.php';
                     }, 1500);
                 } else {
-                    showAlert('Data saved successfully!', 'success');
+                    showToast('Data saved successfully!', 'success');
                     setTimeout(() => location.reload(), 1500);
                 }
             } else {
@@ -1567,7 +1558,7 @@ function proceedWithSave(formData, isEdit, isLoad, $submitBtn, originalText) {
     });
 }
 
-  // Auto-load data if in load mode
+  // Auto-load data if in load mode (CLONE) - with toast message that auto-disappears after 5 seconds
   <?php if ($is_loading && $load_record): ?>
   $(document).ready(function() {
     // Populate the form with loaded data
@@ -1589,11 +1580,13 @@ function proceedWithSave(formData, isEdit, isLoad, $submitBtn, originalText) {
     });
 
     calculateAllTotals();
-    showAlert('Record loaded successfully! You can modify the data and save as a new record.', 'info');
+    
+    // Show toast message that auto-disappears after 5 seconds (CLONE message)
+    showToast('Record loaded successfully! You can modify the data and save as a new record.', 'info');
   });
   <?php endif; ?>
 
-  // Auto-load data if in edit mode
+  // Auto-load data if in edit mode - with toast message that auto-disappears after 5 seconds
   <?php if ($is_editing && $edit_record): ?>
   $(document).ready(function() {
     // Populate the form with edit data
@@ -1615,7 +1608,9 @@ function proceedWithSave(formData, isEdit, isLoad, $submitBtn, originalText) {
     });
 
     calculateAllTotals();
-    showAlert('Record loaded for editing! Date field is locked.', 'success');
+    
+    // Show toast message that auto-disappears after 5 seconds (EDIT message)
+    showToast('Record loaded for editing! Date field is locked.', 'success');
   });
   <?php endif; ?>
 });

@@ -23,6 +23,7 @@ $staff_tbl       = 'staffs_tbl';
 $worker_tbl      = 'workers_tbl';
 $daily_basis_tbl = 'daily_basis_tbl';
 $ansar_tbl       = 'ansar_tbl';
+$vacant_statistics_tbl = 'vacant_statistics_tbl';
 
 // Bangla number conversion
 function englishToBanglaNumber($number) {
@@ -30,6 +31,12 @@ function englishToBanglaNumber($number) {
     $banglaNumbers = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
     // ensure string
     return str_replace($englishNumbers, $banglaNumbers, (string)$number);
+}
+
+// Helper function for vacant statistics
+function csvToArray($csv) {
+    if (empty($csv)) return [];
+    return array_map('intval', explode(',', $csv));
 }
 
 // ---------- HELPER FUNCTIONS ----------
@@ -254,6 +261,70 @@ function getFactoryData($conn, $factory_name, $yearMonth = null) {
     return $data;
 }
 
+// ---------- FETCH VACANT STATISTICS DATA ----------
+function getVacantStatisticsSummary($conn, $factory_name = null) {
+    $sql = "SELECT * FROM `vacant_statistics_tbl`";
+    if ($factory_name) {
+        $sql .= " WHERE `factory_name` = '$factory_name'";
+    }
+    $sql .= " ORDER BY entry_date DESC, id DESC";
+    
+    $result = $conn->query($sql);
+    $records = [];
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $records[] = $row;
+        }
+    }
+    
+    // Calculate summary
+    $total_granted = 0;
+    $total_service = 0;
+    $total_vacant = 0;
+    $factory_summary = [];
+    
+    foreach ($records as $record) {
+        $factory = $record['factory_name'];
+        $granted_sum = array_sum(csvToArray($record['granted_post']));
+        $service_sum = array_sum(csvToArray($record['in_service']));
+        $promo_sum = array_sum(csvToArray($record['eligible_promotion']));
+        $direct_sum = array_sum(csvToArray($record['direct_recruit']));
+        $vacant_sum = $promo_sum + $direct_sum;
+        
+        $total_granted += $granted_sum;
+        $total_service += $service_sum;
+        $total_vacant += $vacant_sum;
+        
+        if (!isset($factory_summary[$factory])) {
+            $factory_summary[$factory] = [
+                'granted' => 0,
+                'service' => 0,
+                'vacant' => 0,
+                'records' => 0,
+                'latest_date' => $record['entry_date']
+            ];
+        }
+        $factory_summary[$factory]['granted'] += $granted_sum;
+        $factory_summary[$factory]['service'] += $service_sum;
+        $factory_summary[$factory]['vacant'] += $vacant_sum;
+        $factory_summary[$factory]['records']++;
+        
+        // Keep latest date
+        if ($record['entry_date'] > $factory_summary[$factory]['latest_date']) {
+            $factory_summary[$factory]['latest_date'] = $record['entry_date'];
+        }
+    }
+    
+    return [
+        'records' => $records,
+        'total_granted' => $total_granted,
+        'total_service' => $total_service,
+        'total_vacant' => $total_vacant,
+        'total_records' => count($records),
+        'factory_summary' => $factory_summary
+    ];
+}
+
 // ---------- GET LAST UPDATED MONTH ----------
 // For admin: across all factories & tables
 // For factory: only for that factory
@@ -366,6 +437,10 @@ if ($is_admin) {
         $admin_ansar['male'] += $d['ansar']['male'];
         $admin_ansar['female'] += $d['ansar']['female'];
     }
+    
+    // Fetch vacant statistics for admin (all factories)
+    $vacant_stats = getVacantStatisticsSummary($conn);
+    $current_month_display = date('F Y');
 
 } else {
     // FACTORY VIEW: Single factory data for last month
@@ -399,6 +474,10 @@ if ($is_admin) {
     $total_people_male   = $officer_male + $staff_male + $worker_male + $daily_male + $ansar_male;
     $total_people_female = $officer_female + $staff_female + $worker_female + $daily_female + $ansar_female;
     $total_people        = $total_people_male + $total_people_female;
+    
+    // Fetch vacant statistics for single factory
+    $vacant_stats = getVacantStatisticsSummary($conn, $username);
+    $current_month_display = date('F Y');
 }
 
 // Convert to Bangla (ensure variables exist)
@@ -429,13 +508,6 @@ if (!$is_admin) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap" rel="stylesheet">
-<!-- Fonts -->
-<!-- <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Varela+Round&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> -->
-
 <style>
 .akaya-kanadaka-regular {
   font-family: "Akaya Kanadaka", system-ui;
@@ -445,7 +517,6 @@ if (!$is_admin) {
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
                
-/*body { font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif; background: #f8f9fa; }*/
 body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
 .sidebar { height: 100vh; width: 220px; position: fixed; background: #007bff; color: #fff; padding-top: 1rem; transition: .3s; }
 .sidebar.collapsed { width: 60px; }
@@ -459,6 +530,44 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
 .factory-table th { background-color: #f8f9fa; }
 .factory-card { transition: transform 0.2s; }
 .factory-card:hover { transform: translateY(-2px); }
+.records-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-top: 30px;
+}
+.records-card .card-header {
+    background: #2c5a7a;
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+}
+.btn-action {
+    padding: 4px 12px;
+    margin: 0 3px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+.btn-clone {
+    background: #17a2b8;
+    color: white;
+}
+.btn-clone:hover {
+    background: #138496;
+    color: white;
+}
+.vacant-summary-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+.summary-stats {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    margin: 5px;
+}
 
 * {
   font-family: 'Open Sans', 'Noto Sans Bengali', sans-serif;
@@ -490,6 +599,7 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
     <a href="worker_details.php"><i class="fa fa-hard-hat me-2"></i>Worker Info.</a>
     <a href="daily_basis_details.php"><i class="fa fa-calendar-day me-2"></i>Daily Basis Info.</a>
     <a href="ansar_details.php"><i class="fa fa-shield-alt me-2"></i>Ansar Info.</a>
+    <a href="vacant_statistics_details.php"><i class="fa fa-chart-line me-2"></i>Vacant Statistics</a>
     <?php  
     if($_SESSION['role'] == 'sadmin' && $_SESSION['username'] == 'sadmin') {
     ?>
@@ -512,6 +622,30 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
                 <?php echo $is_admin ? 'সমস্ত কারখানা ড্যাশবোর্ড' : 'ড্যাশবোর্ড সারসংক্ষেপ'; ?>
             </span>
         </div>
+
+        <!-- Vacant Statistics Summary Card -->
+        <?php if ($vacant_stats['total_records'] > 0): ?>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card vacant-summary-card p-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="mb-2"><i class="fas fa-chart-line me-2"></i>শূন্য পদ পরিসংখ্যান (সর্বমোট)</h5>
+                            <div>
+                                <span class="summary-stats"><i class="fas fa-tasks me-1"></i>মোট অনুমোদিত: <?= englishToBanglaNumber($vacant_stats['total_granted']) ?></span>
+                                <span class="summary-stats"><i class="fas fa-user-friends me-1"></i>মোট কর্মরত: <?= englishToBanglaNumber($vacant_stats['total_service']) ?></span>
+                                <span class="summary-stats"><i class="fas fa-chart-line me-1"></i>মোট শূন্য পদ: <?= englishToBanglaNumber($vacant_stats['total_vacant']) ?></span>
+                                <span class="summary-stats"><i class="fas fa-calendar me-1"></i>মোট রেকর্ড: <?= englishToBanglaNumber($vacant_stats['total_records']) ?></span>
+                            </div>
+                        </div>
+                        <a href="vacant_statistics.php" class="btn btn-light btn-sm mt-2 mt-md-0">
+                            <i class="fas fa-plus me-1"></i>বিস্তারিত দেখুন
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if ($is_admin): ?>
         <!-- ADMIN VIEW: All Factories -->
@@ -576,8 +710,96 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
             </div>
         </div>
 
+<?php if ($vacant_stats['total_records'] > 0): ?>
+        <div class="records-card">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <span><i class="fas fa-chart-line me-2"></i>কারখানা অনুযায়ী শূন্য পদ পরিসংখ্যান (সর্বশেষ মাস)</span>
+                <span class="badge bg-light text-dark">মোট: <?= englishToBanglaNumber(count($vacant_stats['factory_summary'])) ?> টি কারখানার রেকর্ড</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered mb-0">
+                    <thead style="background: #e9ecef;">
+                        <tr>
+                            <th>ক্রম</th>
+                            <th>কারখানার নাম</th>
+                            <th>সর্বশেষ এন্ট্রির তারিখ</th>
+                            <th>মাস/বছর</th>
+                            <th>মোট অনুমোদিত</th>
+                            <th>মোট কর্মরত</th>
+                            <th>মোট শূন্য</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Initialize counter
+                        $i = 1;
+                        // Get only the latest record for each factory
+                        $latest_records = [];
+                        $total_granted_all = 0;
+                        $total_service_all = 0;
+                        $total_vacant_all = 0;
+                        
+                        foreach ($vacant_stats['records'] as $record) {
+                            $factory = $record['factory_name'];
+                            // If we haven't stored a record for this factory yet, or this record is newer
+                            if (!isset($latest_records[$factory]) || strtotime($record['entry_date']) > strtotime($latest_records[$factory]['entry_date'])) {
+                                $latest_records[$factory] = $record;
+                            }
+                        }
+                        
+                        foreach ($latest_records as $factory => $record): 
+                            $granted_array = csvToArray($record['granted_post']);
+                            $service_array = csvToArray($record['in_service']);
+                            $promo_array = csvToArray($record['eligible_promotion']);
+                            $direct_array = csvToArray($record['direct_recruit']);
+                            
+                            $rec_granted = array_sum($granted_array);
+                            $rec_service = array_sum($service_array);
+                            $rec_promo = array_sum($promo_array);
+                            $rec_direct = array_sum($direct_array);
+                            $rec_vacant = $rec_promo + $rec_direct;
+                            
+                            // Add to totals
+                            $total_granted_all += $rec_granted;
+                            $total_service_all += $rec_service;
+                            $total_vacant_all += $rec_vacant;
+                            
+                            $entry_date_display = !empty($record['entry_date']) ? date('d-m-Y', strtotime($record['entry_date'])) : date('d-m-Y', strtotime($record['created_at']));
+                            $entry_month_year = !empty($record['entry_date']) ? date('F Y', strtotime($record['entry_date'])) : date('F Y', strtotime($record['created_at']));
+                        ?>
+                        <tr>
+                            <td class="text-center"><?php echo englishToBanglaNumber($i++); ?></td>
+                            <td><strong><?php echo htmlspecialchars($factory); ?></strong></td>
+                            <td class="text-center"><?php echo $entry_date_display; ?></td>
+                            <td class="text-center"><?php echo $entry_month_year; ?></td>
+                            <td class="text-center"><?php echo englishToBanglaNumber($rec_granted); ?></td>
+                            <td class="text-center"><?php echo englishToBanglaNumber($rec_service); ?></td>
+                            <td class="text-center text-danger fw-bold"><?php echo englishToBanglaNumber($rec_vacant); ?></td>
+                            <td class="text-center">
+                                <a href="vacant_statistics1.php?factory=<?php echo urlencode($factory); ?>" class="btn btn-sm btn-info btn-action" title="দেখুন">
+                                    <i class="fas fa-eye"></i> দেখুন
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        
+                        <!-- Total Row -->
+                        <tr class="table-secondary fw-bold">
+                            <td colspan="4" class="text-center"><strong>সর্বমোট</strong></td>
+                            <td class="text-center"><strong><?php echo englishToBanglaNumber($total_granted_all); ?></strong></td>
+                            <td class="text-center"><strong><?php echo englishToBanglaNumber($total_service_all); ?></strong></td>
+                            <td class="text-center text-danger"><strong><?php echo englishToBanglaNumber($total_vacant_all); ?></strong></td>
+                            <td class="text-center"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Factory-wise Charts -->
-        <div class="row mb-4">
+        <div class="row mb-4 mt-4">
             <div class="col-md-6">
                 <div class="card p-4">
                     <h5 class="mb-3">কারখানা অনুযায়ী মোট কর্মী (<?= htmlspecialchars($monthBn) ?> <?= htmlspecialchars($yearBn) ?>)</h5>
@@ -667,8 +889,90 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
             </div>
         </div>
 
+        <!-- Vacant Statistics Records Table for Single Factory -->
+        <?php if ($vacant_stats['total_records'] > 0): ?>
+        <div class="records-card">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <span><i class="fas fa-chart-line me-2"></i>শূন্য পদ পরিসংখ্যানের রেকর্ডসমূহ</span>
+                <span class="badge bg-light text-dark">মোট: <?= englishToBanglaNumber($vacant_stats['total_records']) ?> টি রেকর্ড</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background: #e9ecef;">
+                        <tr>
+                            <th>ID</th>
+                            <th>এন্ট্রির তারিখ</th>
+                            <th>মাস/বছর</th>
+                            <th>মোট অনুমোদিত</th>
+                            <th>মোট কর্মরত</th>
+                            <th>মোট শূন্য</th>
+                            <th>পদোন্নতিযোগ্য</th>
+                            <th>সরাসরি নিয়োগ</th>
+                            <th>অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($vacant_stats['records'] as $record): 
+                            $granted_array = csvToArray($record['granted_post']);
+                            $service_array = csvToArray($record['in_service']);
+                            $promo_array = csvToArray($record['eligible_promotion']);
+                            $direct_array = csvToArray($record['direct_recruit']);
+                            
+                            $rec_granted = array_sum($granted_array);
+                            $rec_service = array_sum($service_array);
+                            $rec_promo = array_sum($promo_array);
+                            $rec_direct = array_sum($direct_array);
+                            $rec_vacant = $rec_promo + $rec_direct;
+                            
+                            $entry_date_display = !empty($record['entry_date']) ? date('d-m-Y', strtotime($record['entry_date'])) : date('d-m-Y', strtotime($record['created_at']));
+                            $entry_month_year = !empty($record['entry_date']) ? date('F Y', strtotime($record['entry_date'])) : date('F Y', strtotime($record['created_at']));
+                            $is_current_month_record = ($entry_month_year == $current_month_display);
+                        ?>
+                        <tr>
+                            <td><?= $record['id'] ?></td>
+                            <td><?= $entry_date_display ?>
+                                <?php if ($is_current_month_record): ?>
+                                    <span class="badge bg-success ms-1">বর্তমান মাস</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= $entry_month_year ?></td>
+                            <td><?= englishToBanglaNumber($rec_granted) ?></td>
+                            <td><?= englishToBanglaNumber($rec_service) ?></td>
+                            <td class="text-danger fw-bold"><?= englishToBanglaNumber($rec_vacant) ?></td>
+                            <td><?= englishToBanglaNumber($rec_promo) ?></td>
+                            <td><?= englishToBanglaNumber($rec_direct) ?></td>
+                            <td>
+                                <a href="vacant_statistics.php?edit_id=<?= $record['id'] ?>" class="btn btn-sm btn-warning btn-action" title="সম্পাদনা">
+                                    <i class="fas fa-edit"></i> এডিট
+                                </a>
+                                <a href="vacant_statistics.php?clone_id=<?= $record['id'] ?>" class="btn btn-sm btn-clone btn-action" title="ক্লোন করুন" onclick="return confirm('এই রেকর্ডটি ক্লোন করতে চান?')">
+                                    <i class="fas fa-copy"></i> ক্লোন
+                                </a>
+                                <a href="vacant_statistics.php?delete_id=<?= $record['id'] ?>" class="btn btn-sm btn-danger btn-action" title="মুছুন" onclick="return confirm('আপনি কি নিশ্চিত? এই রেকর্ড স্থায়ীভাবে মুছে যাবে!')">
+                                    <i class="fas fa-trash"></i> ডিলিট
+                                </a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php else: ?>
+        <div class="records-card">
+            <div class="card-header">
+                <span><i class="fas fa-chart-line me-2"></i>শূন্য পদ পরিসংখ্যান</span>
+            </div>
+            <div class="text-center py-4">
+                <i class="fas fa-database fa-2x mb-2 d-block text-muted"></i>
+                <p class="text-muted">কোনো শূন্য পদ রেকর্ড পাওয়া যায়নি।</p>
+                <a href="vacant_statistics.php" class="btn btn-sm btn-primary">নতুন রেকর্ড তৈরি করুন</a>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Gender Distribution Chart -->
-        <div class="card p-4 mb-4">
+        <div class="card p-4 mb-4 mt-4">
             <h5 class="mb-3">লিঙ্গভিত্তিক কর্মী বণ্টন</h5>
             <canvas id="genderChart"></canvas>
         </div>
@@ -699,7 +1003,6 @@ new Chart(factoryCtx, {
         labels: <?php echo json_encode(array_keys($factory_data)); ?>,
         datasets: [{
             label: 'মোট কর্মী',
-            // Chart.js accepts arrays or single color; using single color is fine
             backgroundColor: '#28a745',
             data: <?php 
                 $vals = array_map(function($d){ return $d['total_people']; }, $factory_data);

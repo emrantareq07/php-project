@@ -33,7 +33,8 @@ $_SESSION['section']  = $user['section'];
 $_SESSION['emp_id']  = $user['emp_id'];
 $_SESSION['emp_type']  = $user['emp_type'];
 $routine_role = $user['routine_role'];
-
+$_SESSION['routine_role']  = $user['routine_role'];
+$_SESSION['addl_role']  = $user['addl_role'];
 $stmt->close();
 
 // Initialize arrays for work type counts
@@ -785,7 +786,7 @@ if ($routine_role === 'section_head' || $routine_role === 'division_head') {
                     </a>
                 </div>
                    <div class="nav-item">
-                    <a href="my_fc_sheet.php" class="nav-link">
+                    <a href="fc_sheet_details.php" class="nav-link">
                         <i class="fas fa-list-check"></i>
                         <span>My FC</span>
                     </a>

@@ -109,13 +109,13 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 // Insert into emp_tbl with pending status
 $sql = "INSERT INTO emp_tbl (
     emp_id, name, designation, phone_office, intercom, 
-    mobile, email, department, division, image, fax, 
+    mobile, email, department, division,blood_group, image, fax,address, 
     status, system_status, submitted_by, submitted_at
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', 'pending', ?, NOW())";
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, 'active', 'pending', ?, NOW())";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param(
-    "ssssssssssss", 
+    "ssssssssssssss", 
     $emp_id, 
     $name, 
     $designation, 
@@ -125,8 +125,10 @@ $stmt->bind_param(
     $email, 
     $department, 
     $division, 
+    $blood_group,
     $image_path, 
     $fax,
+    $address,
     $submitted_by
 );
 

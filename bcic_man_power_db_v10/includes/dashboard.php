@@ -17,12 +17,19 @@ $staff_tbl       = 'staffs_tbl';
 $worker_tbl      = 'workers_tbl';
 $daily_basis_tbl = 'daily_basis_tbl';
 $ansar_tbl       = 'ansar_tbl';
+$vacant_statistics_tbl = 'vacant_statistics_tbl';
 
 // Bangla number conversion
 function englishToBanglaNumber($number) {
     $englishNumbers = range(0, 9);
     $banglaNumbers = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-    return str_replace($englishNumbers, $banglaNumbers, $number);
+    return str_replace($englishNumbers, $banglaNumbers, (string)$number);
+}
+
+// Helper functions for vacant statistics
+function csvToArray($csv) {
+    if (empty($csv)) return [];
+    return array_map('intval', explode(',', $csv));
 }
 
 // ---------- HELPER FUNCTIONS ----------
@@ -164,26 +171,41 @@ $total_people_male   = $officerGender['male']+$staffGender['male']+$workerGender
 $total_people_female = $officerGender['female']+$staffGender['female']+$workerGender['female']+$dailyGender['female']+$ansarGender['female'];
 $total_people        = $total_people_male+$total_people_female;
 
-// ---------- SHOW LATEST DATE ----------
-// echo "<h4>সর্বশেষ হালনাগাদ মাস: $monthBn $yearBn</h4>";
+// ---------- FETCH VACANT STATISTICS DATA ----------
+$vacant_records = [];
+$vacant_sql = "SELECT * FROM `$vacant_statistics_tbl` WHERE `factory_name` = '$username' ORDER BY entry_date DESC, id DESC";
+$vacant_result = $conn->query($vacant_sql);
+if ($vacant_result && $vacant_result->num_rows > 0) {
+    while ($row = $vacant_result->fetch_assoc()) {
+        $vacant_records[] = $row;
+    }
+}
 
-// ---------- SHOW WHICH TABLES HAVE DATA AND WHICH DO NOT ----------
-// foreach($tables as $t){
-//     $sqlCheck = "SELECT COUNT(*) AS cnt FROM $t WHERE factory_name=? AND date LIKE CONCAT(?, '%')";
-//     $stmt = $conn->prepare($sqlCheck);
-//     $stmt->bind_param("ss",$username,$yearMonth);
-//     $stmt->execute();
-//     $res = $stmt->get_result()->fetch_assoc();
-//     $count = $res['cnt'] ?? 0;
+// Calculate summary for vacant statistics
+$total_granted_all = 0;
+$total_service_all = 0;
+$total_vacant_all = 0;
+$latest_vacant_record = null;
 
-//     if($count > 0){
-//         echo "<p>Table <strong>$t</strong> has data for this month.</p>";
-//     } else {
-//         echo "<p>Table <strong>$t</strong> has <strong>no data</strong> for this month.</p>";
-//     }
-// }
+if (count($vacant_records) > 0) {
+    $latest_vacant_record = $vacant_records[0]; // Most recent record
+    
+    foreach ($vacant_records as $record) {
+        $granted_sum = array_sum(csvToArray($record['granted_post']));
+        $service_sum = array_sum(csvToArray($record['in_service']));
+        $promo_sum = array_sum(csvToArray($record['eligible_promotion']));
+        $direct_sum = array_sum(csvToArray($record['direct_recruit']));
+        
+        $total_granted_all += $granted_sum;
+        $total_service_all += $service_sum;
+        $total_vacant_all += ($promo_sum + $direct_sum);
+    }
+}
+
+// Get current month display for latest record
+$current_month_display = date('F Y');
+$latest_entry_month = $latest_vacant_record ? date('F Y', strtotime($latest_vacant_record['entry_date'])) : $current_month_display;
 ?>
-
 
 <!DOCTYPE html>
 <html lang="bn">
@@ -209,6 +231,44 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
 .card{border-radius:15px;box-shadow:0 4px 12px rgba(0,0,0,0.1);}
 .people-count{font-size:1.1rem;font-weight:600;}
 .entry-count{font-size:0.85rem;color:#6c757d;margin-top:5px;}
+.records-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-top: 30px;
+}
+.records-card .card-header {
+    background: #2c5a7a;
+    color: white;
+    padding: 15px 20px;
+    font-weight: 600;
+}
+.btn-action {
+    padding: 4px 12px;
+    margin: 0 3px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+.btn-clone {
+    background: #17a2b8;
+    color: white;
+}
+.btn-clone:hover {
+    background: #138496;
+    color: white;
+}
+.vacant-summary-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+.summary-stats {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    margin: 5px;
+}
 </style>
 </head>
 <body>
@@ -224,6 +284,7 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
     <a href="workers_info_1.php"><i class="fa fa-hard-hat me-2"></i>Worker Info.</a>
     <a href="daily_basis_info.php"><i class="fa fa-calendar-day me-2"></i>Daily Basis Info.</a>
     <a href="ansar_info.php"><i class="fa fa-shield-alt me-2"></i>Ansar Info.</a>
+    <a href="vacant_statistics1.php"><i class="fa fa-chart-line me-2"></i>Vacant Statistics</a>
     <a href="logout.php"><i class="fa fa-sign-out-alt me-2"></i>Logout</a>
     <a href="#" id="toggleSidebar"><i class="fa fa-bars me-2"></i>Collapse</a>
 </div>
@@ -237,6 +298,30 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
             </span>
             <span class="text-muted">ড্যাশবোর্ড সারসংক্ষেপ</span>
         </div>
+
+        <!-- Vacant Statistics Summary Card -->
+        <?php if (count($vacant_records) > 0): ?>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card vacant-summary-card p-3">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        <div>
+                            <h5 class="mb-2"><i class="fas fa-chart-line me-2"></i>শূন্য পদ পরিসংখ্যান (সর্বশেষ: <?= $latest_entry_month ?>)</h5>
+                            <div>
+                                <span class="summary-stats"><i class="fas fa-tasks me-1"></i>মোট অনুমোদিত: <?= englishToBanglaNumber($total_granted_all) ?></span>
+                                <span class="summary-stats"><i class="fas fa-user-friends me-1"></i>মোট কর্মরত: <?= englishToBanglaNumber($total_service_all) ?></span>
+                                <span class="summary-stats"><i class="fas fa-chart-line me-1"></i>মোট শূন্য পদ: <?= englishToBanglaNumber($total_vacant_all) ?></span>
+                                <span class="summary-stats"><i class="fas fa-calendar me-1"></i>মোট রেকর্ড: <?= englishToBanglaNumber(count($vacant_records)) ?></span>
+                            </div>
+                        </div>
+                        <a href="vacant_statistics.php" class="btn btn-light btn-sm mt-2 mt-md-0">
+                            <i class="fas fa-plus me-1"></i>বিস্তারিত দেখুন
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Cards -->
         <div class="row g-4 mb-4">
@@ -304,8 +389,90 @@ body{font-family:'Noto Sans Bengali',sans-serif;background:#f8f9fa;}
             </div>
         </div>
 
+        <!-- Vacant Statistics Records Table -->
+        <div class="records-card">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+                <span><i class="fas fa-chart-line me-2"></i>শূন্য পদ পরিসংখ্যানের রেকর্ডসমূহ</span>
+                <span class="badge bg-light text-dark">মোট: <?= englishToBanglaNumber(count($vacant_records)) ?> টি রেকর্ড</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead style="background: #e9ecef;">
+                        <tr>
+                            <th>ID</th>
+                            <th>কারখানার নাম</th>
+                            <th>এন্ট্রির তারিখ</th>
+                            <th>মাস/বছর</th>
+                            <th>মোট অনুমোদিত</th>
+                            <th>মোট কর্মরত</th>
+                            <th>মোট শূন্য</th>
+                            <th>পদোন্নতিযোগ্য</th>
+                            <th>সরাসরি নিয়োগ</th>
+                            <!-- <th>অ্যাকশন</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($vacant_records) > 0): ?>
+                            <?php foreach ($vacant_records as $record): 
+                                $granted_array = csvToArray($record['granted_post']);
+                                $service_array = csvToArray($record['in_service']);
+                                $promo_array = csvToArray($record['eligible_promotion']);
+                                $direct_array = csvToArray($record['direct_recruit']);
+                                
+                                $rec_granted = array_sum($granted_array);
+                                $rec_service = array_sum($service_array);
+                                $rec_promo = array_sum($promo_array);
+                                $rec_direct = array_sum($direct_array);
+                                $rec_vacant = $rec_promo + $rec_direct;
+                                
+                                $entry_date_display = !empty($record['entry_date']) ? date('d-m-Y', strtotime($record['entry_date'])) : date('d-m-Y', strtotime($record['created_at']));
+                                $entry_month_year = !empty($record['entry_date']) ? date('F Y', strtotime($record['entry_date'])) : date('F Y', strtotime($record['created_at']));
+                                $is_current_month_record = ($entry_month_year == $current_month_display);
+                            ?>
+                            <tr>
+                                <td><?= $record['id'] ?></td>
+                                <td>
+                                    <strong><?= htmlspecialchars($record['factory_name']) ?></strong>
+                                    <?php if ($is_current_month_record): ?>
+                                        <span class="badge bg-success ms-1">বর্তমান মাস</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= $entry_date_display ?></td>
+                                <td><?= $entry_month_year ?></td>
+                                <td><?= englishToBanglaNumber($rec_granted) ?></td>
+                                <td><?= englishToBanglaNumber($rec_service) ?></td>
+                                <td class="text-danger fw-bold"><?= englishToBanglaNumber($rec_vacant) ?></td>
+                                <td><?= englishToBanglaNumber($rec_promo) ?></td>
+                                <td><?= englishToBanglaNumber($rec_direct) ?></td>
+                              <!--   <td>
+                                    <a href="vacant_statistics.php?edit_id=<?= $record['id'] ?>" class="btn btn-sm btn-warning btn-action" title="সম্পাদনা">
+                                        <i class="fas fa-edit"></i> এডিট
+                                    </a>
+                                    <a href="vacant_statistics.php?clone_id=<?= $record['id'] ?>" class="btn btn-sm btn-clone btn-action" title="ক্লোন করুন" onclick="return confirm('এই রেকর্ডটি ক্লোন করতে চান?')">
+                                        <i class="fas fa-copy"></i> ক্লোন
+                                    </a>
+                                    <a href="vacant_statistics.php?delete_id=<?= $record['id'] ?>" class="btn btn-sm btn-danger btn-action" title="মুছুন" onclick="return confirm('আপনি কি নিশ্চিত? এই রেকর্ড স্থায়ীভাবে মুছে যাবে!')">
+                                        <i class="fas fa-trash"></i> ডিলিট
+                                    </a>
+                                </td> -->
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="10" class="text-center py-4 text-muted">
+                                    <i class="fas fa-database fa-2x mb-2 d-block"></i>
+                                    কোনো শূন্য পদ রেকর্ড পাওয়া যায়নি। 
+                                    <a href="vacant_statistics.php" class="btn btn-sm btn-primary mt-2">নতুন রেকর্ড তৈরি করুন</a>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Charts -->
-        <div class="row g-4 mb-4">
+        <div class="row g-4 mt-2">
             <div class="col-md-6">
                 <div class="card p-4">
                     <h5 class="mb-3">লিঙ্গভিত্তিক কর্মী বণ্টন</h5>
@@ -361,7 +528,6 @@ new Chart(document.getElementById('categoryChart').getContext('2d'),{
     options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:14}}}}}
 });
 </script>
-
 
 </body>
 </html>
