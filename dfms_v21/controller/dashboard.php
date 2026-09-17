@@ -564,7 +564,7 @@ textarea.form-control {
                     <a href="home.php?username=<?=$_SESSION['username']?>&user_type=<?=$_SESSION['user_type']?>" 
                        class="btn btn-primary sidebar-btn">
                         <i class="fa fa-arrow-left me-2"></i> Dashboard
-                        <small class="d-block text-white-75 mt-1">Return to main dashboard</small>
+                        <small class="d-block text-white-75 mt-1 me-2"> Return to main dashboard</small>
                     </a>
                     <a href="view_urea_report.php?username=<?=$_SESSION['username']?>&user_type=<?=$_SESSION['user_type']?>" 
                        class="btn btn-warning sidebar-btn">

@@ -652,7 +652,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                         <label for="fiscalstart" class="form-label small">Start Date</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">
-                                                <i class="fa fa-calendar-start"></i>
+                                                <i class="fa fa-calendar"></i>
                                             </span>
                                             <input type="date" class="form-control" name="fiscalstart" 
                                                    id="fiscalstart" value="<?= $yearrange12; ?>" readonly>
@@ -662,7 +662,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                         <label for="fiscalend" class="form-label small">End Date</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">
-                                                <i class="fa fa-calendar-end"></i>
+                                                <i class="fa fa-calendar"></i>
                                             </span>
                                             <input type="date" class="form-control" name="fiscalend" 
                                                    id="fiscalend" value="<?= $yearrange13; ?>" readonly>
@@ -710,7 +710,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                     <th><i class="fa fa-calendar-start me-2"></i>Fiscal Start</th>
                                     <th><i class="fa fa-calendar-end me-2"></i>Fiscal End</th>
                                     <th><i class="fa fa-chart-bar me-2"></i>Status</th>
-                                    <?php if ($user_type == 'admin' || $user_type == 'sadmin'): ?>
+                                     <?php if ($user_type == 'admin' || $user_type == 'sadmin' || $user_type == 'user'): ?>
                                     <th class="text-center"><i class="fa fa-cogs me-2"></i>Actions</th>
                                     <?php endif; ?>
                                 </tr>
@@ -769,7 +769,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
                                             <?= $status_text; ?>
                                         </span>
                                     </td>
-                                    <?php if ($user_type == 'admin' || $user_type == 'sadmin'): ?>
+                                     <?php if ($user_type == 'admin' || $user_type == 'sadmin' || $user_type == 'user'): ?>
                                     <td class="text-center">
                                         <button type="button" class="btn btn-success btn-sm editBtn" 
                                             data-id="<?= $row['id']; ?>" 

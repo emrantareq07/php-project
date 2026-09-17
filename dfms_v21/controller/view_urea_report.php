@@ -290,7 +290,7 @@ include('../db/db.php');
                   <th width="15%"><i class="fa fa-chart-bar me-1"></i> Daily (MT)</th>              
                   <th width="15%"><i class="fa fa-tachometer-alt me-1"></i> Plant Load (%)</th>
                   <th width="25%"><i class="fa fa-comment me-1"></i> Remarks</th>
-                  <?php if ($user_type == 'admin' || $user_type == 'sadmin') { ?>
+                  <?php if ($user_type == 'admin' || $user_type == 'sadmin' || $user_type == 'user') { ?>
                     <th width="10%"><i class="fa fa-cogs me-1"></i> Action</th>
                   <?php } ?>
                 </tr>
@@ -366,7 +366,7 @@ include('../db/db.php');
                           <span><?= htmlspecialchars($row['remarks']); ?></span>
                         </div>
                       </td>
-                      <?php if ($user_type == 'admin' || $user_type == 'sadmin') { ?>
+                      <?php if ($user_type == 'admin' || $user_type == 'sadmin' || $user_type == 'user') { ?>
                         <td>
                           <a href="edit_urea.php?id=<?= $row['id'] ?>" 
                              class="btn btn-warning btn-sm rounded-pill px-3">
@@ -380,7 +380,7 @@ include('../db/db.php');
                 } else {
                   ?>
                   <tr>
-                    <td colspan="<?php echo ($user_type == 'admin' || $user_type == 'sadmin') ? '6' : '5'; ?>" 
+                    <td colspan="<?php echo ($user_type == 'admin' || $user_type == 'sadmin' || $user_type == 'user') ? '6' : '5'; ?>" 
                         class="text-center py-5">
                       <div class="text-muted">
                         <i class="fa fa-database fa-3x mb-3 opacity-25"></i>

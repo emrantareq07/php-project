@@ -21,6 +21,7 @@ include('../db/db.php');
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     
     <style>
         /* Gradient Theme */
@@ -29,7 +30,7 @@ include('../db/db.php');
             color: white;
             border-radius: 15px;
             padding: 30px;
-            margin-bottom: 30px;
+            margin-bottom: 0px;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
         
@@ -268,7 +269,7 @@ include('../db/db.php');
                                     <?php echo date('F d, Y'); ?>
                                 </h6>
                                 <a href="view_urea_report.php?username=<?php echo $_SESSION['username'] ?>" 
-                                   class="btn btn-outline-light">
+                                   class="btn btn-outline-light me-2 mb-2 mb-lg-0">
                                     <i class="fa fa-arrow-left me-2"></i> Back to Records
                                 </a>
                             </div>
@@ -406,7 +407,7 @@ include('../db/db.php');
                                     <span class="input-group-text bg-light align-items-start" style="padding-top: 12px;">
                                         <i class="fa fa-sticky-note"></i>
                                     </span>
-                                    <textarea class="form-control" name="remarks" id="remarks" rows="4"
+                                    <textarea class="form-control" name="remarks" id="remarks" rows="2"
                                               onfocus="showProgress('remarks')"><?php echo !empty($row['remarks']) ? $row['remarks'] : ''; ?></textarea>
                                 </div>
                                 <div class="progress-indicator" id="remarks-progress"></div>
