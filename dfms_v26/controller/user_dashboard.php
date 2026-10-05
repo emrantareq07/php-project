@@ -35,45 +35,33 @@ if ($s = mysqli_prepare($conn, "
 // =================================================================
 //  2) FERTILIZER STOCK IN TRANSIT (pending buffer_transaction)
 // =================================================================
-$stockInTransit = 0.0;
-if ($s = mysqli_prepare($conn, "
-    SELECT COALESCE(SUM(amount),0) AS v
-    FROM buffer_transaction
-    WHERE status = 'pending'
-")) {
-    mysqli_stmt_execute($s);
-    $r = mysqli_stmt_get_result($s);
-    if ($row = mysqli_fetch_assoc($r)) $stockInTransit = (float)$row['v'];
-    mysqli_stmt_close($s);
-}
+// $stockInTransit = 0.0;
+// if ($s = mysqli_prepare($conn, "
+//     SELECT COALESCE(SUM(amount),0) AS v
+//     FROM buffer_transaction
+//     WHERE status = 'pending'
+// ")) {
+//     mysqli_stmt_execute($s);
+//     $r = mysqli_stmt_get_result($s);
+//     if ($row = mysqli_fetch_assoc($r)) $stockInTransit = (float)$row['v'];
+//     mysqli_stmt_close($s);
+// }
 
 // -----------------------------------------------------------------
 // FERTILIZER IN TRANSIT: pending buffer_transaction rows, with
 // Sender (who recorded the transaction) and Receiver (the buffer
 // that import_allotment was allotted to)
 // -----------------------------------------------------------------
-// -----------------------------------------------------------------
-// FERTILIZER IN TRANSIT: pending buffer_transaction rows.
-// A row links to exactly ONE of three tables depending on which FK
-// is populated:
-//   - import_allotment_id  -> import_allotment.buffer_name
-//   - buffer_allotment_id  -> urea_allotment.receiver
-//   - prod_allotment_id    -> urea_allotment.receiver
-// LEFT JOIN all three, then COALESCE picks whichever one matched
-// (the other two will be NULL for that row).
-// -----------------------------------------------------------------
 $stockInTransit = 0.0;
 $transitRows = [];
 
 $s = mysqli_prepare($conn, "
     SELECT
-        bt.created_by AS sender,
-        COALESCE(ia.buffer_name, ua_buf.receiver, ua_prod.receiver) AS receiver,
-        bt.amount AS amount
+        bt.created_by  AS sender,
+        ia.buffer_name AS receiver,
+        bt.amount      AS amount
     FROM buffer_transaction bt
-    LEFT JOIN import_allotment ia      ON bt.import_allotment_id = ia.id
-    LEFT JOIN urea_allotment  ua_buf   ON bt.buffer_allotment_id = ua_buf.id
-    LEFT JOIN urea_allotment  ua_prod  ON bt.prod_allotment_id  = ua_prod.id
+    JOIN import_allotment ia ON bt.import_allotment_id = ia.id
     WHERE bt.status = 'pending'
     ORDER BY bt.created_at DESC
 ");
@@ -283,7 +271,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'production_by_date') {
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
-      <i class="fa fa-industry"></i> Smart Fertilizer Monitoring System (SFMS), BCIC
+      <i class="fa fa-industry"></i> Digital Fertilizer Monitoring System (DFMS), BCIC
     </a>
   </div>
 </nav>
@@ -298,7 +286,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'production_by_date') {
 
         <div class="col-md-6 text-md-end mt-2 mt-md-0">
             <a href="summary_reports.php" class="btn btn-primary"><i class="fa fa-eye"></i> Details </a>
-            <a href="logout.php" class="btn btn-danger">Logout <i class="fa fa-sign-out"></i></a>
+            <a href="logout.php" class="btn btn-danger"><i class="fa fa-sign-out"></i> Logout </a>
         </div>
     </div>
 
@@ -312,23 +300,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'production_by_date') {
                 <i class="fa fa-industry stat-icon"></i>
             </div>
         </div> -->
-
-        <div class="col-md-4">
-            <div class="stat-card stat-daily stat-clickable p-3"
-                 role="button"
-                 data-bs-toggle="modal"
-                 data-bs-target="#productionByDateModal">
-                <div class="stat-label">Yearly Demand </div>
-                <div class="stat-value">
-                    <?= h(number_format($prodAll, 2)); ?> <small class="fs-6">MT</small>
-                </div>
-                <div class="small opacity-75 mt-1">
-                    <i class="fa fa-mouse-pointer"></i> Click for details (<?= h($yesterday); ?>)
-                </div>
-                <i class="fa fa-industry stat-icon"></i>
-            </div>
-        </div>
-
 
         <div class="col-md-4">
             <div class="stat-card stat-daily stat-clickable p-3"
@@ -352,7 +323,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'production_by_date') {
                  role="button"
                  data-bs-toggle="modal"
                  data-bs-target="#importRemainingModal">
-                <div class="stat-label">Discharge Port</div>
+                <div class="stat-label">Total Import Remaining </div>
                 <div class="stat-value"><?= h(number_format($totalImportRemaining, 2)); ?> <small class="fs-6">MT</small></div>
                 <div class="small opacity-75 mt-1">
                     <i class="fa fa-mouse-pointer"></i>
@@ -388,7 +359,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'production_by_date') {
                  role="button"
                  data-bs-toggle="modal"
                  data-bs-target="#stockBreakdownModal">
-                <div class="stat-label">Buffer/Factory Total Stock</div>
+                <div class="stat-label">Buffer & Factory Total Stock</div>
                 <div class="stat-value">
                     <?= h(number_format($currentTotalStock, 2)); ?> <small class="fs-6">MT</small>
                 </div>
